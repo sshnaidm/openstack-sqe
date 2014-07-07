@@ -25,6 +25,10 @@ LOGS_COPY = {
 }
 
 
+def apply_patches(func_run):
+    warn_if_fail(func_run("git fetch https://review.openstack.org/openstack-dev/devstack refs/changes"
+                                 "/87/87987/12 && git cherry-pick -x FETCH_HEAD"))
+
 def make_local(filepath, sudo_flag):
     conf = """[[local|localrc]]
 ADMIN_PASSWORD=secrete
@@ -33,11 +37,18 @@ RABBIT_PASSWORD=$ADMIN_PASSWORD
 SERVICE_PASSWORD=$ADMIN_PASSWORD
 SERVICE_PASSWORD=$ADMIN_PASSWORD
 SERVICE_TOKEN=1112f596-76f3-11e3-b3b2-e716f9080d50
+NEUTRON_REPO=https://github.com/CiscoSystems/neutron.git
+#TEMPEST_REPO=https://github.com/kshileev/tempest.git
+TEMPEST_BRANCH=ipv6
+#MGMT_NET=6
+IP_VERSION=6
+IP_RA_MODE=slaac
+IP_ADDRESS_MODE=slaac
 """
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
 
-def install_openstack(settings_dict, envs=None, verbose=None, prepare=False, force=False, proxy=None, config=None):
+def install_openstack(settings_dict, envs=None, verbose=None, prepare=False, proxy=None, config=None):
     """
     Install OS with COI with script provided by Chris on any host(s)
 
@@ -45,7 +56,6 @@ def install_openstack(settings_dict, envs=None, verbose=None, prepare=False, for
     :param envs: environment variables to inject when executing job
     :param verbose: if to hide all output or print everything
     :param url_script: URl of Cisco installer script from Chris
-    :param force: Use if you don't connect via interface you gonna bridge later
     :return: always true
     """
     envs = envs or {}
@@ -77,46 +87,14 @@ def install_openstack(settings_dict, envs=None, verbose=None, prepare=False, for
                          "127.0.1.1 all-in-one all-in-one.domain.name", use_sudo=use_sudo_flag))
         warn_if_fail(put(StringIO("all-in-one"), "/etc/hostname", use_sudo=use_sudo_flag))
         warn_if_fail(run_func("hostname all-in-one"))
-        if not force and prepare:
+        if prepare:
             return True
-        elif not force and not prepare:
+        else:
             warn_if_fail(run("git clone https://github.com/openstack-dev/devstack.git"))
             make_local("devstack/local.conf", False)
             with cd("devstack"):
-                warn_if_fail(run("git fetch https://review.openstack.org/openstack-dev/devstack refs/changes"
-                                 "/87/87987/12 && git cherry-pick -x FETCH_HEAD"))
+                apply_patches(run)
                 warn_if_fail(run("./stack.sh"))
-        elif force:
-            shell_envs = ";".join(["export " + k + "=" + v for k, v in envs.iteritems()]) or ""
-            sudo_mode = "sudo " if use_sudo_flag else ''
-            if not settings_dict['gateway']:
-                local("{shell_envs}; ssh -t -t -i {id_rsa} {user}@{host} \
-                 'git clone https://github.com/openstack-dev/devstack.git; cd devstack; ./stack.sh'".format(
-                    shell_envs=shell_envs,
-                    id_rsa=settings_dict['key_filename'],
-                    user=settings_dict['user'],
-                    host=settings_dict['host_string']))
-                local("scp -i {id_rsa} {user}@{host}:~/openrc ./openrc".format(
-                    id_rsa=settings_dict['key_filename'],
-                    user=settings_dict['user'],
-                    host=settings_dict['host_string']))
-            else:
-                local('ssh -t -t -i {id_rsa} {user}@{gateway} \
-                 "{shell_envs}; ssh -t -t -i {id_rsa} {user}@{host} \
-                 \'{sudo_mode}git clone https://github.com/openstack-dev/devstack.git;\
-                  cd devstack; ./stack.sh\'"'.format(
-                    shell_envs=shell_envs,
-                    id_rsa=settings_dict['key_filename'],
-                    user=settings_dict['user'],
-                    host=settings_dict['host_string'],
-                    gateway=settings_dict['gateway'],
-                    sudo_mode=sudo_mode))
-                local('scp -Cp -o "ProxyCommand ssh {user}@{gateway} '
-                      'nc {host} 22" {user}@{host}:~/openrc ./openrc'.format(
-                    user=settings_dict['user'],
-                    host=settings_dict['host_string'],
-                    gateway=settings_dict['gateway'],
-                ))
         if exists('~/devstack/openrc'):
             get('~/devstack/openrc', "./openrc")
         else:
@@ -145,8 +123,6 @@ def main():
                         help='SSH key file, default is from repo')
     parser.add_argument('-z', action='store_true', dest='prepare_mode', default=False,
                         help='Only prepare, don`t run the main script')
-    parser.add_argument('-f', action='store_true', dest='force', default=False,
-                        help='Force SSH client run. Use it if dont work')
     parser.add_argument('-j', action='store_true', dest='proxy', default=False,
                         help='Use cisco proxy if installing from Cisco local network')
     parser.add_argument('-c', action='store', dest='config_file', default=None,
@@ -196,7 +172,6 @@ def main():
                                 verbose=verb_mode,
                                 envs=envs_aio,
                                 prepare=opts.prepare_mode,
-                                force=opts.force,
                                 proxy=opts.proxy)
         if res:
             print "Job with host {host} finished successfully!".format(host=host)
