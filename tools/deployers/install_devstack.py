@@ -42,8 +42,8 @@ TEMPEST_REPO=https://github.com/kshileev/tempest.git
 TEMPEST_BRANCH=ipv6
 #MGMT_NET=6
 IP_VERSION=6
-IP_RA_MODE=slaac
-IP_ADDRESS_MODE=slaac
+IPV6_RA_MODE=slaac
+IPV6_ADDRESS_MODE=slaac
 """
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
