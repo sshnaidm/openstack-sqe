@@ -475,7 +475,7 @@ def main():
         else:
             for host in config["servers"]["control-servers"]:
                 job_settings['host_string'] = host["ip"]
-                run_services(config,
+                run_services(host,
                              job_settings,
                              verbose=verb_mode,
                              envs=envs_build,
