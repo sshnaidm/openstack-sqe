@@ -29,6 +29,7 @@ LOGS_COPY = {
 
 ip_re = re.compile("\d+\.\d+\.\d+\.\d+")
 
+
 def prepare2role(config, common_file):
     """
         Function prepare user.common.yaml file according to lab configuration
