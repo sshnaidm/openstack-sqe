@@ -1,0 +1,42 @@
+pool:
+  xml: |
+    <pool type="dir">
+        <name>{name}</name>
+        <target>
+            <path>{path}</path>
+        </target>
+    </pool>
+vol:
+  xml: |
+    <volume>
+      <name>{name}.qcow2</name>
+      <allocation>{size}</allocation>
+      <capacity>{size}</capacity>
+      <target>
+        <path>{path}</path>
+        <format type='qcow2'/>
+      </target>
+     </volume>
+  virt_disk: |
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='{output_file}'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+  cloudimg_disk: |
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='{output_file}'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source file='{seed_disk}'/>
+      <target dev='hda' bus='ide'/>
+    </disk>
+  storage_disk: |
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='{output_file}'/>
+      <target dev='{target}' bus='virtio'/>
+    </disk>

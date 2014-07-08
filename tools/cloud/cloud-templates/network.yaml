@@ -1,0 +1,131 @@
+nets:
+  boot:
+    name: net-boot
+    role: boot
+    net-ip:
+    xml: |
+        <network>
+          <name>{name}</name>
+          <forward mode='nat'>
+            <nat>
+              <port start='1024' end='65535'/>
+            </nat>
+          </forward>
+          <domain name='domain.name'/>
+          <dns>
+            <host ip='{net_ip}.2'>
+              <hostname>build-server</hostname>
+              <hostname>build-server.domain.name</hostname>
+            </host>
+            <host ip='{net_ip}.253'>
+              <hostname>control</hostname>
+              <hostname>control.domain.name</hostname>
+            </host>
+            <host ip='{net_ip}.252'>
+              <hostname>swiftproxy</hostname>
+              <hostname>swiftproxy.domain.name</hostname>
+            </host>
+          </dns>
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+            <dhcp>
+              <range start='{net_ip}.2' end='{net_ip}.250' />
+              {dhcp_records}
+            </dhcp>
+          </ip>
+        </network>
+  admin:
+    role: admin
+    name: net-admin
+    net-ip:
+    xml: |
+        <network>
+          <name>{name}</name>
+          <domain name='domain.name'/>
+          <dns>
+            <host ip='{net_ip}.2'>
+              <hostname>build-server</hostname>
+              <hostname>build-server.domain.name</hostname>
+            </host>
+            <host ip='{net_ip}.253'>
+              <hostname>control</hostname>
+              <hostname>control.domain.name</hostname>
+            </host>
+            <host ip='{net_ip}.252'>
+              <hostname>swiftproxy</hostname>
+              <hostname>swiftproxy.domain.name</hostname>
+            </host>
+          </dns>
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+          </ip>
+        </network>
+  public:
+    role: public
+    name: net-public
+    net-ip:
+    xml: |
+        <network>
+          <name>{name}</name>
+          <domain name='domain.name'/>
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+          </ip>
+        </network>
+  internal:
+    role: internal
+    name: net-internal
+    net-ip:
+    xml: |
+        <network>
+          <name>{name}</name>
+          <domain name='domain.name'/>
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+          </ip>
+        </network>
+  external:
+    role: external
+    name: net-external
+    net-ip:
+    xml: |
+        <network>
+          <name>{name}</name>
+          <forward mode='nat'>
+            <nat>
+              <port start='1024' end='65535'/>
+            </nat>
+          </forward>
+          <domain name='domain.name'/>
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+          </ip>
+        </network>
+template:
+  xml: |
+        <network>
+          <name>{name}</name>
+          {nat}
+          <domain name='{domain}'/>
+          {dns}
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+          {dhcp}
+          </ip>
+        </network>
+  dns_def: |
+        <dns>
+          {dns_records}
+        </dns>
+  dns_host: |
+        <host ip='{net_ip}.{host_ip}'>
+          <hostname>{host}</hostname>
+          <hostname>{host}.{domain}</hostname>
+        </host>
+  dhcp_def: |
+        <dhcp>
+          <range start='{net_ip}.2' end='{net_ip}.250' />
+          {dhcp_records}
+        </dhcp>
+  dhcp_host: |
+        <host mac="{server_mac}" name="{host}.{domain}" ip="{server_ip}"/>
+  nat: |
+        <forward mode='nat'>
+          <nat>
+            <port start='1024' end='65535'/>
+          </nat>
+        </forward>

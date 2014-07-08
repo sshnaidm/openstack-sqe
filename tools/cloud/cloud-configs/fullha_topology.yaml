@@ -1,0 +1,78 @@
+servers:
+  build-server:
+    params:
+      count: 1
+      add_disks: 0
+      ram: 8
+      cpu: 1
+      networks:
+        - admin
+  control-server:
+    params:
+      count: 3
+      add_disks: 0
+      ram: 8
+      cpu: 1
+      networks:
+        - admin
+        - external
+  compute-server:
+    params:
+      count: 3
+      add_disks: 0
+      ram: 8
+      cpu: 1
+      networks:
+        - admin
+        - external
+  swift-storage:
+    params:
+      count: 3
+      add_disks: 0
+      ram: 2
+      cpu: 1
+      networks:
+        - admin
+        - internal
+  swift-proxy:
+    params:
+      count: 2
+      add_disks: 0
+      ram: 2
+      cpu: 1
+      networks:
+        - admin
+        - internal
+  load-balancer:
+    params:
+      count: 2
+      add_disks: 0
+      ram: 2
+      cpu: 1
+      networks:
+        - admin
+networks:
+  - admin:
+      dhcp: true
+      external: false
+      nat: true
+      dns:
+        - build-server: 2
+        - control: 253
+        - swiftproxy: 252
+  - external:
+      dhcp: false
+      external: true
+      nat: true
+      dns:
+  - internal:
+      dhcp: false
+      external: false
+      nat: false
+      dns:
+storage:
+  pool:
+    default: 10
+    add: 20
+
+
