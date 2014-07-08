@@ -129,3 +129,12 @@ template:
             <port start='1024' end='65535'/>
           </nat>
         </forward>
+  interface: |
+        <interface type='network'>
+          <source network='{net_name}'/>
+        </interface>
+  interface-dhcp: |
+        <interface type='network'>
+          <source network='{net_name}'/>
+          <mac address='{mac}'/>
+        </interface>

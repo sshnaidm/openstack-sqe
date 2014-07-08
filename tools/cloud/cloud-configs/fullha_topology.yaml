@@ -1,6 +1,7 @@
 servers:
   build-server:
     params:
+      hostname:
       count: 1
       add_disks: 0
       ram: 8
@@ -9,6 +10,7 @@ servers:
         - admin
   control-server:
     params:
+      hostname:
       count: 3
       add_disks: 0
       ram: 8
@@ -18,6 +20,7 @@ servers:
         - external
   compute-server:
     params:
+      hostname:
       count: 3
       add_disks: 0
       ram: 8
@@ -27,6 +30,7 @@ servers:
         - external
   swift-storage:
     params:
+      hostname:
       count: 3
       add_disks: 0
       ram: 2
@@ -36,6 +40,7 @@ servers:
         - internal
   swift-proxy:
     params:
+      hostname:
       count: 2
       add_disks: 0
       ram: 2
@@ -45,6 +50,7 @@ servers:
         - internal
   load-balancer:
     params:
+      hostname:
       count: 2
       add_disks: 0
       ram: 2
@@ -57,9 +63,9 @@ networks:
       external: false
       nat: true
       dns:
-        - build-server: 2
-        - control: 253
-        - swiftproxy: 252
+        build-server: 2
+        control: 253
+        swiftproxy: 252
   - external:
       dhcp: false
       external: true

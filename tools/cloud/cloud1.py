@@ -114,7 +114,8 @@ class Lab:
     def __init__(self,
                  lab_id,
                  config,
-                 lab_img_path):
+                 lab_img_path,
+                 boot):
         self.id = lab_id
         with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "templates", config + ".yaml")) as f:
             self.config = yaml.load(f)
@@ -122,13 +123,26 @@ class Lab:
         self.boxes = {}
         self.nets = {}
         self.path = os.path.join(lab_img_path, lab_id)
-        self.macs = [rand_mac() for _ in xrange(sum(self.config.values()))]
+        self.boot = boot
 
     def create_networks(self):
         for net in self.config["networks"]:
             n = Network(lab_id=self.id, config=self.config, name=net, **self.config["networks"][net])
             self.nets[net] = n.create()
 
+    def create_storage(self):
+        for box in self.config["servers"]:
+            storage = Storage(self.id, self.config, self.path, self.boot, box, self.config["servers"][box])
+            storage.setup()
+
+
+    def create_vms(self):
+        for box in self.config["servers"]:
+            vm = VM(self.id, self.path, self.config, box)
+            vm.start()
+
+    def delete_networks(self):
+        erase_net(conn, lab=self.id)
 
     def setup(self):
         self.create_networks()
@@ -152,6 +166,115 @@ class Lab:
         erase_vm(self.id)
 
 
+
+class VM:
+    pool = {}
+    def __init__(self, lab_id, path, config, box):
+        self.path = path
+        self.lab_id = lab_id
+        self.box = box
+        self.conf = config["servers"][box]
+        self.full_conf = config
+        self.names = [self.lab_id + "-" + self.box + "%.2d" % num if self.conf['params']['count'] != 1 \
+                          else self.lab_id + "-" + self.box for num in xrange(self.conf['params']['count'])]
+
+
+    def network(self, index):
+        xml = ""
+        for net in self.conf['params']['networks']:
+            net_dhcp = [i for i in self.full_conf['networks'] if net in i][0][net]["dhcp"]
+            if net_dhcp:
+                xml += netconf["interface-dhcp"].format(
+                    net_name=net,
+                    mac=Network.hosts[0][self.box][index]["mac"]
+                )
+            else:
+                xml += netconf["interface"].format(net_name=net)
+
+    def storage(self, index):
+
+
+
+        pass
+
+
+    def define(self):
+        return [vmconf[self.box].format(
+            name=self.names[num],
+            ram=self.conf['params']["ram"],
+            cpu=self.conf['params']["cpu"],
+            network=self.network(num),
+            disk=self.storage(num),
+        ) for num in xrange(self.conf['params']['count'])]
+
+
+    def start(self):
+        vm_xmls = self.define()
+        for vm_xml in vm_xmls:
+            vm = conn.defineXML(vm_xml)
+            vm.create()
+
+
+
+class Storage:
+    disks = {}
+    def __init__(self, lab_id, config, path, boot, box, full_config):
+        self.boot = boot
+        self.lab_id = lab_id
+        self.config = config
+        self.path = path
+        self.pool_name = lab_id + "-default"
+        self.server = box
+        self.conf = full_config["servers"][box]
+        self.full_conf = full_config
+
+
+    def pool_define(self):
+        return storconf["pool"]["xml"].format(
+            name=self.pool_name,
+            path=self.path,
+        )
+
+    def pool_create(self):
+        pool_xml = self.pool_define()
+        self.pool = conn.storagePoolDefineXML(pool_xml)
+        self.pool.create()
+        self.pool.setAutostart(True)
+        return self.pool
+
+
+    def virtual_disk_define(self):
+        xmls = []
+        self.pool_create()
+        for num in self.conf["params"]["count"]:
+            name = self.lab_id + "-" + self.server + "%.2d" % num if self.conf['params']['count'] != 1 \
+                          else self.lab_id + "-" + self.server
+            disk_path = os.path.join(self.path, name + ".qcow2")
+            size_bytes = self.full_conf["storage"]["default"]*1024*1024*1024
+            disk_xml = storconf['vol']['xml'].format(name=name, size=size_bytes, path=disk_path)
+            vol = self.pool.createXML(disk_xml, 1)
+            xmls.append(storconf['vol']["virt_disk"].format(output_file=disk_path))
+        return xmls
+
+
+    def cloud_disk_define(self):
+        pass
+
+
+    def setup(self):
+        if self.boot == "net":
+            xml = self.virtual_disk_define()
+        else:
+            xml = self.cloud_disk_define()
+
+        pass
+
+
+
+
+
+
+
 def rand_mac():
     mac = [0x52, 0x54, 0x00,
            random.randint(0x00, 0xff),
@@ -161,6 +284,7 @@ def rand_mac():
 
 class Network:
     pool = {}
+    hosts = []
     def __init__(self, lab_id, config, name, **kwargs):
         self.xml = netconf["template"]
         self.lab_id = lab_id
@@ -174,34 +298,48 @@ class Network:
 
 
     def dhcp_definition(self):
-        hostnames = []
-        for server in sorted(self.config['servers']):
-            params = self.config['servers'][server]['params']
-            if params['count'] == 1:
-                hostnames.append(server)
-            else:
-                for num in xrange(params['count']):
-                    hostnames.append(server + "%.2d" % num)
-        macs = zip(hostnames, [rand_mac() for i in xrange(len(hostnames))])
+        hosts_def = {}
         ip_start = env[self.lab_id]["ip_start"]
+        servers_count = sum([self.config['servers'][i]['params']['count'] for i in self.config['servers']])
         ips = [".".join(
             ip_start.split(".")[:3] + [str(int(ip_start.split(".")[-1]) + i)])
-               for i in xrange(len(hostnames))]
+               for i in xrange(len(servers_count))]
+        ip_iter = iter(ips)
+        for server in sorted(self.config['servers']):
+            params = self.config['servers'][server]['params']
+            hosts_def[server] = []
+            for num in xrange(params['count']):
+                if params['count'] == 1:
+                    hostname = server if not params['hostname'] else params['hostname']
+                else:
+                    hostname = server + "%.2d" % num if not params['hostname'] else params['hostname']
+                hosts_def[server] += [{
+                                          "hostname": hostname,
+                                          "mac": rand_mac(),
+                                          "ip": ip_iter.next(),
+                                          "domain": DOMAIN_NAME}]
         dhcp_hosts = "\n".join([
-            netconf["template"]["dhcp_host"].format(
-                server_mac=macs[h],
-                host=h,
-                domain=DOMAIN_NAME,
-                server_ip=ips.next()
-            ) for h in sorted(macs)
-        ])
+            netconf["template"]["dhcp_host"].format(**kwargs)
+            for host in hosts_def
+            for kwargs in host])
+        self.hosts.append(hosts_def)
         return netconf["template"]["dhcp_def"].format(
             dhcp_records=dhcp_hosts,
             net_ip=self.net_ip
         )
 
     def dns_definition(self):
-        pass
+        dns_hosts = "\n".join(
+            [netconf["template"]["dns_host"].format(
+                net_ip=self.net_ip,
+                host_ip=self.dns[i],
+                host=i,
+                domain=DOMAIN_NAME)
+             for i in self.dns])
+        return netconf["template"]["dns_def"].format(
+            dns_records=dns_hosts
+        )
+
 
     def define(self):
         dhcp_text = self.dhcp_definition() if self.dhcp else ""
