@@ -252,12 +252,13 @@ class Storage:
             disk_path = os.path.join(self.path, name + ".qcow2")
             size_bytes = self.full_conf["storage"]["default"]*1024*1024*1024
             disk_xml = storconf['vol']['xml'].format(name=name, size=size_bytes, path=disk_path)
-            vol = self.pool.createXML(disk_xml, 1)
+            self.pool.createXML(disk_xml, 1)
             xmls.append(storconf['vol']["virt_disk"].format(output_file=disk_path))
         return xmls
 
 
     def cloud_disk_define(self):
+
         pass
 
 
