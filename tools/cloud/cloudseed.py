@@ -31,16 +31,18 @@ class SeedStorage:
         ifupdown = []
         for num, net in enumerate(nets):
             net_name = make_network_name(self.lab_id, net.keys()[0])
-            interface = Network.pool[net_name][1].interface
-            interface_ip = Network.network_combine(
-                Network.pool[net_name][1].net_ip,
-                Network.hosts[0][self.server][self.index]['ip_base']
-            )
-            ydict["write_files"].append({
-                "content": interface.format(int_name="eth" + str(num), int_ip=interface_ip),
-                "path": "/etc/network/interfaces.d/eth{int_num}.cfg".format(int_num=num),
-            })
-            ifupdown.append("eth{int_num}".format(int_num=num))
+            network = Network.pool[net_name][1]
+            if not network.dhcp:
+                interface = network.interface
+                interface_ip = Network.network_combine(
+                    network.net_ip,
+                    Network.hosts[0][self.server][self.index]['ip_base']
+                )
+                ydict["write_files"].append({
+                    "content": interface.format(int_name="eth" + str(num), int_ip=interface_ip),
+                    "path": "/etc/network/interfaces.d/eth{int_num}.cfg".format(int_num=num),
+                })
+                ifupdown.append("eth{int_num}".format(int_num=num))
         hostname = Network.hosts[0][self.server][self.index]['hostname']
         hosts_file = hostconf['hosts_template'].format(
             server_name=hostname,
