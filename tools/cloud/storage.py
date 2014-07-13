@@ -112,7 +112,7 @@ class Storage:
         if self.boot == "net":
             xmls = self.virtual_disk_define()
         else:
-            xmls = self.cloud_disk_define()
+            xmls = ["\n".join(i) for i in zip(self.cloud_disk_define(), self.seed_disk())]
         if self.conf["params"]["add_disks"]:
             xmls_add = self.storage_disk()
         for num in xrange(self.conf['params']['count']):
