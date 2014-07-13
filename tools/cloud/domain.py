@@ -35,6 +35,7 @@ class VM:
                 )
             else:
                 xml += netconf['template']["interface"].format(net_name=net)
+        return xml
 
     def storage(self, index):
         return Storage.disks[self.names[index]]
