@@ -77,7 +77,7 @@ class Storage:
             disk_path = os.path.join(self.path, name)
             xmls.append(storconf['vol']['seed_disk'].format(seed_disk=disk_path))
             seed_class = SeedStorage if self.distro == "ubuntu" else SeedStorageRedHat
-            seed = seed_class(self.server, self.full_conf, disk_path, num, self.full_conf)
+            seed = seed_class(self.lab_id, self.server, disk_path, num, self.full_conf)
             seed.create()
         return xmls
 

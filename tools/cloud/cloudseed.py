@@ -3,19 +3,22 @@ import yaml
 import crypt
 
 from network import Network, DOMAIN_NAME
-from config import TEMPLATE_PATH
+from config import TEMPLATE_PATH, DIR_PATH
 from tempfile import NamedTemporaryFile
-from cloudtools import run_cmd
+from cloudtools import run_cmd, make_network_name
 
 with open(os.path.join(TEMPLATE_PATH, "host_template.yaml")) as f:
     hostconf = yaml.load(f)
+with open(os.path.join(TEMPLATE_PATH, "vm.yaml")) as f:
+    vmconf = yaml.load(f)
 
 
 class SeedStorage:
-    def __init__(self, server, config, path, num, full_conf):
+    def __init__(self, lab_id, server, path, num, full_conf):
+        self.lab_id = lab_id
         self.server = server
         self.index = num
-        self.yaml = config[self.server]["user-yaml"]
+        self.yaml = vmconf[self.server]["user-yaml"]
         self.path = path
         self.full_conf = full_conf
 
@@ -24,12 +27,13 @@ class SeedStorage:
         ydict['users'][1]['ssh-authorized-keys'] = hostconf['id_rsa_pub']
         ydict['users'][1]['passwd'] = crypt.crypt(ydict['users'][1]['passwd'], "$6$rounds=4096")
         ydict['write_files'][0]['content'] = "\n".join(hostconf['id_rsa_pub'])
-        nets = self.full_conf[self.server]['networks']
+        nets = self.full_conf['networks']
         ifupdown = []
         for num, net in enumerate(nets):
-            interface = Network.pool[net][1].interface
+            net_name = make_network_name(self.lab_id, net.keys()[0])
+            interface = Network.pool[net_name][1].interface
             interface_ip = Network.network_combine(
-                Network.pool[net][1].net_ip,
+                Network.pool[net_name][1].net_ip,
                 Network.hosts[0][self.server][self.index]['ip_base']
             )
             ydict["write_files"].append({
@@ -57,11 +61,11 @@ class SeedStorage:
         return yaml.dump(ydict)
 
     def create(self):
-        c_localds = os.path.join(os.path.dirname(__file__), "cloud-localds")
+        c_localds = os.path.join(DIR_PATH, "cloud-localds")
         cloud_init = self.define()
         with NamedTemporaryFile() as temp:
             temp.write("#cloud-config\n" + cloud_init)
-            run_cmd([c_localds, "-d", "qcow2", self.path, temp.name])
+            run_cmd(["/bin/bash", c_localds, "-d", "qcow2", self.path, temp.name])
 
 
 class SeedStorageRedHat(SeedStorage):
