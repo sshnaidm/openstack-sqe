@@ -2,7 +2,7 @@ import os
 import random
 import yaml
 
-from cloudtools import conn
+from cloudtools import conn, make_network_name
 from config import DOMAIN_NAME, DNS, TEMPLATE_PATH
 
 with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
@@ -28,7 +28,7 @@ class Network:
     def __init__(self, lab_id, config, name, net_shift, **kwargs):
         self.xml = netconf["template"]
         self.lab_id = lab_id
-        self.name = self.lab_id + "-net-" + name
+        self.name = make_network_name(lab_id, name)
         self.config = config
         for key in kwargs:
             setattr(self, key, kwargs.get(key))

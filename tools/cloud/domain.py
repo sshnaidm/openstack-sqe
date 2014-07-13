@@ -3,7 +3,7 @@ import yaml
 
 from network import Network
 from storage import Storage
-from cloudtools import conn
+from cloudtools import conn, make_network_name
 from config import TEMPLATE_PATH
 
 with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
@@ -30,7 +30,7 @@ class VM:
             net_dhcp = [i for i in self.full_conf['networks'] if net in i][0][net]["dhcp"] # True or False
             if net_dhcp:
                 xml += netconf['template']["interface_dhcp"].format(
-                    net_name=net,
+                    net_name=make_network_name(self.lab_id, net),
                     mac=Network.hosts[0][self.box][index]["mac"]
                 )
             else:

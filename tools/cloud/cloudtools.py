@@ -89,3 +89,6 @@ def found_pool(pool_name):
         return True
     except libvirtError:
         return False
+
+def make_network_name(lab, name):
+    return lab + "-net-" + name
