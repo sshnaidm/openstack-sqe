@@ -1,0 +1,75 @@
+lab1:
+  net_start: 192.168.10
+  ip_start: 2
+lab2:
+   net_start: 192.168.15
+   ip_start: 2
+lab3:
+   net_start: 192.168.20
+   ip_start: 2
+lab4:
+   net_start: 192.168.25
+   ip_start: 2
+lab5:
+   net_start: 192.168.30
+   ip_start: 2
+lab6:
+   net_start: 192.168.35
+   ip_start: 2
+lab7:
+   net_start: 192.168.40
+   ip_start: 2
+lab8:
+   net_start: 192.168.45
+   ip_start: 2
+lab9:
+   net_start: 192.168.50
+   ip_start: 2
+lab10:
+   net_start: 192.168.55
+   ip_start: 2
+lab11:
+   net_start: 192.168.60
+   ip_start: 2
+lab12:
+   net_start: 192.168.65
+   ip_start: 2
+lab13:
+   net_start: 192.168.70
+   ip_start: 2
+lab14:
+   net_start: 192.168.75
+   ip_start: 2
+lab15:
+   net_start: 192.168.80
+   ip_start: 2
+lab16:
+   net_start: 192.168.85
+   ip_start: 2
+lab17:
+   net_start: 192.168.90
+   ip_start: 2
+lab18:
+   net_start: 192.168.95
+   ip_start: 2
+lab19:
+   net_start: 192.168.100
+   ip_start: 2
+lab20:
+   net_start: 192.168.105
+   ip_start: 2
+lab21:
+   net_start: 192.168.110
+   ip_start: 2
+lab22:
+   net_start: 192.168.115
+   ip_start: 2
+lab23:
+   net_start: 192.168.125
+   ip_start: 2
+lab24:
+   net_start: 192.168.130
+   ip_start: 2
+lab25:
+   net_start: 192.168.135
+   ip_start: 2

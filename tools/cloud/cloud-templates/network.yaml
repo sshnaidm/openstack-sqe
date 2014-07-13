@@ -122,7 +122,7 @@ template:
           {dhcp_records}
         </dhcp>
   dhcp_host: |
-        <host mac="{server_mac}" name="{host}.{domain}" ip="{server_ip}"/>
+        <host mac="{mac}" name="{hostname}.{domain}" ip="{ip}"/>
   nat: |
         <forward mode='nat'>
           <nat>
@@ -133,7 +133,7 @@ template:
         <interface type='network'>
           <source network='{net_name}'/>
         </interface>
-  interface-dhcp: |
+  interface_dhcp: |
         <interface type='network'>
           <source network='{net_name}'/>
           <mac address='{mac}'/>

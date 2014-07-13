@@ -3,7 +3,8 @@ servers:
     params:
       hostname:
       count: 1
-      add_disks: 0
+      storage: 10
+      add_disks:
       ram: 8
       cpu: 1
       networks:
@@ -12,7 +13,8 @@ servers:
     params:
       hostname:
       count: 3
-      add_disks: 0
+      storage: 20
+      add_disks:
       ram: 8
       cpu: 1
       networks:
@@ -22,7 +24,8 @@ servers:
     params:
       hostname:
       count: 3
-      add_disks: 0
+      storage: 60
+      add_disks:
       ram: 8
       cpu: 1
       networks:
@@ -32,7 +35,8 @@ servers:
     params:
       hostname:
       count: 3
-      add_disks: 0
+      storage: 60
+      add_disks: [3, 60]
       ram: 2
       cpu: 1
       networks:
@@ -42,7 +46,8 @@ servers:
     params:
       hostname:
       count: 2
-      add_disks: 0
+      storage: 10
+      add_disks:
       ram: 2
       cpu: 1
       networks:
@@ -52,7 +57,8 @@ servers:
     params:
       hostname:
       count: 2
-      add_disks: 0
+      storage: 10
+      add_disks:
       ram: 2
       cpu: 1
       networks:
@@ -76,9 +82,3 @@ networks:
       external: false
       nat: false
       dns:
-storage:
-  pool:
-    default: 10
-    add: 20
-
-
