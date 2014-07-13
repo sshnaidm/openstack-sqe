@@ -43,7 +43,7 @@ class VM:
     def define(self):
         return [vmconf[self.box]["xml"].format(
             name=self.names[num],
-            ram=self.conf['params']["ram"],
+            ram=self.conf['params']["ram"]*1024*1024,
             cpu=self.conf['params']["cpu"],
             network=self.network(num),
             disk=self.storage(num),
