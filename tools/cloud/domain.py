@@ -34,7 +34,7 @@ class VM:
                     mac=Network.hosts[0][self.box][index]["mac"]
                 )
             else:
-                xml += netconf['template']["interface"].format(net_name=net)
+                xml += netconf['template']["interface"].format(net_name=make_network_name(self.lab_id, net))
         return xml
 
     def storage(self, index):
