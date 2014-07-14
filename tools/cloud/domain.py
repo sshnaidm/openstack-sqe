@@ -10,7 +10,12 @@ with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
     netconf = yaml.load(f)
 with open(os.path.join(TEMPLATE_PATH, "vm.yaml")) as f:
     vmconf = yaml.load(f)
+with open(os.path.join(TEMPLATE_PATH, "lab.yaml")) as f:
+    env = yaml.load(f)
 
+
+def construct_net_ip(lab_ip, net_shift):
+    return ".".join(lab_ip.split(".")[:2] + [str(int(lab_ip.split(".")[-1]) + net_shift)] + ["0"])
 
 class VM:
     pool = {}
@@ -52,6 +57,8 @@ class VM:
             self.pool[self.box][index]["hostname"] = box_net["hostname"]
             if net_params[net]["external"]:
                 self.pool[self.box][index]["external_interface"] = "eth" + str(key)
+                if "external_net" not in self.pool:
+                    self.pool["external_net"] = construct_net_ip(env[self.lab_id]["net_start"], key)
             if not net_params[net]["nat"]:
                 self.pool[self.box][index]["internal_interface"] = "eth" + str(key)
         return xml

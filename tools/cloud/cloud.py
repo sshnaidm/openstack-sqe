@@ -1,4 +1,5 @@
 import os
+import yaml
 
 from network import Network, Network6
 from storage import Storage
@@ -59,7 +60,14 @@ class Lab:
         for box in self.topo["servers"]:
             vm = VM(self.id, self.path, self.topo, box)
             vm.start()
-            self.report[box] = vm.pool
+        self.report = VM.pool
+
+    def print_reports(self):
+        print yaml.dump(self.report)
+        if "external_net" in self.report:
+            with open("external_net", "w") as f:
+                f.write(".".join(self.report["external_net"].split(".")[:3]))
+
 
     def delete_networks(self):
         erase_net(lab=self.id)
@@ -75,6 +83,7 @@ class Lab:
         self.create_networks()
         self.create_storage()
         self.create_vms()
+        self.print_reports()
 
     def destroy(self):
         self.delete_networks()
