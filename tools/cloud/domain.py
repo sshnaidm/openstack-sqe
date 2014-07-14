@@ -50,9 +50,9 @@ class VM:
             else:
                 xml += netconf['template']["interface"].format(net_name=make_network_name(self.lab_id, net))
             self.pool[self.box][index]["hostname"] = box_net["hostname"]
-            if net_params["external"]:
+            if net_params[net]["external"]:
                 self.pool[self.box][index]["external_interface"] = "eth" + str(key)
-            if not net_params["nat"]:
+            if not net_params[net]["nat"]:
                 self.pool[self.box][index]["internal_interface"] = "eth" + str(key)
         return xml
 
