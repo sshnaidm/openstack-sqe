@@ -44,16 +44,16 @@ class VM:
                     net_name=make_network_name(self.lab_id, net),
                     mac=mac
                 )
-                self.pool[index]["mac"] = mac
-                self.pool[index]["ip"] = box_net["ip"]
-                self.pool[index]["admin_interface"] = "eth" + str(key)
+                self.pool[self.box][index]["mac"] = mac
+                self.pool[self.box][index]["ip"] = box_net["ip"]
+                self.pool[self.box][index]["admin_interface"] = "eth" + str(key)
             else:
                 xml += netconf['template']["interface"].format(net_name=make_network_name(self.lab_id, net))
-            self.pool[index]["hostname"] = box_net["hostname"]
+            self.pool[self.box][index]["hostname"] = box_net["hostname"]
             if net_params["external"]:
-                self.pool[index]["external_interface"] = "eth" + str(key)
+                self.pool[self.box][index]["external_interface"] = "eth" + str(key)
             if not net_params["nat"]:
-                self.pool[index]["internal_interface"] = "eth" + str(key)
+                self.pool[self.box][index]["internal_interface"] = "eth" + str(key)
         return xml
 
     def storage(self, index):
