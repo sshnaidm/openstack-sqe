@@ -9,6 +9,7 @@ from cloudtools import erase_net, erase_pool, erase_vm, remove_all_imgs, conn
 
 class Lab:
     nets = {}
+    report = {}
 
     def __init__(self,
                  lab_id,
@@ -19,7 +20,6 @@ class Lab:
                  ipv):
         self.id = lab_id
         self.boxes = {}
-        self.nets = {}
         self.path = os.path.join(lab_img_path, lab_id)
         self.boot = boot
         self.cloud_disk = cloud_disk
@@ -59,6 +59,7 @@ class Lab:
         for box in self.topo["servers"]:
             vm = VM(self.id, self.path, self.topo, box)
             vm.start()
+            self.report[box] = vm.pool
 
     def delete_networks(self):
         erase_net(lab=self.id)
