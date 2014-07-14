@@ -67,7 +67,9 @@ class SeedStorage:
         cloud_init = self.define()
         with NamedTemporaryFile() as temp:
             temp.write("#cloud-config\n" + cloud_init)
-            run_cmd(["/bin/bash", c_localds, "-d", "qcow2", self.path, temp.name])
+            temp.flush()
+            run_cmd([c_localds, "-d", "qcow2", self.path, temp.name])
+
 
 
 class SeedStorageRedHat(SeedStorage):
