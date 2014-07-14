@@ -84,7 +84,7 @@ class Storage:
     def storage_disk(self):
         xmls = []
         for num in xrange(self.conf['params']['count']):
-            xmls[num] = []
+            xmls.append([])
             targets = iter(["vd" + i for i in string.ascii_lowercase[1:]])
             for disk in xrange(1, self.conf['params']['add_disks'][0] + 1):
                 name = self.box_name(num=num) + "-add%.2d.qcow2" % disk
