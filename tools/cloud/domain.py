@@ -24,12 +24,13 @@ class VM:
         self.report = []
         self.names = [self.lab_id + "-" + self.box + "%.2d" % num if self.conf['params']['count'] != 1
                       else self.lab_id + "-" + self.box for num in xrange(self.conf['params']['count'])]
+        ydict = yaml.load(vmconf[self.box]["user-yaml"])
         self.pool[box] = [
             {
-                "vm_name": i,
-                "user": vmconf[self.box]["user-yaml"]['users'][1]['name'],
-                "password": vmconf[self.box]["user-yaml"]['users'][1]['password']
-            } for i in self.names
+                "vm_name": name,
+                "user": ydict['users'][1]['name'],
+                "password": ydict['users'][1]['password']
+            } for name in self.names
         ]
 
     def network(self, index):
