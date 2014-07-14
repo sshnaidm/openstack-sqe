@@ -20,8 +20,6 @@ parser.add_argument('-a', action='store', dest='host', default="localhost",
                     help='Host for action')
 parser.add_argument('-b', action='store', dest='boot', default="cloudimg",
                     choices=['net', 'cloudimg'], help='Boot')
-
-
 parser.add_argument('-t', action='store', dest='topology', default=None,
                     choices=["aio", "2role", "fullha", "devstack", "standalone"],
                     help='Choose topology')

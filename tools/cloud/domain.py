@@ -4,7 +4,7 @@ import yaml
 from network import Network
 from storage import Storage
 from cloudtools import conn, make_network_name
-from config import TEMPLATE_PATH, opts
+from config import TEMPLATE_PATH
 
 with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
     netconf = yaml.load(f)
@@ -24,7 +24,13 @@ class VM:
         self.report = []
         self.names = [self.lab_id + "-" + self.box + "%.2d" % num if self.conf['params']['count'] != 1
                       else self.lab_id + "-" + self.box for num in xrange(self.conf['params']['count'])]
-        self.pool[box] = [{"vm_name": i, "user": opts.user, "password": opts.password} for i in self.names]
+        self.pool[box] = [
+            {
+                "vm_name": i,
+                "user": vmconf[self.box]["user-yaml"]['users'][1]['name'],
+                "password": vmconf[self.box]["user-yaml"]['users'][1]['password']
+            } for i in self.names
+        ]
 
     def network(self, index):
         xml = ""
@@ -43,8 +49,10 @@ class VM:
             else:
                 xml += netconf['template']["interface"].format(net_name=make_network_name(self.lab_id, net))
             self.pool[index]["hostname"] = box_net["hostname"]
-            if net_params["external"]: self.pool[index]["external_interface"] = "eth" + str(key)
-            if not net_params["nat"]: self.pool[index]["internal_interface"] = "eth" + str(key)
+            if net_params["external"]:
+                self.pool[index]["external_interface"] = "eth" + str(key)
+            if not net_params["nat"]:
+                self.pool[index]["internal_interface"] = "eth" + str(key)
         return xml
 
     def storage(self, index):
