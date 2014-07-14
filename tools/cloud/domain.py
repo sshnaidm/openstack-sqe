@@ -29,7 +29,7 @@ class VM:
             {
                 "vm_name": name,
                 "user": ydict['users'][1]['name'],
-                "password": ydict['users'][1]['password']
+                "password": ydict['users'][1]['passwd']
             } for name in self.names
         ]
 
