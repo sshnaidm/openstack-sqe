@@ -86,12 +86,12 @@ class Storage:
         for num in xrange(self.conf['params']['count']):
             xmls[num] = []
             targets = iter(["vd" + i for i in string.ascii_lowercase[1:]])
-            for disk in xrange(1, self.conf['params']['add_disks'] + 1):
+            for disk in xrange(1, self.conf['params']['add_disks'][0] + 1):
                 name = self.box_name(num=num) + "-add%.2d.qcow2" % disk
                 disk_path = os.path.join(self.path, name)
                 disk_add_xml = storconf['vol']['xml'].format(
                     name=name,
-                    size=self.full_conf['storage']['add']*1024*1024*1024,
+                    size=self.conf['params']['add_disks'][1]*1024*1024*1024,
                     path=disk_path
                 )
                 self.pool.createXML(disk_add_xml, 1)
