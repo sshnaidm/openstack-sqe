@@ -61,6 +61,7 @@ class Lab:
             vm = VM(self.id, self.path, self.topo, box)
             vm.start()
         self.report["servers"] = VM.pool
+        self.report["external_net"] = VM.pool
 
     def print_reports(self):
         print yaml.dump(self.report)
