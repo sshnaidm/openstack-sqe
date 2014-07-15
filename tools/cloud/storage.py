@@ -108,7 +108,6 @@ class Storage:
                 sys.exit(1)
         self.pool = found_pool(self.pool_name)
         if not self.pool:
-            print "Creating pool"
             self.pool_create()
             self.pool = found_pool(self.pool_name)
         if self.boot == "net":
