@@ -60,7 +60,7 @@ class Lab:
         for box in self.topo["servers"]:
             vm = VM(self.id, self.path, self.topo, box)
             vm.start()
-        self.report = VM.pool
+        self.report["servers"] = VM.pool
 
     def print_reports(self):
         print yaml.dump(self.report)
