@@ -424,55 +424,48 @@ def main():
         except IOError as e:
             print >> sys.stderr, "Not found file {file}: {exc}".format(file=opts.config_file, exc=e)
             sys.exit(1)
-        build = config['servers']['build-server']
-        hosts = [build["ip"]]
+        build = config['servers']['build-server'][0]
+        host = build["ip"]
         user = build["user"]
         password = build["password"]
-        envs_build = {"default_interface": build["default_interface"],
-                      "external_interface": build["external_interface"],
-                      "vendor": "cisco",
-                      "scenario": "2_role",
-                      "build_server_ip": build["ip"]}
+        envs_build = {
+            "vendor": "cisco",
+            "scenario": "2_role",
+            "build_server_ip": build["ip"]
+        }
 
-    job_settings = {"host_string": "",
+    job_settings = {"host_string": host,
                     "user": user,
                     "password": password,
                     "warn_only": True,
                     "key_filename": ssh_key_file,
                     "abort_on_prompts": True,
                     "gateway": opts.gateway}
-    if opts.test_mode:
-        job_settings['host_string'] = hosts[0]
-        job_settings['command_timeout'] = 15
-        sys.exit(run_probe(job_settings, verbose=verb_mode, envs=envs_build))
-    for host in hosts:
-        job_settings['host_string'] = host
-        print job_settings
-        print envs_build
-        res = install_openstack(job_settings,
-                                verbose=verb_mode,
-                                envs=envs_build,
-                                url_script=opts.url,
-                                prepare=opts.prepare_mode,
-                                force=opts.force,
-                                config=config,
-                                use_cobbler=opts.use_cobbler,
-                                proxy=opts.proxy)
-        if res:
-            print "Job with host {host} finished successfully!".format(host=host)
+    print >> sys.stderr, job_settings
+    res = install_openstack(job_settings,
+                            verbose=verb_mode,
+                            envs=envs_build,
+                            url_script=opts.url,
+                            prepare=opts.prepare_mode,
+                            force=opts.force,
+                            config=config,
+                            use_cobbler=opts.use_cobbler,
+                            proxy=opts.proxy)
+    if res:
+        print "Job with host {host} finished successfully!".format(host=host)
     if not opts.only_build:
         if opts.use_cobbler:
-            job_settings['host_string'] = hosts[0]
+            job_settings['host_string'] = host
             track_cobbler(config, job_settings)
         else:
-            for host in config["servers"]["control-servers"]:
+            for host in config["servers"]["control-server"]:
                 job_settings['host_string'] = host["ip"]
                 run_services(host,
                              job_settings,
                              verbose=verb_mode,
                              envs=envs_build,
                              )
-            for host in config["servers"]["compute-servers"]:
+            for host in config["servers"]["compute-server"]:
                 job_settings['host_string'] = host["ip"]
                 run_services(host,
                              job_settings,

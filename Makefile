@@ -51,31 +51,31 @@ help:
 prepare-aio:
 	@echo "$(CYAN)>>>> Preparing AIO box...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b cloudimg -l ${LAB} -d /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t aio > config_file
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t aio > config_file
 
 prepare-aio-local:
 	@echo "$(CYAN)>>>> Preparing AIO box...$(RESET)"
-	time ./tools/cloud/create.py -u root -a localhost -b cloudimg -l lab1 -d /media/hdd/tmpdir/tmp/imgs -z /media/hdd/tmpdir/trusty-server-cloudimg-amd64-disk1.img -o > config_file
+	time ./tools/cloud/create.py -l lab1 -s /media/hdd/tmpdir/tmp/imgs -z /media/hdd/tmpdir/trusty-server-cloudimg-amd64-disk1.img -t aio > config_file
 
 prepare-2role:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b cloudimg -l ${LAB} -d /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
 
 prepare-2role-cobbler:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -d /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
+	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
 
 prepare-fullha:
 	@echo "$(CYAN)>>>> Preparing full HA boxes...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b cloudimg -l ${LAB} -d /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -t fullha> config_file
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -t fullha> config_file
 
 prepare-fullha-cobbler:
 	@echo "$(CYAN)>>>> Preparing full HA boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -d /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -t fullha> config_file
+	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -t fullha> config_file
 
 
 give-a-time:

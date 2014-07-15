@@ -15,12 +15,14 @@ def main():
     else:
         raise ConfigError("Please provide topology!")
 
+    cloud_img = os.path.abspath(opts.cloud_img_path)
+
     lab = Lab(
         opts.lab_id,
         topo_config,
         opts.img_dir,
         opts.boot,
-        opts.cloud_img_path,
+        cloud_img,
         opts.ipv
     )
     if not opts.undefine_all and not opts.shutdown_all:
