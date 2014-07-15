@@ -14,7 +14,6 @@ with open(os.path.join(TEMPLATE_PATH, "storage.yaml")) as f:
 
 class Storage:
     disks = {}
-    pool = None
 
     def __init__(self, lab_id, config, path, boot, box, cloud_disk):
         self.boot = boot
@@ -23,6 +22,7 @@ class Storage:
         self.path = path
         self.cloud_disk_path = cloud_disk
         self.pool_name = lab_id + "-default"
+        self.pool = None
         self.server = box
         self.conf = config["servers"][box]
         self.distro = opts.distro
@@ -39,9 +39,9 @@ class Storage:
 
     def pool_create(self):
         pool_xml = self.pool_define()
-        self.pool = conn.storagePoolDefineXML(pool_xml)
-        self.pool.create()
-        self.pool.setAutostart(True)
+        self.pool_obj = conn.storagePoolDefineXML(pool_xml)
+        self.pool_obj.create()
+        self.pool_obj.setAutostart(True)
 
     def virtual_disk_define(self):
         xmls = []
@@ -94,7 +94,7 @@ class Storage:
                     size=self.conf['params']['add_disks'][1]*1024*1024*1024,
                     path=disk_path
                 )
-                self.pool.createXML(disk_add_xml, 1)
+                self.pool.createXML(disk_add_xml, 0)
                 disk_add = storconf['vol']['storage_disk'].format(output_file=disk_path, target=targets.next())
                 xmls[num].append(disk_add)
         return xmls
@@ -106,9 +106,11 @@ class Storage:
             except IOError:
                 print >> sys.stderr, "Can not create directory {dir} that doesn't exist!".format(dir=self.path)
                 sys.exit(1)
-        if not found_pool(self.pool_name):
+        self.pool = found_pool(self.pool_name)
+        if not self.pool:
             print "Creating pool"
             self.pool_create()
+            self.pool = found_pool(self.pool_name)
         if self.boot == "net":
             xmls = self.virtual_disk_define()
         else:

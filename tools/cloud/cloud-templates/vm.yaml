@@ -213,7 +213,7 @@ control-server:
     <name>{name}</name>
     <memory unit='KiB'>{ram}</memory>
     <currentMemory unit='KiB'>{ram}</currentMemory>
-    <vcpu placement='static'>1</vcpu>
+    <vcpu placement='static'>{cpu}</vcpu>
     <os>
       <type arch='x86_64' machine='pc-i440fx-1.5'>hvm</type>
       <boot dev='hd'/>
@@ -265,7 +265,7 @@ compute-server:
     <name>{name}</name>
     <memory unit='KiB'>{ram}</memory>
     <currentMemory unit='KiB'>{ram}</currentMemory>
-    <vcpu placement='static'>{compute_server_cpu}</vcpu>
+    <vcpu placement='static'>{cpu}</vcpu>
     <os>
       <type arch='x86_64' machine='pc-i440fx-1.5'>hvm</type>
       <boot dev='hd'/>
@@ -318,7 +318,7 @@ swift-storage:
     <name>{name}</name>
     <memory unit='KiB'>{ram}</memory>
     <currentMemory unit='KiB'>{ram}</currentMemory>
-    <vcpu placement='static'>1</vcpu>
+    <vcpu placement='static'>{cpu}</vcpu>
     <os>
       <type arch='x86_64' machine='pc-i440fx-1.5'>hvm</type>
       <boot dev='hd'/>
@@ -371,7 +371,7 @@ swift-proxy:
     <name>{name}</name>
     <memory unit='KiB'>{ram}</memory>
     <currentMemory unit='KiB'>{ram}</currentMemory>
-    <vcpu placement='static'>{compute_server_cpu}</vcpu>
+    <vcpu placement='static'>{cpu}</vcpu>
     <os>
       <type arch='x86_64' machine='pc-i440fx-1.5'>hvm</type>
       <boot dev='hd'/>
@@ -424,7 +424,7 @@ load-balancer:
     <name>{name}</name>
     <memory unit='KiB'>{ram}</memory>
     <currentMemory unit='KiB'>{ram}</currentMemory>
-    <vcpu placement='static'>{compute_server_cpu}</vcpu>
+    <vcpu placement='static'>{cpu}</vcpu>
     <os>
       <type arch='x86_64' machine='pc-i440fx-1.5'>hvm</type>
       <boot dev='hd'/>

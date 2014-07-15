@@ -85,10 +85,10 @@ def remove_all_imgs(lab_img_path):
 
 def found_pool(pool_name):
     try:
-        conn.storagePoolLookupByName(pool_name)
-        return True
+        pool = conn.storagePoolLookupByName(pool_name)
+        return pool
     except libvirtError:
-        return False
+        return None
 
 def make_network_name(lab, name):
     return lab + "-net-" + name

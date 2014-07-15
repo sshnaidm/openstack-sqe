@@ -9,7 +9,7 @@ pool:
 vol:
   xml: |
     <volume>
-      <name>{name}.qcow2</name>
+      <name>{name}</name>
       <allocation>0</allocation>
       <capacity>{size}</capacity>
       <target>
