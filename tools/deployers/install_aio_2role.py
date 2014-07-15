@@ -7,11 +7,10 @@ import os
 import time
 
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
-from fabric.contrib.files import exists, contains
+from fabric.contrib.files import exists, contains, sed
 from fabric.colors import green, red
 
 from utils import collect_logs, warn_if_fail, update_time, resolve_names, CONFIG_PATH, change_ip_to
-
 
 __author__ = 'sshnaidm'
 
@@ -40,9 +39,9 @@ def prepare2role(config, common_file):
     print common_file
 
     conf = yaml.load(common_file)
-    conf["controller_public_address"] = config['servers']['control-servers'][0]['ip']
-    conf["controller_admin_address"] = config['servers']['control-servers'][0]['ip']
-    conf["controller_internal_address"] = config['servers']['control-servers'][0]['ip']
+    conf["controller_public_address"] = config['servers']['control-server'][0]['ip']
+    conf["controller_admin_address"] = config['servers']['control-server'][0]['ip']
+    conf["controller_internal_address"] = config['servers']['control-server'][0]['ip']
     conf["coe::base::controller_hostname"] = "control-server00"
     conf["domain_name"] = "domain.name"
     conf["ntp_servers"] = ["ntp.esl.cisco.com"]
@@ -51,20 +50,20 @@ def prepare2role(config, common_file):
     conf["build_node_name"] = "build-server"
     conf["controller_public_url"] = change_ip_to(
         conf["controller_public_url"],
-        config['servers']['control-servers'][0]['ip'])
+        config['servers']['control-server'][0]['ip'])
     conf["controller_admin_url"] = change_ip_to(
         conf["controller_admin_url"],
-        config['servers']['control-servers'][0]['ip'])
+        config['servers']['control-server'][0]['ip'])
     conf["controller_internal_url"] = change_ip_to(
         conf["controller_internal_url"],
-        config['servers']['control-servers'][0]['ip'])
-    conf["cobbler_node_ip"] = config['servers']['build-server']['ip']
+        config['servers']['control-server'][0]['ip'])
+    conf["cobbler_node_ip"] = config['servers']['build-server'][0]['ip']
     conf["node_subnet"] = ".".join(conf["cobbler_node_ip"].split(".")[:3]) + ".0"
     conf["node_gateway"] = ".".join(conf["cobbler_node_ip"].split(".")[:3]) + ".1"
-    conf["swift_internal_address"] = config['servers']['control-servers'][0]['ip']
-    conf["swift_public_address"] = config['servers']['control-servers'][0]['ip']
-    conf["swift_admin_address"] = config['servers']['control-servers'][0]['ip']
-    conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-servers'][0]['ip']
+    conf["swift_internal_address"] = config['servers']['control-server'][0]['ip']
+    conf["swift_public_address"] = config['servers']['control-server'][0]['ip']
+    conf["swift_admin_address"] = config['servers']['control-server'][0]['ip']
+    conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-server'][0]['ip']
     conf['internal_ip'] = "%{ipaddress_eth0}"
     conf['public_interface'] = "eth0"
     conf['private_interface'] = "eth0"
@@ -86,11 +85,11 @@ def prepare_cobbler(config, cob_file):
         text_cobbler = f.read()
     text_cobbler = text_cobbler.format(
         int_ipadd="{$eth0_ip-address}",
-        ip_gateway=".".join((config['servers']['build-server']["ip"].split(".")[:3])) + ".1",
-        ip_dns=".".join((config['servers']['build-server']["ip"].split(".")[:3])) + ".1"
+        ip_gateway=".".join((config['servers']['build-server'][0]["ip"].split(".")[:3])) + ".1",
+        ip_dns=".".join((config['servers']['build-server'][0]["ip"].split(".")[:3])) + ".1"
     )
 
-    for c in config['servers']['control-servers']:
+    for c in config['servers']['control-server']:
         new_conf[c['hostname']] = {
             "hostname": c['hostname'] + "." + DOMAIN_NAME,
             "power_address": c["ip"],
@@ -104,7 +103,7 @@ def prepare_cobbler(config, cob_file):
                 }
             }
         }
-    for c in config['servers']['compute-servers']:
+    for c in config['servers']['compute-server']:
         new_conf[c['hostname']] = {
             "hostname": c['hostname'] + "." + DOMAIN_NAME,
             "power_address": c["ip"],
@@ -130,11 +129,11 @@ def role_mappings(config):
     :return: text dump of new role_mappings.yaml file
     """
     roles = {}
-    for c in config["servers"]["control-servers"]:
+    for c in config["servers"]["control-server"]:
         roles.update({c["hostname"]: "controller"})
-    for c in config["servers"]["compute-servers"]:
+    for c in config["servers"]["compute-server"]:
         roles.update({c["hostname"]: "compute"})
-    roles.update({config["servers"]["build-server"]["hostname"]: "build"})
+    roles.update({config["servers"]["build-server"][0]["hostname"]: "build"})
     return yaml.dump(roles)
 
 
@@ -228,10 +227,13 @@ def install_openstack(settings_dict,
                 with cd("/root"):
                     warn_if_fail(run_func("git clone -b icehouse "
                                           "https://github.com/CiscoSystems/puppet_openstack_builder"))
-                with cd("/root/puppet_openstack_builder"):
-                    run_func('git checkout i.0')
-                with cd("/root/puppet_openstack_builder/install-scripts"):
-                    warn_if_fail(run_func("./install.sh"))
+                with cd("puppet_openstack_builder"):
+                    ## run the latest, not i.0 release
+                    sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
+                        "icehouse/snapshots/i.0",
+                        "icehouse-proposed", use_sudo=use_sudo_flag)
+                    with cd("install-scripts"):
+                        warn_if_fail(run_func("./install.sh"))
                 fd = StringIO()
                 warn_if_fail(get("/etc/puppet/data/hiera_data/user.common.yaml", fd))
                 new_user_common = prepare2role(config, fd.getvalue())
@@ -269,7 +271,7 @@ def install_openstack(settings_dict,
                 else:
                     print (red("No openrc file, something went wrong! :("))
                 print (green("Copying logs and configs"))
-                collect_logs(run_func=run_func, hostname=config["servers"]["build-server"]["hostname"], clean=True)
+                collect_logs(run_func=run_func, hostname=config["servers"]["build-server"][0]["hostname"], clean=True)
                 print (green("Finished!"))
                 return True
             elif not force and prepare:
@@ -305,7 +307,7 @@ def track_cobbler(config, setts):
 
     wait_os_up = 20*60
     wait_catalog = 40*60
-    hosts = config["servers"]["compute-servers"] + config["servers"]["control-servers"]
+    hosts = config["servers"]["compute-server"] + config["servers"]["control-server"]
     # reset machines
     try:
         import libvirt

@@ -2,7 +2,12 @@ import os
 import yaml
 import crypt
 
-from network import Network, DOMAIN_NAME
+from config import opts
+if opts.ipv == 4:
+    from network import Network as Network
+else:
+    from network import Network6 as Network
+from network import DOMAIN_NAME
 from config import TEMPLATE_PATH, DIR_PATH
 from tempfile import NamedTemporaryFile
 from cloudtools import run_cmd, make_network_name
@@ -21,12 +26,15 @@ class SeedStorage:
         self.yaml = vmconf[self.server]["user-yaml"]
         self.path = path
         self.full_conf = full_conf
+        self.cmd = []
+        self.ydict = yaml.load(self.yaml)
 
-    def define(self):
-        ydict = yaml.load(self.yaml)
-        ydict['users'][1]['ssh-authorized-keys'] = hostconf['id_rsa_pub']
-        ydict['users'][1]['passwd'] = crypt.crypt(ydict['users'][1]['passwd'], "$6$rounds=4096")
-        ydict['write_files'][0]['content'] = "\n".join(hostconf['id_rsa_pub'])
+    def define_credentials(self):
+        self.ydict['users'][1]['ssh-authorized-keys'] = hostconf['id_rsa_pub']
+        self.ydict['users'][1]['passwd'] = crypt.crypt(self.ydict['users'][1]['passwd'], "$6$rounds=4096")
+        self.ydict['write_files'][0]['content'] = "\n".join(hostconf['id_rsa_pub'])
+
+    def define_interfaces(self):
         nets = self.full_conf['networks']
         ifupdown = []
         for num, net in enumerate(nets):
@@ -38,29 +46,41 @@ class SeedStorage:
                     network.net_ip,
                     Network.hosts[0][self.server][self.index]['ip_base']
                 )
-                ydict["write_files"].append({
+                if opts.distro == "ubuntu":
+                    interface_path = "/etc/network/interfaces.d/eth{int_num}.cfg"
+                else:
+                    interface_path = "/etc/sysconfig/network-scripts/ifcfg-{int_num}"
+                self.ydict["write_files"].append({
                     "content": interface.format(int_name="eth" + str(num), int_ip=interface_ip),
-                    "path": "/etc/network/interfaces.d/eth{int_num}.cfg".format(int_num=num),
+                    "path": interface_path.format(int_num=num),
                 })
                 ifupdown.append("eth{int_num}".format(int_num=num))
+        for cmd in self.ydict['runcmd']:
+            if "ifdown" in cmd:
+                for i in ifupdown:
+                    self.cmd.append("/sbin/ifdown {int} && /sbin/ifup {int}".format(int=i))
+                    self.cmd.append("service networking restart")
+
+    def define_hosts(self):
         hostname = Network.hosts[0][self.server][self.index]['hostname']
         hosts_file = hostconf['hosts_template'].format(
             server_name=hostname,
             domain_name=DOMAIN_NAME)
-        ydict["write_files"].append({"content": hosts_file, "path": "/etc/hosts"})
-        cmds = []
-        for cmd in ydict['runcmd']:
+        self.ydict["write_files"].append({"content": hosts_file, "path": "/etc/hosts"})
+        for cmd in self.ydict['runcmd']:
             if "hostname" in cmd:
-                cmds.append("/bin/hostname " + hostname)
-                cmds.append("/bin/echo " + hostname + " > /etc/hostname")
-            elif "ifdown" in cmd:
-                for i in ifupdown:
-                    cmds.append("/sbin/ifdown {int} && /sbin/ifup {int}".format(int=i))
-                cmds.append("/etc/init.d/networking restart")
-            else:
-                cmds.append(cmd)
-        ydict['runcmd'] = cmds
-        return yaml.dump(ydict)
+                self.cmd.append("/bin/hostname " + hostname)
+                self.cmd.append("/bin/echo " + hostname + " > /etc/hostname")
+
+    def define(self):
+        self.define_credentials()
+        self.define_interfaces()
+        self.define_hosts()
+        for cmd in self.ydict['runcmd']:
+            if cmd not in ("hostname", "ifdown"):
+                self.cmd.append(cmd)
+        self.ydict['runcmd'] = self.cmd
+        return yaml.dump(self.ydict)
 
     def create(self):
         c_localds = os.path.join(DIR_PATH, "cloud-localds")
@@ -69,8 +89,3 @@ class SeedStorage:
             temp.write("#cloud-config\n" + cloud_init)
             temp.flush()
             run_cmd([c_localds, "-d", "qcow2", self.path, temp.name])
-
-
-
-class SeedStorageRedHat(SeedStorage):
-    pass

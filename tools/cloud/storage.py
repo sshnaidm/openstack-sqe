@@ -6,7 +6,7 @@ import string
 
 from cloudtools import conn, found_pool
 from config import TEMPLATE_PATH, opts
-from cloudseed import SeedStorage, SeedStorageRedHat
+from cloudseed import SeedStorage
 
 with open(os.path.join(TEMPLATE_PATH, "storage.yaml")) as f:
     storconf = yaml.load(f)
@@ -76,8 +76,7 @@ class Storage:
             name = self.box_name(num=num) + "-seed.qcow2"
             disk_path = os.path.join(self.path, name)
             xmls.append(storconf['vol']['seed_disk'].format(seed_disk=disk_path))
-            seed_class = SeedStorage if self.distro == "ubuntu" else SeedStorageRedHat
-            seed = seed_class(self.lab_id, self.server, disk_path, num, self.full_conf)
+            seed = SeedStorage(self.lab_id, self.server, disk_path, num, self.full_conf)
             seed.create()
         return xmls
 

@@ -3,7 +3,7 @@ import random
 import yaml
 
 from cloudtools import conn, make_network_name
-from config import DOMAIN_NAME, DNS, TEMPLATE_PATH
+from config import opts, DOMAIN_NAME, DNS, TEMPLATE_PATH
 
 with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
     netconf = yaml.load(f)
@@ -97,14 +97,15 @@ class Network:
         )
 
     def define_interface(self):
+        distr_prefix = opts.distro + "_"
         if self.external:
-            self.interface = hostconf['manual_interface_template'].format(
+            self.interface = hostconf[distr_prefix + 'manual_interface_template'].format(
                 int_name="{int_name}")
         elif self.dhcp:
-            self.interface = hostconf['dhcp_interface'].format(
+            self.interface = hostconf[distr_prefix + 'dhcp_interface'].format(
                 int_name="{int_name}")
         else:
-            self.interface = hostconf['static_interface_template'].format(
+            self.interface = hostconf[distr_prefix + 'static_interface_template'].format(
                 int_name="{int_name}",
                 int_ip="{int_ip}",
                 net_ip=self.net_ip_base,

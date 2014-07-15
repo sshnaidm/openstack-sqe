@@ -1,7 +1,11 @@
 import os
 import yaml
 
-from network import Network
+from config import opts
+if opts.ipv == 4:
+    from network import Network as Network
+else:
+    from network import Network6 as Network
 from storage import Storage
 from cloudtools import conn, make_network_name
 from config import TEMPLATE_PATH
