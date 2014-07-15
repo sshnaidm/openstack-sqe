@@ -19,7 +19,6 @@ def construct_net_ip(lab_ip, net_shift):
 
 class VM:
     pool = {}
-    external_net = ""
 
     def __init__(self, lab_id, path, config, box):
         self.path = path
@@ -58,8 +57,8 @@ class VM:
             self.pool[self.box][index]["hostname"] = box_net["hostname"]
             if net_params[net]["external"]:
                 self.pool[self.box][index]["external_interface"] = "eth" + str(key)
-                if not self.external_net:
-                    self.external_net = construct_net_ip(env[self.lab_id]["net_start"], key)
+                if "external_net" not in self.pool:
+                    self.pool["external_net"] = construct_net_ip(env[self.lab_id]["net_start"], key)
             if not net_params[net]["nat"]:
                 self.pool[self.box][index]["internal_interface"] = "eth" + str(key)
         return xml
