@@ -10,7 +10,7 @@ from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 from fabric.contrib.files import exists, contains, sed
 from fabric.colors import green, red
 
-from utils import collect_logs, warn_if_fail, update_time, resolve_names, CONFIG_PATH, change_ip_to
+from utils import collect_logs, warn_if_fail, update_time, resolve_names, CONFIG_PATH, change_ip_to, dump
 
 __author__ = 'sshnaidm'
 
@@ -39,6 +39,8 @@ def prepare2role(config, common_file):
     print common_file
 
     conf = yaml.load(common_file)
+    print >> sys.stderr, " >>>> FABRIC loaded user.common.yaml file"
+    print conf
     conf["controller_public_address"] = config['servers']['control-server'][0]['ip']
     conf["controller_admin_address"] = config['servers']['control-server'][0]['ip']
     conf["controller_internal_address"] = config['servers']['control-server'][0]['ip']
@@ -74,8 +76,8 @@ def prepare2role(config, common_file):
     conf['ipv6_ra'] = 1
     conf['packages'] = conf['packages'] + " radvd"
     conf['install_drive'] = "/dev/vda"
-    conf['service-plugins'] += ["neutron.services.metering.metering_plugin.MeteringPlugin"]
-    return yaml.dump(conf)
+    conf['service_plugins'] += ["neutron.services.metering.metering_plugin.MeteringPlugin"]
+    return dump(conf)
 
 
 def prepare_cobbler(config, cob_file):
@@ -125,7 +127,7 @@ def prepare_cobbler(config, cob_file):
             }
         }
 
-    return text_cobbler + "\n" + yaml.dump(new_conf)
+    return text_cobbler + "\n" + dump(new_conf)
 
 
 def role_mappings(config):
@@ -141,7 +143,7 @@ def role_mappings(config):
     for c in config["servers"]["compute-server"]:
         roles.update({c["hostname"]: "compute"})
     roles.update({config["servers"]["build-server"][0]["hostname"]: "build"})
-    return yaml.dump(roles)
+    return dump(roles)
 
 
 def run_services(host,
@@ -160,8 +162,10 @@ def run_services(host,
     verbose = verbose or []
     if settings_dict['user'] != 'root':
         run_func = sudo
+        use_sudo_flag = True
     else:
         run_func = run
+        use_sudo_flag = False
     print >> sys.stderr, "FABRIC connecting to", settings_dict["host_string"],
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         with cd("/root/"):
@@ -172,8 +176,10 @@ def run_services(host,
                      'Dpkg::Options::="--force-confold" dist-upgrade')
             run_func("apt-get install -y git")
             run_func("git clone -b icehouse https://github.com/CiscoSystems/puppet_openstack_builder")
-            with cd("/root/puppet_openstack_builder"):
-                    run_func('git checkout i.0')
+            ## run the latest, not i.0 release
+            sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
+                        "icehouse/snapshots/i.0",
+                        "icehouse-proposed", use_sudo=use_sudo_flag)
             with cd("/root/puppet_openstack_builder/install-scripts"):
                 warn_if_fail(run_func("./setup.sh"))
                 warn_if_fail(run_func('puppet agent --enable'))
@@ -211,6 +217,8 @@ def install_openstack(settings_dict,
     with open(os.path.join(CONFIG_PATH, "buildserver_yaml")) as f:
                     build_yaml = f.read()
     roles_file = role_mappings(config)
+    print "Job settings", settings_dict
+    print "Env settings", envs
     print >> sys.stderr, roles_file
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         with cd("/root/"):
@@ -233,13 +241,14 @@ def install_openstack(settings_dict,
                                       'Dpkg::Options::="--force-confold" dist-upgrade'))
                 warn_if_fail(run_func("git clone -b icehouse "
                                         "https://github.com/CiscoSystems/puppet_openstack_builder"))
-                with cd("puppet_openstack_builder"):
+
                     ## run the latest, not i.0 release
-                    sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
-                        "icehouse/snapshots/i.0",
-                        "icehouse-proposed", use_sudo=use_sudo_flag)
-                    with cd("install-scripts"):
-                        warn_if_fail(run_func("./install.sh"))
+                sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
+                    "icehouse/snapshots/i.0",
+                    "icehouse-proposed", use_sudo=use_sudo_flag)
+                with cd("puppet_openstack_builder/install-scripts"):
+                    warn_if_fail(run_func("./install.sh"))
+                run_func("cp /etc/puppet/data/hiera_data/user.common.yaml /tmp/myfile")
                 fd = StringIO()
                 warn_if_fail(get("/etc/puppet/data/hiera_data/user.common.yaml", fd))
                 new_user_common = prepare2role(config, fd.getvalue())
@@ -369,9 +378,9 @@ def run_probe(settings_dict, envs=None, verbose=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', action='store', dest='user',
+    parser.add_argument('-u', action='store', dest='user', default=None,
                         help='User to run the script with')
-    parser.add_argument('-p', action='store', dest='password',
+    parser.add_argument('-p', action='store', dest='password', default=None,
                         help='Password for user and sudo')
     parser.add_argument('-a', action='append', dest='hosts', default=[],
                         help='List of hosts for action')
@@ -434,8 +443,8 @@ def main():
             sys.exit(1)
         build = config['servers']['build-server'][0]
         host = build["ip"]
-        user = build["user"]
-        password = build["password"]
+        user = opts.user or build["user"]
+        password = opts.password or build["password"]
         envs_build = {
             "vendor": "cisco",
             "scenario": "2_role",
