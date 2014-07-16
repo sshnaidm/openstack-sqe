@@ -31,10 +31,6 @@ requirements: venv
 	@echo "$(CYAN)>>>> Installing dependencies...$(RESET)"
 	test $(VENV)/requirements_installed -nt requirements || (. $(VENV)/bin/activate; pip install -Ur requirements && echo > $(VENV)/requirements_installed) || :
 
-init: venv requirements
-
-aio: init prepare-aio give-a-time install-aio
-
 flake8: init
 	@echo "$(CYAN)>>>> Running static analysis...$(RESET)"
 	@. $(VENV)/bin/activate; flake8 --max-line-length=120 --show-source --exclude=.env . | \
@@ -119,6 +115,8 @@ run-tests-parallel:
 	@echo "$(CYAN)>>>> Run tempest tests in parallel ...$(RESET)"
 	sed -i 's/testr run/testr run --parallel /g' ./tools/tempest-scripts/run_tempest_tests.sh
 	time /bin/bash ./tools/tempest-scripts/run_tempest_tests.sh
+
+
 
 init: venv requirements
 

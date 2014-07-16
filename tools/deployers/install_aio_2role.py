@@ -42,12 +42,19 @@ def prepare2role(config, common_file):
     conf["controller_public_address"] = config['servers']['control-server'][0]['ip']
     conf["controller_admin_address"] = config['servers']['control-server'][0]['ip']
     conf["controller_internal_address"] = config['servers']['control-server'][0]['ip']
-    conf["coe::base::controller_hostname"] = "control-server00"
+    conf["coe::base::controller_hostname"] = config['servers']['control-server'][0]['hostname']
     conf["domain_name"] = "domain.name"
     conf["ntp_servers"] = ["ntp.esl.cisco.com"]
-    conf["external_interface"] = "eth4"
-    conf["nova::compute::vncserver_proxyclient_address"] = "%{ipaddress_eth0}"
-    conf["build_node_name"] = "build-server"
+    conf['public_interface'] = config['servers']['control-server'][0]['admin_interface']
+    conf['private_interface'] = config['servers']['control-server'][0]['admin_interface']
+    conf["external_interface"] = config['servers']['control-server'][0]['external_interface']
+    conf['internal_ip'] = "%%{ipaddress_%s}" % config['servers']['control-server'][0]['admin_interface']
+    conf["nova::compute::vncserver_proxyclient_address"] = "%%{ipaddress_%s}" % \
+                                                           config['servers']['control-server'][0]['admin_interface']
+    conf["build_node_name"] = config['servers']['build-server'][0]['hostname']
+    conf["admin_user"] = "localadmin"
+    conf["password_crypted"] = ("$6$UfgWxrIv$k4KfzAEMqMg.fppmSOTd0usI4j6gfjs0962."
+                                "JXsoJRWa5wMz8yQk4SfInn4.WZ3L/MCt5u.62tHDGB36EhiKF1")
     conf["controller_public_url"] = change_ip_to(
         conf["controller_public_url"],
         config['servers']['control-server'][0]['ip'])
@@ -64,10 +71,10 @@ def prepare2role(config, common_file):
     conf["swift_public_address"] = config['servers']['control-server'][0]['ip']
     conf["swift_admin_address"] = config['servers']['control-server'][0]['ip']
     conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-server'][0]['ip']
-    conf['internal_ip'] = "%{ipaddress_eth0}"
-    conf['public_interface'] = "eth0"
-    conf['private_interface'] = "eth0"
+    conf['ipv6_ra'] = 1
+    conf['packages'] = conf['packages'] + " radvd"
     conf['install_drive'] = "/dev/vda"
+    conf['service-plugins'] += ["neutron.services.metering.metering_plugin.MeteringPlugin"]
     return yaml.dump(conf)
 
 
@@ -224,9 +231,8 @@ def install_openstack(settings_dict,
                 warn_if_fail(run_func('DEBIAN_FRONTEND=noninteractive apt-get -y '
                                       '-o Dpkg::Options::="--force-confdef" -o '
                                       'Dpkg::Options::="--force-confold" dist-upgrade'))
-                with cd("/root"):
-                    warn_if_fail(run_func("git clone -b icehouse "
-                                          "https://github.com/CiscoSystems/puppet_openstack_builder"))
+                warn_if_fail(run_func("git clone -b icehouse "
+                                        "https://github.com/CiscoSystems/puppet_openstack_builder"))
                 with cd("puppet_openstack_builder"):
                     ## run the latest, not i.0 release
                     sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
