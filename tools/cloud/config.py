@@ -60,3 +60,5 @@ else:
     params = parse(opts.defaults)
     DOMAIN_NAME = params["domain.name"]
     DNS = params["8.8.8.8"]
+ip_order = ("devstack-server", "aio-server", "build-server", "control-server",
+            "compute-server", "swift-storage", "swift-proxy", "load-balancer")

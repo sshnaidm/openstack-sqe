@@ -3,7 +3,7 @@ import random
 import yaml
 
 from cloudtools import conn, make_network_name
-from config import opts, DOMAIN_NAME, DNS, TEMPLATE_PATH
+from config import opts, DOMAIN_NAME, DNS, TEMPLATE_PATH, ip_order
 
 with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
     netconf = yaml.load(f)
@@ -44,7 +44,7 @@ class Network:
         servers_count = sum([self.config['servers'][i]['params']['count'] for i in self.config['servers']])
         ips = [self.net_ip_base + "." + str(ip_start + i) for i in xrange(servers_count)]
         ip_iter = iter(ips)
-        for server in sorted(self.config['servers']):
+        for server in sorted(self.config['servers'], key=lambda k: ip_order.index(k) if k in ip_order else -1):
             params = self.config['servers'][server]['params']
             hosts_def[server] = []
             for num in xrange(params['count']):

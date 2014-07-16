@@ -136,9 +136,9 @@ def run_probe(settings_dict, envs=None, verbose=None):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', action='store', dest='user',
+    parser.add_argument('-u', action='store', dest='user', default=None,
                         help='User to run the script with')
-    parser.add_argument('-p', action='store', dest='password',
+    parser.add_argument('-p', action='store', dest='password', default=None,
                         help='Password for user and sudo')
     parser.add_argument('-a', action='append', dest='hosts', default=[],
                         help='List of hosts for action')
@@ -188,8 +188,8 @@ def main():
             config = yaml.load(f)
         aio = config['servers']['aio-server'][0]
         host = aio["ip"]
-        user = aio["user"]
-        password = aio["password"]
+        user = opts.user or aio["user"]
+        password = opts.password or aio["password"]
         envs_aio = {"default_interface": aio["internal_interface"],
                     "external_interface": aio["external_interface"],
                     "scenario": "all-in-one",
