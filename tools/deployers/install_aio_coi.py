@@ -64,7 +64,8 @@ def install_openstack(settings_dict, envs=None, verbose=None, url_script=None, p
                         "icehouse/snapshots/i.0",
                         "icehouse-proposed", use_sudo=use_sudo_flag)
                     with cd("install-scripts"):
-                        result = run_func("./install.sh")
+                        run_func("./install.sh")
+                        result = run_func('puppet apply -v /etc/puppet/manifests/site.pp', pty=False)
                         tries = 1
                         error = "Error:"
                         while error in result and tries <= APPLY_LIMIT:
@@ -177,7 +178,7 @@ def main():
     if not opts.config_file:
         envs_aio = {"default_interface": opts.default_interface,
                     "external_interface": opts.default_interface,
-                    "scenario": "all-in-one",
+                    "scenario": "all_in_one",
                     "vendor": "cisco"
         }
         host = opts.hosts[0]
@@ -192,7 +193,7 @@ def main():
         password = opts.password or aio["password"]
         envs_aio = {"default_interface": aio["internal_interface"],
                     "external_interface": aio["external_interface"],
-                    "scenario": "all-in-one",
+                    "scenario": "all_in_one",
                     "vendor": "cisco"
         }
 

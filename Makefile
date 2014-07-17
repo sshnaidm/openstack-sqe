@@ -7,13 +7,14 @@ RESET=$(shell echo `tput sgr0`)
 #WORKSPACE=$(shell echo ${WORKSPACE})
 UBUNTU_DISK=http://172.29.173.233/trusty-server-cloudimg-amd64-disk1.img
 #UBUNTU_DISK=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+
 ifndef LAB
     LAB="lab1"
 endif
 ifndef WORKSPACE
     WORKSPACE=$$(pwd)"/.."
 endif
-
+TPATH=$(WORKSPACE)"/tempest/.venv/bin"
 
 clean:
 	@echo "$(CYAN)>>> Cleaning...$(RESET)"
@@ -103,8 +104,8 @@ prepare-tempest:
 	time python ${WORKSPACE}/tempest/tools/install_venv.py
 	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
 	. ${WORKSPACE}/tempest/.venv/bin/activate
-	./tools/tempest-scripts/tempest_unconfig.sh
-	./tools/tempest-scripts/tempest_configurator.sh $$(grep OS_AUTH_URL ./openrc | grep -Eo "/.*:" | sed "s@/@@g"  | sed "s@:@@g")
+	PATH=${PATH}:$(TPATH) ./tools/tempest-scripts/tempest_unconfig.sh
+	PATH=${PATH}:$(TPATH) ./tools/tempest-scripts/tempest_configurator.sh $$(grep OS_AUTH_URL ./openrc | grep -Eo "/.*:" | sed "s@/@@g"  | sed "s@:@@g")
 	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
 
 run-tests:
