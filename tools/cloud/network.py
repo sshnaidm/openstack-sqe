@@ -113,7 +113,7 @@ class Network:
 
     @staticmethod
     def network_combine(net, ip):
-        return net + "." + ip
+        return ".".join(net.split(".")[:3] + [ip])
 
     def create(self):
         xml = self.define()

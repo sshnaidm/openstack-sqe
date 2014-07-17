@@ -10,7 +10,9 @@ else
     testr run "$REG" --subunit | subunit-2to1 | tools/colorizer.py || :
 fi
 
-testr last --subunit | subunit-1to2 | subunit2junitxml --output-to="${WORKSPACE}/nosetests.xml" || :
-failed_tests=$(testr failing --list | grep -Eo "tempest[\._A-z]+" | sed "s/\(.*\)\..*\(JSON\)*\(XML\)*/\1/g" | sort -u)
-echo $failed_tests > failed
-export REG=$(echo $failed_tests | xargs echo | sed 's/ /.*\|/g' | sed "s/\(.*$\)/(\1)/g")
+results=${WORKSPACE}/nosetests_$(date  +%s).xml
+testr last --subunit | subunit-1to2 | subunit2junitxml --output-to="$results" || :
+python $WORKSPACE/openstack-sqe/tools/tempest-scripts/extract_failures.py $results > $tests
+#failed_tests=$(testr failing --list | grep -Eo "tempest[\._A-z]+" | sed "s/\(.*\)\..*\(JSON\)*\(XML\)*/\1/g" | sort -u)
+#echo $failed_tests > "$WORKSPACE/openstack-sqe/failed"
+#export REG=$(echo $failed_tests | xargs echo | sed 's/ /.*\|/g' | sed "s/\(.*$\)/(\1)/g")

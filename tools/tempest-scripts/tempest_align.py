@@ -131,7 +131,7 @@ def main():
             sys.exit(1)
         if "aio-server" in config["servers"]:
             apply_aio(
-                host=config["servers"]["aio-server"]["ip"],
+                host=config["servers"]["aio-server"][0]["ip"],
                 user=opts.user,
                 password=opts.password,
                 gateway=opts.gateway,
