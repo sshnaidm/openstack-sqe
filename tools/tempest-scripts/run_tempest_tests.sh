@@ -11,4 +11,6 @@ else
 fi
 
 testr last --subunit | subunit-1to2 | subunit2junitxml --output-to="${WORKSPACE}/nosetests.xml" || :
-export REG=$(testr failing --list | grep -Eo "tempest[\._A-z]+" | sed "s/\(.*\)\..*\(JSON\)*\(XML\)*/\1/g" | sort -u | xargs echo | sed 's/ /.*\|/g' | sed "s/\(.*$\)/(\1)/g")
+failed_tests=$(testr failing --list | grep -Eo "tempest[\._A-z]+" | sed "s/\(.*\)\..*\(JSON\)*\(XML\)*/\1/g" | sort -u)
+echo $failed_tests > failed
+export REG=$(echo $failed_tests | xargs echo | sed 's/ /.*\|/g' | sed "s/\(.*$\)/(\1)/g")
