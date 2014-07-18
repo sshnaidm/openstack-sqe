@@ -712,6 +712,8 @@ def track_cobbler(config, setts):
 
 
 
+
+
 class Standalone:
     def __init__(self, conf, ssh_key, verb):
         self.conf = conf
@@ -737,7 +739,7 @@ class Standalone:
     def env_update(self):
         pass
 
-    def run(self):
+    def prerun(self):
         if self.conf_yaml:
             self.parse_file()
         else:
@@ -753,9 +755,57 @@ class Standalone:
             "gateway": self.conf.gateway
         }
         if self.scenario == "devstack":
-            install_devstack(job, self.env, self.verb, self.conf.proxy, self.patch)
+            install_devstack(job, self.env, self.verb, self.conf.proxy, self.conf.patch)
         else:
-            install_openstack(job, self.env, self.verb, self.conf.force, None, False, self.conf.proxy, self.scenario)
+            install_openstack(job, self.env, self.verb, self.conf.force, self.conf_yaml, self.conf.use_cobbler,
+                              self.conf.proxy, self.scenario)
+
+    def postrun(self):
+        pass
+
+    def run(self):
+        self.prerun()
+        self.postrun()
+
+
+
+
+
+class Role2(Standalone):
+    def __init__(self, *args):
+        Standalone.__init__(*args)
+        self.env = {"vendor": "cisco",
+                    "scenario": "2role"}
+        self.scenario = "2_role"
+        self.build = None
+        if self.conf_yaml:
+            self.build = self.conf_yaml['servers']['build-server'][0]
+
+    def parse_file(self):
+        self.host = self.build["ip"]
+        self.user = self.build["user"]
+        self.password = self.build["password"]
+
+    def postrun(self):
+        job = {
+            "host_string": None,
+            "user": self.user,
+            "password": self.password,
+            "warn_only": True,
+            "key_filename": self.ssh_key,
+            "abort_on_prompts": True,
+            "gateway": self.conf.gateway
+        }
+        servers = self.conf_yaml["servers"]["control-server"] + self.conf_yaml["servers"]["compute-server"]
+        for host in servers:
+            job['host_string'] = host["ip"]
+            run_services(host,
+                         job,
+                         verbose=self.verb,
+                         envs=self.env,
+                         config=self.conf_yaml,
+                         scenario=self.scenario
+                         )
 
 
 class AIO(Standalone):
@@ -857,6 +907,10 @@ def main():
 
     elif opts.scenario == "devstack":
         deployer = Devstack(opts, ssh_key_file, verb_mode)
+        deployer.run()
+
+    elif opts.scenario == "2role":
+        deployer = Role2(opts, ssh_key_file, verb_mode)
         deployer.run()
 
 

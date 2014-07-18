@@ -107,6 +107,16 @@ template:
           {dhcp}
           </ip>
         </network>
+  xml6: |
+        <network>
+          <name>{name}</name>
+          {nat}
+          <domain name='{domain}'/>
+          {dns}
+          <ip family="ipv6" address='{net_ip}' prefix='{prefix}'>
+          {dhcp}
+          </ip>
+        </network>
   dns_def: |
         <dns>
           {dns_records}
@@ -121,8 +131,15 @@ template:
           <range start='{net_ip}.2' end='{net_ip}.250' />
           {dhcp_records}
         </dhcp>
+  dhcp_def6: |
+        <dhcp>
+          <range start='{start_ip}' end='{end_ip}' />
+          {dhcp_records}
+        </dhcp>
   dhcp_host: |
         <host mac="{mac}" name="{hostname}.{domain}" ip="{ip}"/>
+  dhcp_host6: |
+        <host id="{id}" name="{hostname}.{domain}" ip="{ip}"/>
   nat: |
         <forward mode='nat'>
           <nat>

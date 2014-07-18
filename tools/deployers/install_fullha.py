@@ -267,6 +267,9 @@ def run_services(host,
             sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
                             "icehouse/snapshots/i.0",
                             "icehouse-proposed", use_sudo=use_sudo_flag)
+            sed("/root/puppet_openstack_builder/data/hiera_data/vendor/cisco_coi_common.yaml",
+                            "/snapshots/i.0",
+                            "-proposed", use_sudo=use_sudo_flag)
             with cd("/root/puppet_openstack_builder/install-scripts"):
                 warn_if_fail(run_func("./setup.sh"))
                 warn_if_fail(run_func('puppet agent --enable'))
@@ -332,6 +335,9 @@ def install_openstack(settings_dict,
                         sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
                             "icehouse/snapshots/i.0",
                             "icehouse-proposed", use_sudo=use_sudo_flag)
+                        sed("/root/puppet_openstack_builder/data/hiera_data/vendor/cisco_coi_common.yaml",
+                            "/snapshots/i.0",
+                            "-proposed", use_sudo=use_sudo_flag)
                         with cd("install-scripts"):
                             warn_if_fail(run_func("./install.sh"))
                 prepare_files(config,
