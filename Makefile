@@ -7,7 +7,6 @@ RESET=$(shell echo `tput sgr0`)
 #WORKSPACE=$(shell echo ${WORKSPACE})
 UBUNTU_DISK=http://172.29.173.233/trusty-server-cloudimg-amd64-disk1.img
 #UBUNTU_DISK=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
-
 ifndef LAB
 	LAB="lab1"
 endif
