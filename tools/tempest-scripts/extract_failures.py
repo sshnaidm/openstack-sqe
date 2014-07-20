@@ -2,11 +2,11 @@ __author__ = 'sshnaidm'
 
 
 import sys
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as Et
 
 with open(sys.argv[1]) as f:
     xml = f.read()
-exml = et.fromstring(xml)
+exml = Et.fromstring(xml)
 
 fails = [i.attrib["classname"] + "." + i.attrib["name"]
          for i in exml.getchildren()

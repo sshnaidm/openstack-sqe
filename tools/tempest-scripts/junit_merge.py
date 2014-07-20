@@ -5,8 +5,9 @@
 
 import os
 import sys
-import xml.etree.ElementTree as et
+import xml.etree.ElementTree as Et
 import itertools
+
 
 def main():
     args = sys.argv[1:]
@@ -17,6 +18,7 @@ def main():
         usage()
         sys.exit(2)
     merge_results(args[:])
+
 
 def merge_cases(cases):
     dicmap = {}
@@ -38,8 +40,6 @@ def merge_cases(cases):
     return new_dicmap.values()
 
 
-
-
 def merge_results(xml_files):
     failures = []
     tests = []
@@ -48,7 +48,7 @@ def merge_results(xml_files):
     cases = []
 
     for file_name in xml_files:
-        tree = et.parse(file_name)
+        tree = Et.parse(file_name)
         test_suite = tree.getroot()
         failures.append(int(test_suite.attrib['failures']))
         tests.append(int(test_suite.attrib['tests']))
@@ -56,14 +56,14 @@ def merge_results(xml_files):
         time.append(float(test_suite.attrib['time']))
         cases.append(test_suite.getchildren())
 
-    new_root = et.Element('testsuite')
+    new_root = Et.Element('testsuite')
     new_root.attrib['failures'] = '%s' % min(failures)
     new_root.attrib['tests'] = '%s' % max(tests)
     new_root.attrib['errors'] = '%s' % min(errors)
     new_root.attrib['time'] = '%s' % max(time)
     new_root.extend(merge_cases(cases))
-    new_tree = et.ElementTree(new_root)
-    et.dump(new_tree)
+    new_tree = Et.ElementTree(new_root)
+    Et.dump(new_tree)
 
 
 def usage():
