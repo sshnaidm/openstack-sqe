@@ -154,7 +154,7 @@ def main():
     else:
         with open(opts.config_file) as f:
             config = yaml.load(f)
-        aio = config['servers']['aio']
+        aio = config['servers']['devstack-server'][0]
         job = {"host_string": aio["ip"],
                "user": opts.user or aio["user"],
                "password": opts.password or aio["password"],

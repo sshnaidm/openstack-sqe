@@ -9,8 +9,8 @@ from fabric.contrib.files import exists, contains, append, sed
 from fabric.colors import green, red
 
 from config import APPLY_LIMIT, DOMAIN_NAME
-from role2 import Role2Deploy
-from fullha import FullHADeploy
+#from role2 import Role2Deploy
+#from fullha import FullHADeploy
 
 
 __author__ = 'sshnaidm'
