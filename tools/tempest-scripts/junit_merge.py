@@ -22,7 +22,7 @@ def main():
 
 def merge_cases(cases):
     dicmap = {}
-    for i in itertools.chain(*[case.getchildren() for case in cases]):
+    for i in itertools.chain(*[case for case in cases]):
         name = i.attrib["classname"] + "___" + i.attrib["name"]
         if name in dicmap:
             dicmap[name].append(i)
@@ -37,7 +37,7 @@ def merge_cases(cases):
         else:
             std_case = dicmap[i][-1]
         new_dicmap[i] = std_case
-    return new_dicmap.values()
+    return sorted(new_dicmap.values())
 
 
 def merge_results(xml_files):
