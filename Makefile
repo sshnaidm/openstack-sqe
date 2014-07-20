@@ -9,10 +9,10 @@ UBUNTU_DISK=http://172.29.173.233/trusty-server-cloudimg-amd64-disk1.img
 #UBUNTU_DISK=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
 
 ifndef LAB
-    LAB="lab1"
+	LAB="lab1"
 endif
 ifndef WORKSPACE
-    WORKSPACE=$$(pwd)"/.."
+	WORKSPACE=$$(pwd)"/.."
 endif
 TPATH=$(WORKSPACE)"/tempest/.venv/bin"
 
@@ -54,6 +54,11 @@ prepare-aio-local:
 	@echo "$(CYAN)>>>> Preparing AIO box...$(RESET)"
 	time ./tools/cloud/create.py -l lab1 -s /media/hdd/tmpdir/tmp/imgs -z /media/hdd/tmpdir/trusty-server-cloudimg-amd64-disk1.img -t aio > config_file
 
+prepare-devstack:
+	@echo "$(CYAN)>>>> Preparing AIO box...$(RESET)"
+	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
+	time ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t devstack > config_file
+
 prepare-2role:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
@@ -85,10 +90,12 @@ install-aio:
 install-2role:
 	@echo "$(CYAN)>>>> Installing 2_role multinode...$(RESET)"
 	time $(PYTHON) ./tools/deployers/install_aio_2role.py -c config_file -u root
+	touch 2role
 
 install-2role-cobbler:
 	@echo "$(CYAN)>>>> Installing 2_role multinode with cobbler...$(RESET)"
 	time $(PYTHON) ./tools/deployers/install_aio_2role.py -e -c config_file -u root
+	touch 2role
 
 install-fullha:
 	@echo "$(CYAN)>>>> Installing full HA setup...$(RESET)"
@@ -98,6 +105,10 @@ install-fullha-cobbler:
 	@echo "$(CYAN)>>>> Installing full HA setup with cobbler...$(RESET)"
 	time $(PYTHON) ./tools/deployers/install_fullha.py -e -c config_file
 
+install-devstack:
+	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
+	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu
+
 prepare-tempest:
 	@echo "$(CYAN)>>>> Preparing tempest...$(RESET)"
 	time $(PYTHON) ./tools/tempest-scripts/tempest_align.py -c config_file -u localadmin -p ubuntu
@@ -106,6 +117,7 @@ prepare-tempest:
 	. ${WORKSPACE}/tempest/.venv/bin/activate
 	PATH=${PATH}:$(TPATH) ./tools/tempest-scripts/tempest_unconfig.sh
 	PATH=${PATH}:$(TPATH) ./tools/tempest-scripts/tempest_configurator.sh $$(grep OS_AUTH_URL ./openrc | grep -Eo "/.*:" | sed "s@/@@g"  | sed "s@:@@g")
+	test -e 2role && sed -i "s/.*[sS]wift.*\=.*[Tt]rue.*/swift=false/g" ./tempest.conf.jenkins || :
 	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
 
 run-tests:
@@ -116,7 +128,6 @@ run-tests-parallel:
 	@echo "$(CYAN)>>>> Run tempest tests in parallel ...$(RESET)"
 	sed -i 's/testr run/testr run --parallel /g' ./tools/tempest-scripts/run_tempest_tests.sh
 	time /bin/bash ./tools/tempest-scripts/run_tempest_tests.sh
-
 
 
 init: venv requirements
