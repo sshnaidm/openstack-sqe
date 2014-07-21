@@ -17,7 +17,7 @@ class Standalone(object):
         self.job = None
         self.cls = None
         if self.conf.config_file:
-            self.conf_yaml = yaml.load(self.conf.config_file)
+            self.conf_yaml = self.conf.config_file
 
     def create_config(self):
         self.host = self.conf.host

@@ -67,6 +67,6 @@ if not opts.config_file and opts.scenario not in ("all-in-one", "devstack"):
     raise ConfigError("Config file is requried if not AIO scenario or devstack")
 if opts.config_file:
     try:
-        yaml.load(opts.config_file)
+        opts.config_file = yaml.load(opts.config_file)
     except Exception as e:
         raise ConfigError("Config file is not of YAML format!\n%s" % str(e))
