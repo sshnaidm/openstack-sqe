@@ -1,6 +1,9 @@
 __author__ = 'sshnaidm'
 
-from common import Standalone
+#from common import Standalone
+from deploy import Standalone
+
+
 
 class AIO(Standalone):
     def __init__(self, *args):

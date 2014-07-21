@@ -1,4 +1,4 @@
-from common import Standalone
+from deploy import Standalone
 from utils import warn_if_fail, update_time
 from StringIO import StringIO
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get

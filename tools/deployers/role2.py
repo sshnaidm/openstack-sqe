@@ -3,8 +3,8 @@ import os
 from StringIO import StringIO
 
 from config import DOMAIN_NAME, CONFIG_PATH, opts
-
-from common import Standalone, run_services, track_cobbler
+from deploy import Standalone
+from common import run_services, track_cobbler
 from utils import change_ip_to, dump, warn_if_fail
 from StringIO import StringIO
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
