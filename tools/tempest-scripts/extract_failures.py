@@ -14,4 +14,7 @@ tmp_fails = [i.attrib["classname"] + "." + i.attrib["name"]
          if i.getchildren()
          if "failure" in z.tag]
 fails = [i for i in tmp_fails if "process-returncode" not in i]
-print "\n".join(fails)
+if fails:
+    print("\n".join(fails))
+else:
+    sys.exit()
