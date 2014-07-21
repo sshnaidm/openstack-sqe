@@ -3,6 +3,7 @@ source $WORKSPACE/tempest/.venv/bin/activate
 source $WORKSPACE/openstack-sqe/openrc
 tests="$WORKSPACE/openstack-sqe/tools/tempest-scripts/tests_set"
 cd $WORKSPACE/tempest/
+rm -rf .testrepository || :
 testr init || :
 if [ -s "$tests" ]; then
     testr run --load-list "$tests" --subunit  | subunit-2to1 | tools/colorizer.py || :
