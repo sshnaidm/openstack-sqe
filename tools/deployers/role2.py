@@ -166,11 +166,12 @@ class Role2Deploy:
 
 class Role2(Standalone):
     def __init__(self, *args):
-        Standalone.__init__(*args)
+        super(Standalone, self).__init__(*args)
         self.env = {"vendor": "cisco",
                     "scenario": "2_role"}
         self.scenario = "2_role"
         self.build = None
+        self.cls = Role2Deploy
         if self.conf_yaml:
             self.build = self.conf_yaml['servers']['build-server'][0]
 

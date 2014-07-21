@@ -3,7 +3,7 @@ __author__ = 'sshnaidm'
 from common import install_openstack
 import yaml
 
-class Standalone:
+class Standalone(object):
     def __init__(self, conf, ssh_key, verb):
         self.conf = conf
         self.ssh_key = ssh_key
@@ -15,6 +15,7 @@ class Standalone:
         self.conf_yaml = None
         self.scenario = None
         self.job = None
+        self.cls = None
         if self.conf.config_file:
             self.conf_yaml = yaml.load(self.conf.config_file)
 
@@ -47,7 +48,7 @@ class Standalone:
 
     def run_installer(self):
         install_openstack(self.job, self.env, self.verb, self.conf.force, self.conf_yaml, self.conf.use_cobbler,
-                          self.conf.proxy, self.scenario)
+                          self.conf.proxy, self.scenario, self.cls)
 
     def postrun(self):
         pass

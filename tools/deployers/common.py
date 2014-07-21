@@ -23,7 +23,8 @@ def install_openstack(settings_dict,
                       config=None,
                       use_cobbler=False,
                       proxy=None,
-                      scenario=None):
+                      scenario=None,
+                      cls=None):
     """
         Install OS with COI on build server
 
@@ -74,12 +75,12 @@ def install_openstack(settings_dict,
                 resolve_names(run_func, use_sudo_flag)
                 if scenario != "all_in_one":
                     prepare_hosts(config, scenario)
-                    map = {
-                        "2role": Role2Deploy,
-                        "fullha": FullHADeploy,
-                        "devstack": DevstackDeploy,
-                    }
-                    map[scenario].prepare_all_files(config, use_sudo_flag)
+                    #map = {
+                    #    "2role": Role2Deploy,
+                    #    "fullha": FullHADeploy,
+                    #    "devstack": DevstackDeploy,
+                    #}
+                    cls.prepare_all_files(config, use_sudo_flag)
 
                 check_results(run_func, use_cobbler)
                 if exists('/root/openrc'):
