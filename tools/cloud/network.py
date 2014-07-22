@@ -125,4 +125,6 @@ class Network:
 
 
 class Network6(Network):
+    def __init__(self, *args, **kwargs):
+        super(Network, self).__init__(*args, **kwargs)
     pass

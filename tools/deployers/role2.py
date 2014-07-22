@@ -23,9 +23,9 @@ class Role2Deploy:
         def prepare_common(config, common_file):
             """ Prepare user.common.file """
             conf = yaml.load(common_file)
-            conf["controller_public_address"] = config['servers']['control-servers'][0]['ip']
-            conf["controller_admin_address"] = config['servers']['control-servers'][0]['ip']
-            conf["controller_internal_address"] = config['servers']['control-servers'][0]['ip']
+            conf["controller_public_address"] = config['servers']['control-server'][0]['ip']
+            conf["controller_admin_address"] = config['servers']['control-server'][0]['ip']
+            conf["controller_internal_address"] = config['servers']['control-server'][0]['ip']
             conf["coe::base::controller_hostname"] = "control-server00"
             conf["domain_name"] = "domain.name"
             conf["ntp_servers"] = ["ntp.esl.cisco.com"]
@@ -34,20 +34,20 @@ class Role2Deploy:
             conf["build_node_name"] = "build-server"
             conf["controller_public_url"] = change_ip_to(
                 conf["controller_public_url"],
-                config['servers']['control-servers'][0]['ip'])
+                config['servers']['control-server'][0]['ip'])
             conf["controller_admin_url"] = change_ip_to(
                 conf["controller_admin_url"],
-                config['servers']['control-servers'][0]['ip'])
+                config['servers']['control-server'][0]['ip'])
             conf["controller_internal_url"] = change_ip_to(
                 conf["controller_internal_url"],
-                config['servers']['control-servers'][0]['ip'])
-            conf["cobbler_node_ip"] = config['servers']['build-server']['ip']
+                config['servers']['control-server'][0]['ip'])
+            conf["cobbler_node_ip"] = config['servers']['build-server'][0]['ip']
             conf["node_subnet"] = ".".join(conf["cobbler_node_ip"].split(".")[:3]) + ".0"
             conf["node_gateway"] = ".".join(conf["cobbler_node_ip"].split(".")[:3]) + ".1"
-            conf["swift_internal_address"] = config['servers']['control-servers'][0]['ip']
-            conf["swift_public_address"] = config['servers']['control-servers'][0]['ip']
-            conf["swift_admin_address"] = config['servers']['control-servers'][0]['ip']
-            conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-servers'][0]['ip']
+            conf["swift_internal_address"] = config['servers']['control-server'][0]['ip']
+            conf["swift_public_address"] = config['servers']['control-server'][0]['ip']
+            conf["swift_admin_address"] = config['servers']['control-server'][0]['ip']
+            conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-server'][0]['ip']
             conf['internal_ip'] = "%{ipaddress_eth0}"
             conf['public_interface'] = "eth0"
             conf['private_interface'] = "eth0"
@@ -71,11 +71,11 @@ class Role2Deploy:
                 text_cobbler = f.read()
             text_cobbler = text_cobbler.format(
                 int_ipadd="{$eth0_ip-address}",
-                ip_gateway=".".join((config['servers']['build-server']["ip"].split(".")[:3])) + ".1",
-                ip_dns=".".join((config['servers']['build-server']["ip"].split(".")[:3])) + ".1"
+                ip_gateway=".".join((config['servers']['build-server'][0]["ip"].split(".")[:3])) + ".1",
+                ip_dns=".".join((config['servers']['build-server'][0]["ip"].split(".")[:3])) + ".1"
             )
 
-            for c in config['servers']['control-servers']:
+            for c in config['servers']['control-server']:
                 new_conf[c['hostname']] = {
                     "hostname": c['hostname'] + "." + DOMAIN_NAME,
                     "power_address": c["ip"],
@@ -89,7 +89,7 @@ class Role2Deploy:
                         }
                     }
                 }
-            for c in config['servers']['compute-servers']:
+            for c in config['servers']['compute-server']:
                 new_conf[c['hostname']] = {
                     "hostname": c['hostname'] + "." + DOMAIN_NAME,
                     "power_address": c["ip"],
