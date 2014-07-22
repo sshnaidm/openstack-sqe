@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 __author__ = 'sshnaidm'
 
 import os, sys, time, random
