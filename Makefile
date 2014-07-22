@@ -133,6 +133,9 @@ run-tests-parallel:
 	sed -i 's/testr run/testr run --parallel /g' ./tools/tempest-scripts/run_tempest_tests.sh
 	time /bin/bash ./tools/tempest-scripts/run_tempest_tests.sh
 
+shutdown:
+	@echo "$(CYAN)>>>> Shutdown everything ...$(RESET)"
+	./tools/cloud/create.py -l ${LAB} -y
 
 init: venv requirements
 
@@ -163,6 +166,7 @@ full-2role: 2role run-tempest
 full-2role-quick: 2role run-tempest-parallel
 
 full-fullha: fullha run-tempest
+
 
 test-me:
 	@echo "$(CYAN)>>>> test your commands :) ...$(RESET)"
