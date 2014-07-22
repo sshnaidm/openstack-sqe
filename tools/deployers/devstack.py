@@ -137,7 +137,7 @@ def install_devstack(settings_dict,
             warn_if_fail(put(StringIO('Acquire::http::Pipeline-Depth "0";'),
                              "/etc/apt/apt.conf.d/00no_pipelining",
                              use_sudo=True))
-        update_time(run)
+        update_time(sudo)
         warn_if_fail(sudo("apt-get update"))
         warn_if_fail(sudo("apt-get install -y git python-pip"))
         warn_if_fail(run("git config --global user.email 'test.node@example.com';"
