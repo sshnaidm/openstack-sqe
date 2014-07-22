@@ -12,7 +12,9 @@ def main():
             topo_config = yaml.load(f)
     elif opts.topoconf:
         topo_config = yaml.load(opts.topoconf)
-    elif not opts.shutdown_all and not opts.undefine_all:
+    elif opts.shutdown_all or opts.undefine_all:
+        topo_config = None
+    else:
         raise ConfigError("Please provide topology!")
 
     cloud_img = os.path.abspath(opts.cloud_img_path)
