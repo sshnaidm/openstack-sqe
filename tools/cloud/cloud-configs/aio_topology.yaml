@@ -1,7 +1,7 @@
 servers:
   aio-server:
     params:
-      hostname:
+      hostname: all-in-one
       count: 1
       storage: 60
       add_disks:

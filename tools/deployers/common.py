@@ -88,7 +88,14 @@ def install_openstack(settings_dict,
                 else:
                     print (red("No openrc file, something went wrong! :("))
                 print (green("Copying logs and configs"))
-                collect_logs(run_func=run_func, hostname=config["servers"]["build-server"][0]["hostname"], clean=True)
+                if scenario != "all_in_one":
+                    collect_logs(run_func=run_func,
+                                 hostname=config["servers"]["build-server"][0]["hostname"],
+                                 clean=True)
+                else:
+                    collect_logs(run_func=run_func,
+                                 hostname=config["servers"]["aio-server"][0]["hostname"],
+                                 clean=True)
                 print (green("Finished!"))
             else:
                 return True
