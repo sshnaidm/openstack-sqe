@@ -150,6 +150,8 @@ run-tempest: prepare-tempest run-tests
 
 run-tempest-parallel: prepare-tempest run-tests-parallel
 
+devstack: init prepare-devstack give-a-time install-devstack
+
 devstack-tempest: prepare-devstack-tempest run-tests
 
 full-aio: aio run-tempest
