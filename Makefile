@@ -56,7 +56,7 @@ prepare-aio-local:
 prepare-devstack:
 	@echo "$(CYAN)>>>> Preparing AIO box...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t devstack > config_file
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t devstack > config_file
 
 prepare-2role:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes...$(RESET)"
@@ -135,7 +135,7 @@ run-tests-parallel:
 
 shutdown:
 	@echo "$(CYAN)>>>> Shutdown everything ...$(RESET)"
-	./tools/cloud/create.py -l ${LAB} -y
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -y
 
 init: venv requirements
 
