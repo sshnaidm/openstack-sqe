@@ -112,7 +112,7 @@ install-devstack:
 prepare-devstack-tempest:
 	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
 	mv ./tempest.conf ${WORKSPACE}/tempest/etc/tempest.conf
-	cat $WORKSPACE/tempest/etc/*txt > $WORKSPACE/openstack-sqe/tools/tempest-scripts/tests_set
+	cat ${WORKSPACE}/tempest/etc/*txt > ${WORKSPACE}/openstack-sqe/tools/tempest-scripts/tests_set
 
 prepare-tempest:
 	@echo "$(CYAN)>>>> Preparing tempest...$(RESET)"
