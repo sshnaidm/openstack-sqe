@@ -107,7 +107,7 @@ install-fullha-cobbler:
 install-devstack:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
 	#time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu
-	time $(PYTHON) ./tools/deployers/install_coi.py -c config_file  -u localadmin -p ubuntu -t devstack
+	time $(PYTHON) ./tools/deployers/install_coi.py -c config_file  -u localadmin -p ubuntu -s devstack
 
 prepare-devstack-tempest:
 	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
