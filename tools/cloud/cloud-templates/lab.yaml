@@ -73,3 +73,51 @@ lab24:
 lab25:
    net_start: 192.168.135
    ip_start: 2
+lab100:
+   net_start: 10.10.1
+   ip_start: 2
+lab101:
+   net_start: 10.10.2
+   ip_start: 2
+lab102:
+   net_start: 10.10.3
+   ip_start: 2
+lab103:
+   net_start: 10.10.4
+   ip_start: 2
+lab104:
+   net_start: 10.10.5
+   ip_start: 2
+lab105:
+   net_start: 10.10.6
+   ip_start: 2
+lab106:
+   net_start: 10.10.7
+   ip_start: 2
+lab107:
+   net_start: 10.10.8
+   ip_start: 2
+lab108:
+   net_start: 10.10.9
+   ip_start: 2
+lab109:
+   net_start: 10.10.10
+   ip_start: 2
+lab110:
+   net_start: 10.10.11
+   ip_start: 2
+lab111:
+   net_start: 10.10.12
+   ip_start: 2
+lab112:
+   net_start: 10.10.13
+   ip_start: 2
+lab113:
+   net_start: 10.10.14
+   ip_start: 2
+lab114:
+   net_start: 10.10.15
+   ip_start: 2
+lab115:
+   net_start: 10.10.16
+   ip_start: 2
