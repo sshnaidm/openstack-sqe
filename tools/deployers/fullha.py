@@ -248,7 +248,7 @@ class FullHADeploy:
         write(b_text, path, file_name, use_sudo_flag)
 
     @staticmethod
-    def prepare_all_files(self,config, use_sudo_flag):
+    def prepare_all_files(self, config, use_sudo_flag):
         self.prepare_fullha_files(config,
                       paths=(
                       "/etc/puppet/data/hiera_data/user.common.yaml",

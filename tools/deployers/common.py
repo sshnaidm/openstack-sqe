@@ -80,7 +80,7 @@ def install_openstack(settings_dict,
                     #    "fullha": FullHADeploy,
                     #    "devstack": DevstackDeploy,
                     #}
-                    cls.prepare_all_files(config, use_sudo_flag)
+                    cls.prepare_all_files(cls(), config, use_sudo_flag)
 
                 check_results(run_func, use_cobbler)
                 if exists('/root/openrc'):

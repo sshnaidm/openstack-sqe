@@ -18,7 +18,7 @@ class Role2Deploy:
 
 
     @staticmethod
-    def prepare_2role_files(self, config, paths, use_sudo_flag):
+    def prepare_2role_files(config, paths, use_sudo_flag):
 
         def prepare_common(config, common_file):
             """ Prepare user.common.file """
@@ -135,7 +135,7 @@ class Role2Deploy:
             warn_if_fail(put(StringIO(new_file), path, use_sudo=use_sudo_flag))
 
     @staticmethod
-    def prepare_new_2role_files(self, config, path, use_sudo_flag):
+    def prepare_new_2role_files(config, path, use_sudo_flag):
         """ Prepare hostname specific files in puppet/data/hiera_data/hostname """
 
         def write(text, path, filename, sudo):
@@ -148,7 +148,7 @@ class Role2Deploy:
         write(b_text, path, file_name, use_sudo_flag)
 
     @staticmethod
-    def prepare_all_files(self,config, use_sudo_flag):
+    def prepare_all_files(self, config, use_sudo_flag):
         self.prepare_2role_files(config,
                       paths=(
                       "/etc/puppet/data/hiera_data/user.common.yaml",
