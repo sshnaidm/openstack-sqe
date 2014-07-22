@@ -107,14 +107,12 @@ def reconfigure(path):
             print "Tempest configuration %s doesn't exist!" % path2
             sys.exit(1)
     parser = ConfigParser.SafeConfigParser()
-    with open(path) as f:
-        parser.read(f)
+    parser.read(path)
     #lock_dir = os.path.join(ws, "tempest", "data", "tempest")
     #if not os.path.isdir(lock_dir):
     #    os.makedirs(lock_dir)
     #parser.set("DEFAULT", "lock_path", lock_dir)
     venv_bin = os.path.join(ws, "tempest", ".venv", "bin")
-    print parser.sections()
     parser.set("cli", "cli_dir", venv_bin)
     #parser.set("boto", "s3_materials_path", "/home/localadmin/devstack/files/images/s3-materials/cirros-0.3.2")
     #parser.set("scenario", "img_dir", "/home/localadmin/devstack/files/images/cirros-0.3.2-x86_64-uec")
