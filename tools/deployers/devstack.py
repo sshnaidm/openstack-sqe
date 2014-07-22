@@ -1,4 +1,6 @@
 import os
+import ConfigParser
+import sys
 from deploy import Standalone
 from utils import warn_if_fail, update_time
 from StringIO import StringIO
@@ -89,6 +91,37 @@ class DevstackDeploy:
         fd = StringIO(conf)
         warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
 
+
+def reconfigure(path):
+    cur_dir = os.path.dirname(__file__)
+    if "WORKSPACE" in os.environ:
+        ws = os.environ["WORKSPACE"]
+    else:
+        ws = os.path.join(cur_dir, "..", "..", "..")
+    if not os.path.exists(path):
+        print "Tempest configuration %s doesn't exist!" % path
+        path2 = os.path.join(cur_dir, "..", "..", "tempest.conf")
+        if os.path.exists(path2):
+            path = path2
+        else:
+            print "Tempest configuration %s doesn't exist!" % path2
+            sys.exit(1)
+    parser = ConfigParser.SafeConfigParser()
+    with open(path) as f:
+        parser.read(f)
+    lock_dir = os.path.join(ws, "tempest", "data", "tempest")
+    if not os.path.isdir(lock_dir):
+        os.makedirs(lock_dir)
+    #parser.set("DEFAULT", "lock_path", lock_dir)
+    venv_bin = os.path.join(ws, "tempest", ".venv", "bin")
+    parser.set("cli", "cli_dir", venv_bin)
+    #parser.set("boto", "s3_materials_path", "/home/localadmin/devstack/files/images/s3-materials/cirros-0.3.2")
+    #parser.set("scenario", "img_dir", "/home/localadmin/devstack/files/images/cirros-0.3.2-x86_64-uec")
+    with open(path, "w") as f:
+        parser.write(f)
+
+
+
 def install_devstack(settings_dict,
                      envs=None,
                      verbose=None,
@@ -125,5 +158,9 @@ def install_devstack(settings_dict,
                 get(cfg_file, "./" + file_name)
             else:
                 print (red("No %s file, something went wrong! :(" % file_name))
+        if os.path.isfile("./tempest.conf"):
+            reconfigure("./tempest.conf")
+
+
         print (green("Finished!"))
         return True
