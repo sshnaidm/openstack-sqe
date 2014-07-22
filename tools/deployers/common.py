@@ -136,9 +136,10 @@ def run_services(host,
             # use latest, not i.0 release
             #with cd("/root/puppet_openstack_builder"):
             #        run_func('git checkout i.0')
-            sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
-                            "icehouse/snapshots/i.0",
-                            "icehouse-proposed", use_sudo=use_sudo_flag)
+            #sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
+            #                "icehouse/snapshots/i.0",
+            #                "icehouse-proposed", use_sudo=use_sudo_flag)
+            prepare_repo(run_func, use_sudo_flag)
             with cd("/root/puppet_openstack_builder/install-scripts"):
                 warn_if_fail(run_func("./setup.sh"))
                 warn_if_fail(run_func('puppet agent --enable'))
