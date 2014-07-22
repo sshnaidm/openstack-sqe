@@ -5,7 +5,7 @@ from network import Network, Network6
 from storage import Storage
 from domain import VM
 
-from cloudtools import erase_net, erase_pool, erase_vm, remove_all_imgs, conn
+from cloudtools import erase_net, erase_pool, erase_vm, remove_all_imgs, shutdown_vm
 
 
 class Lab:
@@ -20,7 +20,6 @@ class Lab:
                  cloud_disk,
                  ipv):
         self.id = lab_id
-        self.boxes = {}
         self.path = os.path.join(lab_img_path, lab_id)
         self.boot = boot
         self.cloud_disk = cloud_disk
@@ -93,5 +92,4 @@ class Lab:
         self.delete_vms()
 
     def shutdown(self):
-        for box in self.boxes:
-            box.shutdown()
+        shutdown_vm(lab=self.id)

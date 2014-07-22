@@ -77,6 +77,20 @@ def erase_vm(lab):
         vm.undefine()
         print >> sys.stderr, "Domain {name} deleted".format(name=name)
 
+def shutdown_vm(lab):
+    names = [i.name() for i in conn.listAllDomains() if basic(lab) in i.name()]
+    for name in names:
+        try:
+            vm = conn.lookupByName(name)
+        except libvirtError:
+            print >> sys.stderr, "Domain {name} not found, nothing to shutdown".format(name=name)
+            return
+        try:
+            vm.shutdown()
+            print >> sys.stderr, "Domain {name} was shut down...".format(name=name)
+        except Exception as e:
+            print >> sys.stderr, "Domain {name} was NOT shut down...\n{e}".format(name=name, e=str(e))
+
 
 def remove_all_imgs(lab_img_path):
     if os.path.exists(lab_img_path):
