@@ -5,6 +5,7 @@ from fabric.colors import yellow, red
 from fabric.contrib.files import exists
 from fabric.operations import get
 import sys
+from config import LOGS_COPY
 
 __author__ = 'sshnaidm'
 

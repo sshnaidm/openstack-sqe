@@ -10,8 +10,8 @@ from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 from fabric.contrib.files import exists, contains, sed
 from fabric.colors import green, red
 
-from utils import collect_logs, warn_if_fail, update_time, resolve_names, CONFIG_PATH, change_ip_to, dump
-
+from utils import collect_logs, warn_if_fail, update_time, resolve_names, change_ip_to, dump
+CONFIG_PATH=os.path.join(os.path.abspath(os.path.dirname(__file__)), "../libvirt-scripts", "templates")
 __author__ = 'sshnaidm'
 
 
