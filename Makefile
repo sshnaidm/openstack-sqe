@@ -109,7 +109,7 @@ install-devstack:
 	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu
 
 prepare-devstack-tempest:
-    echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
+	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
 	mv ./tempest.conf ${WORKSPACE}/tempest/etc/tempest.conf
 	cat $WORKSPACE/tempest/etc/*txt > $WORKSPACE/openstack-sqe/tools/tempest-scripts/tests_set
 
