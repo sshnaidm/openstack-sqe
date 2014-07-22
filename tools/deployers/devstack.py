@@ -1,3 +1,4 @@
+import os
 from deploy import Standalone
 from utils import warn_if_fail, update_time
 from StringIO import StringIO
@@ -114,9 +115,15 @@ def install_devstack(settings_dict,
             warn_if_fail(run("./stack.sh"))
             if patch:
                 DevstackDeploy.apply_changes()
-        if exists('~/devstack/openrc'):
-            get('~/devstack/openrc', "./openrc")
-        else:
-            print (red("No openrc file, something went wrong! :("))
+        files = ('~/devstack/openrc',
+                 '/opt/stack/tempest/etc/tempest.conf',
+                 '~/devstack/stackrc',
+                 '~/devstack/functions')
+        for cfg_file in files:
+            if exists(cfg_file):
+                file_name = os.path.basename(cfg_file)
+                get(cfg_file, "./" + file_name)
+            else:
+                print (red("No %s file, something went wrong! :(" % file_name))
         print (green("Finished!"))
         return True
