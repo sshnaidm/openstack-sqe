@@ -9,10 +9,7 @@ from utils import change_ip_to, dump, warn_if_fail
 from StringIO import StringIO
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 
-
-
 __author__ = 'sshnaidm'
-
 
 
 class Role2(Standalone):
