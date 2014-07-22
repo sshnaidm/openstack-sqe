@@ -142,6 +142,9 @@ def install_devstack(settings_dict,
         warn_if_fail(sudo("apt-get install -y git python-pip"))
         warn_if_fail(run("git config --global user.email 'test.node@example.com';"
                          "git config --global user.name 'Test Node'"))
+        if exists("devstack"):
+            warn_if_fail(run("~/devstack/unstack.sh"))
+            warn_if_fail(run("rm -rf ~/devstack"))
         warn_if_fail(run("git clone https://github.com/openstack-dev/devstack.git"))
         DevstackDeploy.make_local("devstack/local.conf", sudo_flag=False)
         with cd("devstack"):
