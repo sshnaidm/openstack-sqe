@@ -7,7 +7,7 @@ from deploy import Standalone
 
 class AIO(Standalone):
     def __init__(self, *args):
-        Standalone.__init__(*args)
+        super(AIO, self).__init__(*args)
         self.env = {"vendor": "cisco",
                     "scenario": "all_in_one"}
         self.scenario = "all_in_one"

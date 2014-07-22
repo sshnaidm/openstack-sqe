@@ -15,7 +15,7 @@ __author__ = 'sshnaidm'
 class FullHA(Standalone):
 
     def __init__(self, *args):
-        Standalone.__init__(*args)
+        super(FullHA, self).__init__(*args)
         self.env = {"vendor": "cisco",
                     "scenario": "full_ha"}
         self.scenario = "full_ha"

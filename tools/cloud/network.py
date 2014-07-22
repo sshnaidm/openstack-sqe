@@ -21,7 +21,7 @@ def rand_mac():
     return ':'.join(["%02x" % x for x in mac])
 
 
-class Network:
+class Network(object):
     pool = {}
     hosts = []
 

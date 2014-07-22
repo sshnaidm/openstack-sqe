@@ -14,6 +14,49 @@ from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 __author__ = 'sshnaidm'
 
 
+
+class Role2(Standalone):
+    def __init__(self, *args):
+        super(Role2, self).__init__(*args)
+        self.env = {"vendor": "cisco",
+                    "scenario": "2_role"}
+        self.scenario = "2_role"
+        self.build = None
+        self.cls = Role2Deploy
+        if self.conf_yaml:
+            self.build = self.conf_yaml['servers']['build-server'][0]
+
+    def parse_file(self):
+        self.host = self.build["ip"]
+        self.user = self.build["user"]
+        self.password = self.build["password"]
+
+    def postrun(self):
+        job = {
+            "host_string": None,
+            "user": self.user,
+            "password": self.password,
+            "warn_only": True,
+            "key_filename": self.ssh_key,
+            "abort_on_prompts": True,
+            "gateway": self.conf.gateway
+        }
+        servers = self.conf_yaml["servers"]["control-server"] + self.conf_yaml["servers"]["compute-server"]
+        if opts.use_cobbler:
+            job['host_string'] = self.conf_yaml["servers"]["build-server"][0]["ip"]
+            track_cobbler(self.conf_yaml, job, servers)
+        else:
+            for host in servers:
+                job['host_string'] = host["ip"]
+                run_services(host,
+                             job,
+                             verbose=self.verb,
+                             envs=self.env,
+                             config=self.conf_yaml,
+                             scenario=self.scenario
+                             )
+
+
 class Role2Deploy:
 
 
@@ -163,44 +206,3 @@ class Role2Deploy:
             use_sudo_flag=use_sudo_flag
         )
 
-
-class Role2(Standalone):
-    def __init__(self, *args):
-        super(Role2, self).__init__(*args)
-        self.env = {"vendor": "cisco",
-                    "scenario": "2_role"}
-        self.scenario = "2_role"
-        self.build = None
-        self.cls = Role2Deploy
-        if self.conf_yaml:
-            self.build = self.conf_yaml['servers']['build-server'][0]
-
-    def parse_file(self):
-        self.host = self.build["ip"]
-        self.user = self.build["user"]
-        self.password = self.build["password"]
-
-    def postrun(self):
-        job = {
-            "host_string": None,
-            "user": self.user,
-            "password": self.password,
-            "warn_only": True,
-            "key_filename": self.ssh_key,
-            "abort_on_prompts": True,
-            "gateway": self.conf.gateway
-        }
-        servers = self.conf_yaml["servers"]["control-server"] + self.conf_yaml["servers"]["compute-server"]
-        if opts.use_cobbler:
-            job['host_string'] = self.conf_yaml["servers"]["build-server"][0]["ip"]
-            track_cobbler(self.conf_yaml, job, servers)
-        else:
-            for host in servers:
-                job['host_string'] = host["ip"]
-                run_services(host,
-                             job,
-                             verbose=self.verb,
-                             envs=self.env,
-                             config=self.conf_yaml,
-                             scenario=self.scenario
-                             )

@@ -12,7 +12,7 @@ SERVICES = ['neutron-', 'nova', 'glance', 'cinder', 'keystone']
 
 class Devstack(Standalone):
     def __init__(self, *args):
-        Standalone.__init__(*args)
+        super(Devstack, self).__init__(*args)
         self.scenario = "devstack"
         self.devstack = None
         if self.conf_yaml:
