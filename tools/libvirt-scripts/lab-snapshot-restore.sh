@@ -10,7 +10,7 @@ fi
 
 for pool in $(virsh pool-list --all | grep "\-${labid} " | awk {'print $1'});
 do
-    virsh start $pool || :
+    virsh pool-start $pool || :
 done
 for vm in $(virsh list --name --all | grep "${labid}-");
 do
@@ -18,5 +18,5 @@ do
 done
 for net in $(virsh net-list --all | grep "${labid}-" | awk {'print $1'});
 do
-    virsh start $net || :
+    virsh net-start $net || :
 done
