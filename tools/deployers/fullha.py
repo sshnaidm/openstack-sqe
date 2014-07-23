@@ -63,7 +63,7 @@ class FullHA(Standalone):
 class FullHADeploy:
 
     @staticmethod
-    def prepare_fullha_files(self, config, paths, use_sudo_flag):
+    def prepare_fullha_files(config, paths, use_sudo_flag):
 
         def prepare_fullha(config, ha_file):
             """ Prepare user.full_ha.file """
