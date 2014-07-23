@@ -84,7 +84,7 @@ give-a-time:
 
 install-aio:
 	@echo "$(CYAN)>>>> Installing AIO...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_coi.py -s aio -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_coi.py -s all-in-one -c config_file -u root
 
 install-2role:
 	@echo "$(CYAN)>>>> Installing 2_role multinode...$(RESET)"
