@@ -20,6 +20,7 @@ class FullHA(Standalone):
                     "scenario": "full_ha"}
         self.scenario = "full_ha"
         self.build = None
+        self.cls = FullHADeploy
         if self.conf_yaml:
             self.build = self.conf_yaml['servers']['build-server'][0]
 
