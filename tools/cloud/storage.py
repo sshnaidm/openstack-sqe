@@ -45,7 +45,7 @@ class Storage:
 
     def virtual_disk_define(self):
         xmls = []
-        for num in self.conf["params"]["count"]:
+        for num in xrange(self.conf["params"]["count"]):
             name = self.box_name(num=num) + ".qcow2"
             disk_path = os.path.join(self.path, name)
             size_bytes = self.conf["params"]["storage"]*1024*1024*1024
