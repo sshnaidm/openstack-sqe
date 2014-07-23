@@ -5,7 +5,7 @@ from StringIO import StringIO
 from config import DOMAIN_NAME, CONFIG_PATH, opts
 from common import track_cobbler, run_services
 from utils import change_ip_to, dump, warn_if_fail
-from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
+from fabric.api import put, get
 from deploy import Standalone
 
 

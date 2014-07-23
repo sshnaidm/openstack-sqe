@@ -66,7 +66,7 @@ prepare-2role:
 prepare-2role-cobbler:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -e -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
+	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
 
 prepare-fullha:
 	@echo "$(CYAN)>>>> Preparing full HA boxes...$(RESET)"
@@ -76,7 +76,7 @@ prepare-fullha:
 prepare-fullha-cobbler:
 	@echo "$(CYAN)>>>> Preparing full HA boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -e -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha > config_file
+	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha > config_file
 
 
 give-a-time:
@@ -84,25 +84,25 @@ give-a-time:
 
 install-aio:
 	@echo "$(CYAN)>>>> Installing AIO...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_aio_coi.py -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_coi.py -s aio -c config_file -u root
 
 install-2role:
 	@echo "$(CYAN)>>>> Installing 2_role multinode...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_aio_2role.py -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_coi.py -s 2role -c config_file -u root
 	touch 2role
 
 install-2role-cobbler:
 	@echo "$(CYAN)>>>> Installing 2_role multinode with cobbler...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_aio_2role.py -e -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_aio_2role.py -e -s 2role -c config_file -u root
 	touch 2role
 
 install-fullha:
 	@echo "$(CYAN)>>>> Installing full HA setup...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_fullha.py -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_coi.py -s fullha -c config_file -u root
 
 install-fullha-cobbler:
 	@echo "$(CYAN)>>>> Installing full HA setup with cobbler...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_fullha.py -e -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_coi.py -s fullha -e -c config_file -u root
 
 install-devstack:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
