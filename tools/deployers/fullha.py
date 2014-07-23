@@ -38,6 +38,7 @@ class FullHA(Standalone):
             "abort_on_prompts": True,
             "gateway": self.conf.gateway
         }
+
         servers = self.conf_yaml['servers']['control-servers'] + \
             self.conf_yaml["servers"]["compute-servers"] + \
             self.conf_yaml["servers"]["swift-storage"] + \
