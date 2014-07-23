@@ -66,7 +66,7 @@ prepare-2role:
 prepare-2role-cobbler:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -e > config_file
+	time $(PYTHON) ./tools/cloud/create.py -e -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
 
 prepare-fullha:
 	@echo "$(CYAN)>>>> Preparing full HA boxes...$(RESET)"
@@ -76,7 +76,7 @@ prepare-fullha:
 prepare-fullha-cobbler:
 	@echo "$(CYAN)>>>> Preparing full HA boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha -e > config_file
+	time $(PYTHON) ./tools/cloud/create.py -e -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha > config_file
 
 
 give-a-time:
