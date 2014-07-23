@@ -8,15 +8,15 @@ else
 fi
 fi
 
+for pool in $(virsh pool-list --all | grep "\-${labid} " | awk {'print $1'});
+do
+    virsh start $pool || :
+done
 for vm in $(virsh list --name --all | grep "${labid}-");
 do
-    virsh snapshot-revert $vm original
+    virsh snapshot-revert $vm original || :
 done
 for net in $(virsh net-list --all | grep "${labid}-" | awk {'print $1'});
 do
-    virsh start $net
-done
-for pool in $(virsh pool-list --all | grep "\-${labid} " | awk {'print $1'});
-do
-    virsh start $pool
+    virsh start $net || :
 done

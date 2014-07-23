@@ -16,8 +16,8 @@ fi
 
 DEV_IP=$(sed -n "/${labid}:/{n;p;n;p;}" tools/cloud/cloud-templates/lab.yaml | sed 'N;s/\n/ /' | sed "s/    ip_start: /./g" | sed "s/   net_start: //g")
 
-scp localadmin@$DEV_IP:/opt/stack/tempest/etc/tempest.conf $WORKSPACE/tempest.conf
+scp localadmin@$DEV_IP:/opt/stack/tempest/etc/tempest.conf $WORKSPACE/openstack-sqe/tempest.conf
 if [ -d "$WORKSPACE/tempest/etc" ]; then
-cp $WORKSPACE/tempest.conf $WORKSPACE/tempest/etc/
+cp $WORKSPACE/openstack-sqe/tempest.conf $WORKSPACE/tempest/etc/
 fi
 scp localadmin@$DEV_IP:~/devstack/openrc $WORKSPACE/openrc && cp $WORKSPACE/openrc $WORKSPACE/openstack-sqe/openrc
