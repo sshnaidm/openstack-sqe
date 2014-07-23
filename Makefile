@@ -141,6 +141,16 @@ shutdown:
 	@echo "$(CYAN)>>>> Shutdown everything ...$(RESET)"
 	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -y
 
+snapshot-revert:
+    @echo "$(CYAN)>>>> Resurrecting ${LAB} snapshots ...$(RESET)"
+    time /bin/bash ./tools/libvirt-scripts/lab-snapshot-restore.sh ${LAB}
+    sleep 20
+
+
+devstack-snap-prepare:
+    @echo "$(CYAN)>>>> Preparing devstack for tests run ...$(RESET)"
+    time /bin/bash ./tools/libvirt-scripts/devstack_prepare.sh ${LAB}
+
 init: venv requirements
 
 aio: init prepare-aio give-a-time install-aio
@@ -158,6 +168,8 @@ run-tempest: prepare-tempest run-tests
 run-tempest-parallel: prepare-tempest run-tests-parallel
 
 devstack: init prepare-devstack give-a-time install-devstack
+
+devstack-snapshot: init snapshot-revert devstack-snap-prepare
 
 devstack-tempest: prepare-devstack-tempest run-tests
 
