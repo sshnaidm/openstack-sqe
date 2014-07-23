@@ -66,17 +66,17 @@ prepare-2role:
 prepare-2role-cobbler:
 	@echo "$(CYAN)>>>> Preparing 2_role boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role > config_file
+	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -e > config_file
 
 prepare-fullha:
 	@echo "$(CYAN)>>>> Preparing full HA boxes...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -t fullha > config_file
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha > config_file
 
 prepare-fullha-cobbler:
 	@echo "$(CYAN)>>>> Preparing full HA boxes for cobbler...$(RESET)"
 	test -e trusty-server-cloudimg-amd64-disk1.img || wget -nv $(UBUNTU_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t 2role -t fullha > config_file
+	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha -e > config_file
 
 
 give-a-time:
@@ -98,11 +98,11 @@ install-2role-cobbler:
 
 install-fullha:
 	@echo "$(CYAN)>>>> Installing full HA setup...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_fullha.py -c config_file
+	time $(PYTHON) ./tools/deployers/install_fullha.py -c config_file -u root
 
 install-fullha-cobbler:
 	@echo "$(CYAN)>>>> Installing full HA setup with cobbler...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_fullha.py -e -c config_file
+	time $(PYTHON) ./tools/deployers/install_fullha.py -e -c config_file -u root
 
 install-devstack:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
