@@ -142,14 +142,14 @@ shutdown:
 	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -y
 
 snapshot-revert:
-    @echo "$(CYAN)>>>> Resurrecting ${LAB} snapshots ...$(RESET)"
-    time /bin/bash ./tools/libvirt-scripts/lab-snapshot-restore.sh ${LAB}
-    sleep 20
+	@echo "$(CYAN)>>>> Resurrecting ${LAB} snapshots ...$(RESET)"
+	time /bin/bash ./tools/libvirt-scripts/lab-snapshot-restore.sh ${LAB}
+	sleep 20
 
 
 devstack-snap-prepare:
-    @echo "$(CYAN)>>>> Preparing devstack for tests run ...$(RESET)"
-    time /bin/bash ./tools/libvirt-scripts/devstack_prepare.sh ${LAB}
+	@echo "$(CYAN)>>>> Preparing devstack for tests run ...$(RESET)"
+	time /bin/bash ./tools/libvirt-scripts/devstack_prepare.sh ${LAB}
 
 init: venv requirements
 
