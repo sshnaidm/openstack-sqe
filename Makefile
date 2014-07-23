@@ -115,7 +115,7 @@ prepare-devstack-tempest:
 	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
 	. ${WORKSPACE}/tempest/.venv/bin/activate
 	mv ./tempest.conf ${WORKSPACE}/tempest/etc/tempest.conf
-	cat ${WORKSPACE}/tempest/etc/*txt > ${WORKSPACE}/openstack-sqe/tools/tempest-scripts/tests_set
+	cat ${WORKSPACE}/tempest/etc/*txt > ${WORKSPACE}/openstack-sqe/tools/tempest-scripts/tests_set || :
 
 prepare-tempest:
 	@echo "$(CYAN)>>>> Preparing tempest...$(RESET)"
