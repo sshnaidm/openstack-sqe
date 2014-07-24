@@ -176,7 +176,7 @@ class Network6(Network):
         self.hosts.append(hosts_def)
 
     def define(self):
-        dhcp_text = self.dhcp_definition() if self.dhcp else ""
+        dhcp_text = ""
         dns_text = self.dns_definition() if self.dns else ""
         nat_text = netconf["template"]["nat"] if self.nat else ""
         if self.dhcp:

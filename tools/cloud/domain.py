@@ -62,8 +62,6 @@ class VM:
             self.pool[self.box][index]["hostname"] = box_net["hostname"]
             if net_params[net]["external"]:
                 self.pool[self.box][index]["external_interface"] = "eth" + str(key)
-
-
                 if "external_net" not in self.pool:
                     if "ipv6" in net_params[net] and net_params[net]["ipv6"]:
                         net_name = make_network_name(self.lab_id, net)
