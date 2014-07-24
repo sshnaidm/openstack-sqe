@@ -155,8 +155,8 @@ def install_devstack(settings_dict,
                  '~/devstack/stackrc',
                  '~/devstack/functions')
         for cfg_file in files:
+            file_name = os.path.basename(cfg_file)
             if exists(cfg_file):
-                file_name = os.path.basename(cfg_file)
                 get(cfg_file, "./" + file_name)
             else:
                 print (red("No %s file, something went wrong! :(" % file_name))
