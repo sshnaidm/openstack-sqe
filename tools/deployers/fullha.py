@@ -5,7 +5,7 @@ from StringIO import StringIO
 from config import DOMAIN_NAME, CONFIG_PATH, opts
 from common import track_cobbler, run_services
 from utils import change_ip_to, dump, warn_if_fail
-from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
+from fabric.api import put, get
 from deploy import Standalone
 
 
@@ -20,6 +20,7 @@ class FullHA(Standalone):
                     "scenario": "full_ha"}
         self.scenario = "full_ha"
         self.build = None
+        self.cls = FullHADeploy
         if self.conf_yaml:
             self.build = self.conf_yaml['servers']['build-server'][0]
 
@@ -62,7 +63,7 @@ class FullHA(Standalone):
 class FullHADeploy:
 
     @staticmethod
-    def prepare_fullha_files(self, config, paths, use_sudo_flag):
+    def prepare_fullha_files(config, paths, use_sudo_flag):
 
         def prepare_fullha(config, ha_file):
             """ Prepare user.full_ha.file """
