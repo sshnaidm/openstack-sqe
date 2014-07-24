@@ -121,3 +121,63 @@ lab114:
 lab115:
    net_start: 10.10.16
    ip_start: 2
+lab200:
+   net_start: 10.20.1
+   ip_start: 2
+lab201:
+   net_start: 10.20.2
+   ip_start: 2
+lab202:
+   net_start: 10.20.3
+   ip_start: 2
+lab203:
+   net_start: 10.20.4
+   ip_start: 2
+lab204:
+   net_start: 10.20.5
+   ip_start: 2
+lab205:
+   net_start: 10.20.6
+   ip_start: 2
+lab206:
+   net_start: 10.20.7
+   ip_start: 2
+lab207:
+   net_start: 10.20.8
+   ip_start: 2
+lab208:
+   net_start: 10.20.9
+   ip_start: 2
+lab209:
+   net_start: 10.20.10
+   ip_start: 2
+lab210:
+   net_start: 10.20.11
+   ip_start: 2
+lab211:
+   net_start: 10.20.12
+   ip_start: 2
+lab212:
+   net_start: 10.20.13
+   ip_start: 2
+lab213:
+   net_start: 10.20.14
+   ip_start: 2
+lab214:
+   net_start: 10.20.15
+   ip_start: 2
+lab215:
+   net_start: 10.20.16
+   ip_start: 2
+lab216:
+   net_start: 10.20.17
+   ip_start: 2
+lab217:
+   net_start: 10.20.18
+   ip_start: 2
+lab218:
+   net_start: 10.20.19
+   ip_start: 2
+lab219:
+   net_start: 10.20.20
+   ip_start: 2
