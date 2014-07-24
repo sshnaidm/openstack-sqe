@@ -133,7 +133,7 @@ class Network6(Network):
         super(Network6, self).__init__(*args, **kwargs)
         #lab_ip = env[self.lab_id]["net_start"]
         self.ipv6 = True
-        self.net_ip_base = "2001:dead:beaf:%s" % rand_net()
+        self.net_ip_base = "fddd:dead:beaf:%s" % rand_net()
         self.net_ip = self.net_ip_base + "::"
         self.prefix = "64"
         self.gw = self.net_ip + "1"
