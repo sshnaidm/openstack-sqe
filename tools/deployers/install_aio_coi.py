@@ -199,7 +199,6 @@ def main():
                     "scenario": "all_in_one",
                     "vendor": "cisco"
         }
-
     job_settings = {"host_string": host,
                     "user": user,
                     "password": password,
