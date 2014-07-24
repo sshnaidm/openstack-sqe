@@ -56,13 +56,20 @@ class VM:
                 self.pool[self.box][index]["mac"] = mac
                 self.pool[self.box][index]["ip"] = box_net["ip"]
                 self.pool[self.box][index]["admin_interface"] = "eth" + str(key)
+                self.pool[self.box][index]["eth" + str(key)] = box_net["ip"]
             else:
                 xml += netconf['template']["interface"].format(net_name=make_network_name(self.lab_id, net))
             self.pool[self.box][index]["hostname"] = box_net["hostname"]
             if net_params[net]["external"]:
                 self.pool[self.box][index]["external_interface"] = "eth" + str(key)
+
+
                 if "external_net" not in self.pool:
-                    self.pool["external_net"] = construct_net_ip(env[self.lab_id]["net_start"], key)
+                    if "ipv6" in net_params[net] and net_params[net]["ipv6"]:
+                        net_name = make_network_name(self.lab_id, net)
+                        self.pool["external_net"] = Network.pool[net_name][1].net_ip
+                    else:
+                        self.pool["external_net"] = construct_net_ip(env[self.lab_id]["net_start"], key)
             if not net_params[net]["nat"]:
                 self.pool[self.box][index]["internal_interface"] = "eth" + str(key)
         return xml

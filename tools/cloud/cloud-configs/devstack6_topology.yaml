@@ -8,11 +8,19 @@ servers:
       ram: 8
       cpu: 1
       networks:
+        - boot
         - admin
 networks:
-  - admin:
+  - boot:
       dhcp: true
       external: false
       nat: true
       dns:
         devstack: 2
+  - admin:
+      dhcp: false
+      external: true
+      nat: false
+      dns:
+        devstack: 2
+      ipv6: true

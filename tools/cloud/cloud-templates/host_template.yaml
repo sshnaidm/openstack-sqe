@@ -20,12 +20,28 @@ ubuntu_static_interface_template: |
       gateway {net_ip}.1
       dns-nameservers {net_ip}.1 {dns}
       dns-search cisco.com
+ubuntu_static_interface_template6: |
+  auto {int_name}
+  iface {int_name} inet6 static
+      pre-up modprobe ipv6
+      address {int_ip}
+      netmask {prefix}
+      gateway {gateway}
+      dns-nameservers {dns}
+      dns-search cisco.com
 ubuntu_manual_interface_template: |
   auto {int_name}
   iface {int_name} inet manual
      up ifconfig $IFACE 0.0.0.0 up
      up ip link set $IFACE promisc on
      down ifconfig $IFACE 0.0.0.0 down
+ubuntu_manual_interface_template6: |
+  auto {int_name}
+  iface {int_name} inet6 manual
+     pre-up modprobe ipv6
+     up ifconfig $IFACE :: up
+     up ip link set $IFACE promisc on
+     down ifconfig $IFACE :: down
 ubuntu_dhcp_interface:
   auto {int_name}
   iface {int_name} inet dhcp

@@ -113,7 +113,7 @@ template:
           {nat}
           <domain name='{domain}'/>
           {dns}
-          <ip family="ipv6" address='{net_ip}' prefix='{prefix}'>
+          <ip family="ipv6" address='{gateway}' prefix='{prefix}'>
           {dhcp}
           </ip>
         </network>
@@ -123,6 +123,11 @@ template:
         </dns>
   dns_host: |
         <host ip='{net_ip}.{host_ip}'>
+          <hostname>{host}</hostname>
+          <hostname>{host}.{domain}</hostname>
+        </host>
+  dns6_host: |
+        <host ip='{net_ip}::{host_ip}'>
           <hostname>{host}</hostname>
           <hostname>{host}.{domain}</hostname>
         </host>

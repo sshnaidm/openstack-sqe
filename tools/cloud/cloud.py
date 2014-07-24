@@ -30,10 +30,10 @@ class Lab:
         for num, net in enumerate(self.topo["networks"]):
             net_name = net.keys()[0]
             net_shift = num
-            if self.ipv == 4:
-                net_class = Network
-            else:
+            if "ipv6" in net[net_name].keys() and net[net_name]["ipv6"]:
                 net_class = Network6
+            else:
+                net_class = Network
             n = net_class(
                 lab_id=self.id,
                 config=self.topo,

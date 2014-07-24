@@ -30,13 +30,15 @@ class Network(object):
         self.lab_id = lab_id
         self.name = make_network_name(lab_id, name)
         self.config = config
+        self.net_shift = net_shift
         for key in kwargs:
             setattr(self, key, kwargs.get(key))
         self.denition = None
         lab_ip = env[self.lab_id]["net_start"]
-        self.net_ip = ".".join(lab_ip.split(".")[:2] + [str(int(lab_ip.split(".")[-1]) + net_shift)] + ["0"])
+        self.net_ip = ".".join(lab_ip.split(".")[:2] + [str(int(lab_ip.split(".")[-1]) + self.net_shift)] + ["0"])
         self.net_ip_base = ".".join(self.net_ip.split(".")[:-1])
         self.interface = None
+        self.ipv6 = False
 
     def dhcp_definition(self):
         hosts_def = {}
@@ -123,8 +125,86 @@ class Network(object):
         net.setAutostart(True)
         self.pool[self.name] = [net, self]
 
+def rand_net():
+    return "".join([str(random.randint(1,9)) for i in xrange(4)])
 
 class Network6(Network):
     def __init__(self, *args, **kwargs):
-        super(Network, self).__init__(*args, **kwargs)
-    pass
+        super(Network6, self).__init__(*args, **kwargs)
+        #lab_ip = env[self.lab_id]["net_start"]
+        self.ipv6 = True
+        self.net_ip_base = "2001:dead:beaf:%s" % rand_net()
+        self.net_ip = self.net_ip_base + "::"
+        self.prefix = "64"
+        self.gw = self.net_ip + "1"
+
+    def dns_definition(self):
+        dns_hosts = "\n".join(
+            [netconf["template"]["dns6_host"].format(
+                net_ip=self.net_ip_base,
+                host_ip=self.dns[i],
+                host=i,
+                domain=DOMAIN_NAME)
+             for i in self.dns])
+        return netconf["template"]["dns_def"].format(
+            dns_records=dns_hosts
+        )
+
+    def define_hosts(self):
+        ip_start = env[self.lab_id]["ip_start"]
+        servers_count = sum([self.config['servers'][i]['params']['count'] for i in self.config['servers']])
+        ips = [self.net_ip_base + "::" + str(ip_start + i) for i in xrange(servers_count)]
+        ip_iter = iter(ips)
+        hosts_def = {}
+        for server in sorted(self.config['servers'], key=lambda k: ip_order.index(k) if k in ip_order else -1):
+            params = self.config['servers'][server]['params']
+            hosts_def[server] = []
+            for num in xrange(params['count']):
+                if params['count'] == 1:
+                    hostname = server if not params['hostname'] else params['hostname']
+                else:
+                    hostname = server + "%.2d" % num if not params['hostname'] else params['hostname']
+                ip = ip_iter.next()
+                ip_base = ip.split(":")[-1]
+                hosts_def[server] += [
+                    {"hostname": hostname,
+                     "mac": rand_mac(),
+                     "ip": ip,
+                     "ip_base": ip_base,
+                     "domain": DOMAIN_NAME}
+                ]
+        self.hosts.append(hosts_def)
+
+    def define(self):
+        dhcp_text = self.dhcp_definition() if self.dhcp else ""
+        dns_text = self.dns_definition() if self.dns else ""
+        nat_text = netconf["template"]["nat"] if self.nat else ""
+        if self.dhcp:
+            self.define_hosts()
+
+        return netconf["template"]["xml6"].format(
+            name=self.name,
+            gateway=self.gw,
+            prefix=self.prefix,
+            domain=DOMAIN_NAME,
+            dhcp=dhcp_text,
+            dns=dns_text,
+            nat=nat_text
+        )
+
+    def define_interface(self):
+        distr_prefix = opts.distro + "_"
+        if self.external:
+            self.interface = hostconf[distr_prefix + 'manual_interface_template6'].format(
+                int_name="{int_name}")
+        else:
+            self.interface = hostconf[distr_prefix + 'static_interface_template6'].format(
+                int_name="{int_name}",
+                int_ip="{int_ip}",
+                prefix=self.prefix,
+                gateway=self.gw,
+                dns=self.gw)
+
+    @staticmethod
+    def network_combine(net, ip):
+        return net + ip

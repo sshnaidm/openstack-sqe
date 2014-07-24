@@ -3,10 +3,7 @@ import yaml
 import crypt
 
 from config import opts
-if opts.ipv == 4:
-    from network import Network as Network
-else:
-    from network import Network6 as Network
+from network import Network, Network6
 from network import DOMAIN_NAME
 from config import TEMPLATE_PATH, DIR_PATH
 from tempfile import NamedTemporaryFile
@@ -40,9 +37,10 @@ class SeedStorage:
         for num, net in enumerate(nets):
             net_name = make_network_name(self.lab_id, net.keys()[0])
             network = Network.pool[net_name][1]
+            combine_func = Network6.network_combine if network.ipv6 else Network.network_combine
             if not network.dhcp:
                 interface = network.interface
-                interface_ip = Network.network_combine(
+                interface_ip = combine_func(
                     network.net_ip,
                     Network.hosts[0][self.server][self.index]['ip_base']
                 )
