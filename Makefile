@@ -84,30 +84,35 @@ give-a-time:
 
 install-aio:
 	@echo "$(CYAN)>>>> Installing AIO...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_coi.py -s all-in-one -c config_file -u root
+	#time $(PYTHON) ./tools/deployers/install_coi.py -s all-in-one -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_aio_coi.py -c config_file
 
 install-2role:
 	@echo "$(CYAN)>>>> Installing 2_role multinode...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_coi.py -s 2role -c config_file -u root
+	#time $(PYTHON) ./tools/deployers/install_coi.py -s 2role -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_aio_2role.py -c config_file
 	touch 2role
 
 install-2role-cobbler:
 	@echo "$(CYAN)>>>> Installing 2_role multinode with cobbler...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_aio_2role.py -e -s 2role -c config_file -u root
+	#time $(PYTHON) ./tools/deployers/install_aio_2role.py -e -s 2role -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_aio_2role.py -e -c config_file
 	touch 2role
 
 install-fullha:
 	@echo "$(CYAN)>>>> Installing full HA setup...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_coi.py -s fullha -c config_file -u root
+	#time $(PYTHON) ./tools/deployers/install_coi.py -s fullha -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_fullha.py -c config_file
 
 install-fullha-cobbler:
 	@echo "$(CYAN)>>>> Installing full HA setup with cobbler...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_coi.py -s fullha -e -c config_file -u root
+	#time $(PYTHON) ./tools/deployers/install_coi.py -s fullha -e -c config_file -u root
+	time $(PYTHON) ./tools/deployers/install_fullha.py -e -c config_file
 
 install-devstack:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
-	#time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu
-	time $(PYTHON) ./tools/deployers/install_coi.py -c config_file  -u localadmin -p ubuntu -s devstack
+	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu
+	#time $(PYTHON) ./tools/deployers/install_coi.py -c config_file  -u localadmin -p ubuntu -s devstack
 
 prepare-devstack-tempest:
 	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
