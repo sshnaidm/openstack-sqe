@@ -5,7 +5,13 @@ from fabric.colors import yellow, red
 from fabric.contrib.files import exists
 from fabric.operations import get
 import sys
-from config import LOGS_COPY
+
+
+LOGS_COPY = {
+    "/etc": "etc_configs",
+    "/var/log": "all_logs",
+    "/etc/puppet": "puppet_configs",
+}
 
 __author__ = 'sshnaidm'
 

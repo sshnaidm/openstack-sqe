@@ -6,11 +6,7 @@ import yaml
 DOMAIN_NAME = "domain.name"
 APPLY_LIMIT = 3
 CONFIG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../libvirt-scripts", "templates")
-LOGS_COPY = {
-    "/etc": "etc_configs",
-    "/var/log": "all_logs",
-    "/etc/puppet": "puppet_configs",
-}
+
 
 
 
