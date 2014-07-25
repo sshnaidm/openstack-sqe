@@ -1,2 +1,6 @@
 .idea
 *.pyc
+.env/
+config_file
+external_net
+openrc
