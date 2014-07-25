@@ -4,7 +4,7 @@ import os
 DIR_PATH = os.path.abspath(os.path.dirname(__file__))
 TOPO_PATH = os.path.join(DIR_PATH, "cloud-configs")
 TEMPLATE_PATH = os.path.join(DIR_PATH, "cloud-templates")
-
+SHARED = {}
 
 def parse(f):
     lines = f.readlines()

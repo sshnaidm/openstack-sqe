@@ -71,6 +71,10 @@ USE_SCREEN=True
 SCREEN_LOGDIR=/opt/stack/logs
 TEMPEST_REPO=https://github.com/CiscoSystems/tempest.git
 TEMPEST_BRANCH=master-in-use
+P_VERSION=4+6
+IPV6_PRIVATE_RANGE=2001:dead:beef:deed::/64
+IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
+REMOVE_PUBLIC_BRIDGE=False
 #RECLONE=no
 #OFFLINE=True
 """
