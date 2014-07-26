@@ -1,7 +1,7 @@
+from common import install_openstack
+
 __author__ = 'sshnaidm'
 
-from common import install_openstack
-import yaml
 
 class Standalone(object):
     def __init__(self, conf, ssh_key, verb):

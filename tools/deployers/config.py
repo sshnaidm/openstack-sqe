@@ -8,19 +8,16 @@ APPLY_LIMIT = 3
 CONFIG_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../libvirt-scripts", "templates")
 
 
-
-
 class ConfigError(Exception):
     pass
 
 
 __author__ = 'sshnaidm'
 
-
 parser = argparse.ArgumentParser()
-parser.add_argument('-u', action='store', dest='user',
+parser.add_argument('-u', action='store', dest='user', default=None,
                     help='User to run the script with')
-parser.add_argument('-p', action='store', dest='password',
+parser.add_argument('-p', action='store', dest='password', default=None,
                     help='Password for user and sudo')
 parser.add_argument('-a', action='store', dest='aio_ip', default=None,
                     help='IP of host in case of AIO setup')
@@ -54,9 +51,10 @@ parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 
 opts = parser.parse_args()
 if opts.quiet:
-        verb_mode = ['output', 'running', 'warnings']
+    verb_mode = ['output', 'running', 'warnings']
 else:
     verb_mode = []
+
 path2ssh = os.path.join(os.path.dirname(__file__), "..", "libvirt-scripts", "id_rsa")
 ssh_key_file = opts.ssh_key_file if opts.ssh_key_file else path2ssh
 if not opts.config_file and opts.scenario not in ("all-in-one", "devstack"):

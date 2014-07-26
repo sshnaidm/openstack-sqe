@@ -1,8 +1,6 @@
-__author__ = 'sshnaidm'
-
-#from common import Standalone
 from deploy import Standalone
 
+__author__ = 'sshnaidm'
 
 
 class AIO(Standalone):
@@ -17,8 +15,9 @@ class AIO(Standalone):
 
     def parse_file(self):
         self.host = self.aio["ip"]
-        self.user = self.aio["user"]
-        self.password = self.aio["password"]
+        self.user = self.conf.user or self.aio["user"]
+        self.password = self.conf.password or self.aio["password"]
+
     def env_update(self):
         if self.conf_yaml:
             self.env.update({

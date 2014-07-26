@@ -13,7 +13,6 @@ __author__ = 'sshnaidm'
 
 
 class FullHA(Standalone):
-
     def __init__(self, *args):
         super(FullHA, self).__init__(*args)
         self.env = {"vendor": "cisco",
@@ -26,8 +25,8 @@ class FullHA(Standalone):
 
     def parse_file(self):
         self.host = self.build["ip"]
-        self.user = self.build["user"]
-        self.password = self.build["password"]
+        self.user = self.conf.user or self.build["user"]
+        self.password = self.conf.password or self.build["password"]
 
     def postrun(self):
         job = {
@@ -40,13 +39,13 @@ class FullHA(Standalone):
             "gateway": self.conf.gateway
         }
         servers = self.conf_yaml['servers']['control-servers'] + \
-            self.conf_yaml["servers"]["compute-servers"] + \
-            self.conf_yaml["servers"]["swift-storage"] + \
-            self.conf_yaml["servers"]["swift-proxy"] + \
-            self.conf_yaml["servers"]["load-balancer"]
+                  self.conf_yaml["servers"]["compute-servers"] + \
+                  self.conf_yaml["servers"]["swift-storage"] + \
+                  self.conf_yaml["servers"]["swift-proxy"] + \
+                  self.conf_yaml["servers"]["load-balancer"]
         if opts.use_cobbler:
             job['host_string'] = self.conf_yaml["servers"]["build-server"][0]["ip"]
-            track_cobbler(self.conf_yaml, job, servers)
+            track_cobbler(job, servers)
         else:
             for host in servers:
                 job['host_string'] = host["ip"]
@@ -56,12 +55,10 @@ class FullHA(Standalone):
                              envs=self.env,
                              config=self.conf_yaml,
                              scenario=self.scenario
-                             )
-
+                )
 
 
 class FullHADeploy:
-
     @staticmethod
     def prepare_fullha_files(config, paths, use_sudo_flag):
 
@@ -74,11 +71,12 @@ class FullHADeploy:
             conf["horizon::keystone_url"] = change_ip_to(conf["horizon::keystone_url"], vipc)
             conf["controller_names"] = [c["hostname"] for c in config['servers']['control-servers']]
             conf["openstack-ha::load-balancer::controller_ipaddresses"] = [c["ip"]
-                                                                           for c in config['servers']['control-servers']]
+                                                                           for c in
+                                                                           config['servers']['control-servers']]
             conf["openstack-ha::load-balancer::swift_proxy_ipaddresses"] = [c["ip"]
-                                                                           for c in config['servers']['swift-proxy']]
+                                                                            for c in config['servers']['swift-proxy']]
             conf["openstack-ha::load-balancer::swift_proxy_names"] = [c["hostname"]
-                                                                           for c in config['servers']['swift-proxy']]
+                                                                      for c in config['servers']['swift-proxy']]
             vipsw = net_ip + ".252"
             conf["openstack::swift::proxy::swift_proxy_net_ip"] = "%{ipaddress_eth2}"
             conf["openstack::swift::proxy::swift_memcache_servers"] = [i["ip"] + ":11211"
@@ -125,7 +123,7 @@ class FullHADeploy:
             conf["swift_public_address"] = vipsw
             conf["swift_admin_address"] = vipsw
             conf['mysql::server::override_options']['mysqld']['bind-address'] = "0.0.0.0"
-            #    config['servers']['control-servers'][0]['ip']
+            # config['servers']['control-servers'][0]['ip']
             conf['swift_storage_interface'] = "eth2"
             conf['swift_local_net_ip'] = "%{ipaddress_eth2}"
             conf['internal_ip'] = "%{ipaddress_eth0}"
@@ -153,10 +151,10 @@ class FullHADeploy:
                 ip_dns=".".join((config['servers']['build-server']["ip"].split(".")[:3])) + ".1"
             )
             servers = config['servers']['control-servers'] + \
-                config["servers"]["compute-servers"] + \
-                config["servers"]["swift-storage"] + \
-                config["servers"]["swift-proxy"] + \
-                config["servers"]["load-balancer"]
+                      config["servers"]["compute-servers"] + \
+                      config["servers"]["swift-storage"] + \
+                      config["servers"]["swift-proxy"] + \
+                      config["servers"]["load-balancer"]
             for c in servers:
                 new_conf[c['hostname']] = {
                     "hostname": c['hostname'] + "." + DOMAIN_NAME,
@@ -240,7 +238,7 @@ class FullHADeploy:
                 'openstack::swift::storage-node::swift_zone: {num}\n'
                 'coe::network::interface::interface_name: "%{{swift_storage_interface}}"\n'
                 'coe::network::interface::ipaddress: "%{{swift_local_net_ip}}"\n'
-                'coe::network::interface::netmask: "%{{swift_storage_netmask}}"\n'.format(num=num+1)
+                'coe::network::interface::netmask: "%{{swift_storage_netmask}}"\n'.format(num=num + 1)
             )
             file_name = sw["hostname"] + ".yaml"
             write(sw_text, path, file_name, use_sudo_flag)
@@ -251,17 +249,16 @@ class FullHADeploy:
     @staticmethod
     def prepare_all_files(self, config, use_sudo_flag):
         self.prepare_fullha_files(config,
-                      paths=(
-                      "/etc/puppet/data/hiera_data/user.common.yaml",
-                      "/etc/puppet/data/hiera_data/user.full_ha.yaml",
-                      "/etc/puppet/data/cobbler/cobbler.yaml",
-                      "/etc/puppet/data/role_mappings.yaml",
-                      "/etc/puppet/data/hiera_data/hostname/build_server.yaml"
-                      ),
-                      use_sudo_flag=use_sudo_flag)
+                                  paths=(
+                                      "/etc/puppet/data/hiera_data/user.common.yaml",
+                                      "/etc/puppet/data/hiera_data/user.full_ha.yaml",
+                                      "/etc/puppet/data/cobbler/cobbler.yaml",
+                                      "/etc/puppet/data/role_mappings.yaml",
+                                      "/etc/puppet/data/hiera_data/hostname/build_server.yaml"
+                                  ),
+                                  use_sudo_flag=use_sudo_flag)
         self.prepare_new_fullha_files(
             config,
             path="/etc/puppet/data/hiera_data/hostname",
             use_sudo_flag=use_sudo_flag
         )
-

@@ -1,13 +1,12 @@
 import yaml
 import os
-from StringIO import StringIO
 
 from config import DOMAIN_NAME, CONFIG_PATH, opts
 from deploy import Standalone
 from common import run_services, track_cobbler
 from utils import change_ip_to, dump, warn_if_fail
 from StringIO import StringIO
-from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
+from fabric.api import put, get
 
 __author__ = 'sshnaidm'
 
@@ -25,8 +24,8 @@ class Role2(Standalone):
 
     def parse_file(self):
         self.host = self.build["ip"]
-        self.user = self.build["user"]
-        self.password = self.build["password"]
+        self.user = self.conf.user or self.build["user"]
+        self.password = self.conf.password or self.build["password"]
 
     def postrun(self):
         job = {
@@ -41,7 +40,7 @@ class Role2(Standalone):
         servers = self.conf_yaml["servers"]["control-server"] + self.conf_yaml["servers"]["compute-server"]
         if opts.use_cobbler:
             job['host_string'] = self.conf_yaml["servers"]["build-server"][0]["ip"]
-            track_cobbler(self.conf_yaml, job, servers)
+            track_cobbler(job, servers)
         else:
             for host in servers:
                 job['host_string'] = host["ip"]
@@ -51,12 +50,10 @@ class Role2(Standalone):
                              envs=self.env,
                              config=self.conf_yaml,
                              scenario=self.scenario
-                             )
+                )
 
 
 class Role2Deploy:
-
-
     @staticmethod
     def prepare_2role_files(config, paths, use_sudo_flag):
 
@@ -87,13 +84,14 @@ class Role2Deploy:
             conf["swift_internal_address"] = config['servers']['control-server'][0]['ip']
             conf["swift_public_address"] = config['servers']['control-server'][0]['ip']
             conf["swift_admin_address"] = config['servers']['control-server'][0]['ip']
-            conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-server'][0]['ip']
+            conf['mysql::server::override_options']['mysqld']['bind-address'] = config['servers']['control-server'][0][
+                'ip']
             conf['internal_ip'] = "%{ipaddress_eth0}"
             conf['public_interface'] = "eth0"
             conf['private_interface'] = "eth0"
             conf['install_drive'] = "/dev/vda"
             conf['ipv6_ra'] = 1
-            conf['packages'] = conf['packages'] + " radvd"
+            conf['packages'] += " radvd"
             conf['service_plugins'] += ["neutron.services.metering.metering_plugin.MeteringPlugin"]
             return dump(conf)
 
@@ -190,16 +188,15 @@ class Role2Deploy:
     @staticmethod
     def prepare_all_files(self, config, use_sudo_flag):
         self.prepare_2role_files(config,
-                      paths=(
-                      "/etc/puppet/data/hiera_data/user.common.yaml",
-                      "/etc/puppet/data/cobbler/cobbler.yaml",
-                      "/etc/puppet/data/role_mappings.yaml",
-                      "/etc/puppet/data/hiera_data/hostname/build_server.yaml"
-                      ),
-                      use_sudo_flag=use_sudo_flag)
+                                 paths=(
+                                     "/etc/puppet/data/hiera_data/user.common.yaml",
+                                     "/etc/puppet/data/cobbler/cobbler.yaml",
+                                     "/etc/puppet/data/role_mappings.yaml",
+                                     "/etc/puppet/data/hiera_data/hostname/build_server.yaml"
+                                 ),
+                                 use_sudo_flag=use_sudo_flag)
         self.prepare_new_2role_files(
             config,
             path="/etc/puppet/data/hiera_data/hostname",
             use_sudo_flag=use_sudo_flag
         )
-

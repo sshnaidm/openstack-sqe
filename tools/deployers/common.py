@@ -1,6 +1,5 @@
 import time
 import sys
-import yaml
 
 from StringIO import StringIO
 from utils import warn_if_fail, collect_logs, resolve_names, update_time, all_servers
@@ -9,9 +8,6 @@ from fabric.contrib.files import exists, contains, append, sed
 from fabric.colors import green, red
 
 from config import APPLY_LIMIT, DOMAIN_NAME
-#from role2 import Role2Deploy
-#from fullha import FullHADeploy
-
 
 __author__ = 'sshnaidm'
 
@@ -31,7 +27,6 @@ def install_openstack(settings_dict,
     :param settings_dict: settings dictionary for Fabric
     :param envs: environment variables to inject when executing job
     :param verbose: if to hide all output or print everything
-    :param url_script: URl of Cisco installer script from Chris
     :param force: Use if you don't connect via interface you gonna bridge later
     :return: always true
     """
@@ -67,17 +62,12 @@ def install_openstack(settings_dict,
                 append("/etc/hosts", prepare_hosts(config, scenario))
                 warn_if_fail(run_func("git clone -b icehouse "
                                       "https://github.com/CiscoSystems/puppet_openstack_builder"))
-                prepare_repo(run_func, use_sudo_flag)
+                prepare_repo(use_sudo_flag)
                 with cd("/root/puppet_openstack_builder/install-scripts"):
                     warn_if_fail(run_func("./install.sh"))
                 resolve_names(run_func, use_sudo_flag)
                 if scenario != "all_in_one":
                     prepare_hosts(config, scenario)
-                    #map = {
-                    #    "2role": Role2Deploy,
-                    #    "fullha": FullHADeploy,
-                    #    "devstack": DevstackDeploy,
-                    #}
                     cls.prepare_all_files(cls(), config, use_sudo_flag)
 
                 check_results(run_func, use_cobbler)
@@ -99,7 +89,6 @@ def install_openstack(settings_dict,
                 return True
     print (green("Finished!"))
     return True
-
 
 
 def run_services(host,
@@ -138,13 +127,7 @@ def run_services(host,
                 append("/etc/hosts", prepare_hosts(config, scenario))
             run_func("apt-get install -y git")
             run_func("git clone -b icehouse https://github.com/CiscoSystems/puppet_openstack_builder")
-            # use latest, not i.0 release
-            #with cd("/root/puppet_openstack_builder"):
-            #        run_func('git checkout i.0')
-            #sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
-            #                "icehouse/snapshots/i.0",
-            #                "icehouse-proposed", use_sudo=use_sudo_flag)
-            prepare_repo(run_func, use_sudo_flag)
+            prepare_repo(use_sudo_flag)
             with cd("/root/puppet_openstack_builder/install-scripts"):
                 warn_if_fail(run_func("./setup.sh"))
                 warn_if_fail(run_func('puppet agent --enable'))
@@ -170,17 +153,15 @@ def check_results(run_func, use_cobbler):
         tries += 1
 
 
-def prepare_repo(run_func, sudo_flag):
-    ## run the latest, not i.0 release
-    #run_func('git checkout i.0')
+def prepare_repo(sudo_flag):
+    # # run the latest, not i.0 release
+    # run_func('git checkout i.0')
     sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
         "icehouse/snapshots/i.0",
         "icehouse-proposed", use_sudo=sudo_flag)
     sed("/root/puppet_openstack_builder/data/hiera_data/vendor/cisco_coi_common.yaml",
-                "/snapshots/i.0",
-                "-proposed", use_sudo=sudo_flag)
-
-
+        "/snapshots/i.0",
+        "-proposed", use_sudo=sudo_flag)
 
 
 def prepare_hosts(config, scenario):
@@ -199,14 +180,10 @@ def prepare_hosts(config, scenario):
     return hosts
 
 
-
-
-def track_cobbler(config, setts, hosts):
-
+def track_cobbler(setts, hosts):
     """
         Function for tracking cobbler installation on boxes
 
-    :param config: boxes configuration
     :param setts: settings for connecting to boxes
     :return: Nothing, but exist with 1 when failed
     """
@@ -224,14 +201,16 @@ def track_cobbler(config, setts, hosts):
             try:
                 return contains("/var/log/syslog", "Finished catalog run")
             except Exception as e:
+                print >> sys.stderr, "Exception when checking catalog!\n%s" % str(e)
                 return False
 
-    wait_os_up = 15*60
-    wait_catalog = 40*60
+    wait_os_up = 15 * 60
+    wait_catalog = 40 * 60
 
     # reset machines
     try:
         import libvirt
+
         conn = libvirt.open('qemu+ssh://{user}@localhost/system'.format(user=setts["user"]))
         for servbox in hosts:
             vm_name = servbox["vm_name"]
@@ -256,10 +235,8 @@ def track_cobbler(config, setts, hosts):
             if not host_ips:
                 print >> sys.stderr, "Current step with '%s' was finished successfully!" % check_func.func_name
                 break
-            time.sleep(3*60)
+            time.sleep(3 * 60)
         else:
-            print >> sys.stderr, "TImeout of %d minutes of %s is over. Exiting...." % (timeout/60, check_func.func_name)
+            print >> sys.stderr, "TImeout of %d minutes of %s is over. Exiting...." % (
+                timeout / 60, check_func.func_name)
             sys.exit(1)
-
-
-
