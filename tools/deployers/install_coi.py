@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from aio import AIO
-from devstack import Devstack, DevstackDeploy
-from role2 import Role2, Role2Deploy
-from fullha import FullHA, FullHADeploy
+from devstack import Devstack
+from role2 import Role2
+from fullha import FullHA
 from config import opts, ssh_key_file, verb_mode
 
 __author__ = 'sshnaidm'

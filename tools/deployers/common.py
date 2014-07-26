@@ -65,13 +65,11 @@ def install_openstack(settings_dict,
                                       'Dpkg::Options::="--force-confold" dist-upgrade'))
                 # prepare /etc/hosts file
                 append("/etc/hosts", prepare_hosts(config, scenario))
-                with cd("/root"):
-                    warn_if_fail(run_func("git clone -b icehouse "
-                                          "https://github.com/CiscoSystems/puppet_openstack_builder"))
-                    with cd("puppet_openstack_builder"):
-                        prepare_repo(run_func, use_sudo_flag)
-                        with cd("install-scripts"):
-                            warn_if_fail(run_func("./install.sh"))
+                warn_if_fail(run_func("git clone -b icehouse "
+                                      "https://github.com/CiscoSystems/puppet_openstack_builder"))
+                prepare_repo(run_func, use_sudo_flag)
+                with cd("/root/puppet_openstack_builder/install-scripts"):
+                    warn_if_fail(run_func("./install.sh"))
                 resolve_names(run_func, use_sudo_flag)
                 if scenario != "all_in_one":
                     prepare_hosts(config, scenario)
@@ -178,6 +176,9 @@ def prepare_repo(run_func, sudo_flag):
     sed("/root/puppet_openstack_builder/install-scripts/cisco.install.sh",
         "icehouse/snapshots/i.0",
         "icehouse-proposed", use_sudo=sudo_flag)
+    sed("/root/puppet_openstack_builder/data/hiera_data/vendor/cisco_coi_common.yaml",
+                "/snapshots/i.0",
+                "-proposed", use_sudo=sudo_flag)
 
 
 
