@@ -25,7 +25,6 @@ def main():
         opts.img_dir,
         opts.boot,
         cloud_img,
-        opts.ipv
     )
     if not opts.undefine_all and not opts.shutdown_all:
         lab.destroy()

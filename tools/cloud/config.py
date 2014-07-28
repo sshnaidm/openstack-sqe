@@ -4,7 +4,6 @@ import os
 DIR_PATH = os.path.abspath(os.path.dirname(__file__))
 TOPO_PATH = os.path.join(DIR_PATH, "cloud-configs")
 TEMPLATE_PATH = os.path.join(DIR_PATH, "cloud-templates")
-SHARED = {}
 
 def parse(f):
     lines = f.readlines()
@@ -22,7 +21,7 @@ parser.add_argument('-b', action='store', dest='boot', default="cloudimg",
                     choices=['net', 'cloudimg'], help='Boot')
 parser.add_argument('-t', action='store', dest='topology', default=None,
                     choices=["aio", "2role", "fullha", "devstack", "standalone",
-                             "aio6", "devstack6", "2role6", "fullha6"],
+                             "aio6", "devstack6", "devstack64", "2role6", "fullha6"],
                     help='Choose topology')
 parser.add_argument('-c', dest='topoconf', type=argparse.FileType('r'), default=None,
                     help='Topology configuration file')
@@ -30,8 +29,6 @@ parser.add_argument('-g', dest='defaults', type=argparse.FileType('r'), default=
                     help='Override defaults in this file')
 parser.add_argument('-l', action='store', dest='lab_id', default="lab1",
                     help='Lab ID in configuration, default=lab1')
-parser.add_argument('-i', dest='ipv', choices=[4, 6], default=4,
-                    help='IP version: 4 or 6')
 parser.add_argument('-r', dest='distro', choices=["ubuntu", "redhat"], default="ubuntu",
                     help='Linux distro - RedHat or Ubuntu')
 

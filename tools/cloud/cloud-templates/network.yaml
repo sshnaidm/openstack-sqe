@@ -117,6 +117,17 @@ template:
           {dhcp}
           </ip>
         </network>
+  xml64: |
+        <network>
+          <name>{name}</name>
+          {nat}
+          <domain name='{domain}'/>
+          {dns}
+          <ip family="ipv6" address='{gateway}' prefix='{prefix}'/>
+          <ip address='{net_ip}.1' netmask='255.255.255.0'>
+          {dhcp}
+          </ip>
+        </network>
   dns_def: |
         <dns>
           {dns_records}

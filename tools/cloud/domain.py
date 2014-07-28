@@ -1,11 +1,7 @@
 import os
 import yaml
 
-from config import opts
-if opts.ipv == 4:
-    from network import Network as Network
-else:
-    from network import Network6 as Network
+from network import Network
 from storage import Storage
 from cloudtools import conn, make_network_name
 from config import TEMPLATE_PATH
@@ -47,7 +43,7 @@ class VM:
         for key, net in enumerate(self.conf['params']['networks']):
             net_params = [i for i in self.full_conf['networks'] if net in i][0]
             box_net = Network.hosts[0][self.box][index]
-            if net_params[net]["dhcp"]:  # True or False
+            if net_params[net]["dhcp"] or len(self.conf['params']['networks']) == 1:  # True or False
                 mac = box_net["mac"]
                 xml += netconf['template']["interface_dhcp"].format(
                     net_name=make_network_name(self.lab_id, net),

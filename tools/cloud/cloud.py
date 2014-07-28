@@ -17,20 +17,18 @@ class Lab:
                  config,
                  lab_img_path,
                  boot,
-                 cloud_disk,
-                 ipv):
+                 cloud_disk):
         self.id = lab_id
         self.path = os.path.join(lab_img_path, lab_id)
         self.boot = boot
         self.cloud_disk = cloud_disk
         self.topo = config
-        self.ipv = ipv
 
     def create_networks(self):
         for num, net in enumerate(self.topo["networks"]):
             net_name = net.keys()[0]
             net_shift = num
-            if "ipv6" in net[net_name].keys() and net[net_name]["ipv6"]:
+            if "ipv" in net[net_name].keys() and net[net_name]["ipv"] == 6:
                 net_class = Network6
             else:
                 net_class = Network

@@ -3,7 +3,7 @@ import random
 import yaml
 
 from cloudtools import conn, make_network_name
-from config import opts, DOMAIN_NAME, DNS, TEMPLATE_PATH, ip_order, SHARED
+from config import opts, DOMAIN_NAME, DNS, TEMPLATE_PATH, ip_order
 
 with open(os.path.join(TEMPLATE_PATH, "network.yaml")) as f:
     netconf = yaml.load(f)
@@ -31,6 +31,7 @@ class Network(object):
         self.name = make_network_name(lab_id, name)
         self.config = config
         self.net_shift = net_shift
+        self.ipv = None
         for key in kwargs:
             setattr(self, key, kwargs.get(key))
         self.denition = None
@@ -39,6 +40,7 @@ class Network(object):
         self.net_ip_base = ".".join(self.net_ip.split(".")[:-1])
         self.interface = None
         self.ipv6 = False
+        self.dns_host_template = netconf["template"]["dns_host"]
 
     def dhcp_definition(self):
         hosts_def = {}
@@ -75,7 +77,7 @@ class Network(object):
 
     def dns_definition(self):
         dns_hosts = "\n".join(
-            [netconf["template"]["dns_host"].format(
+            [self.dns_host_template.format(
                 net_ip=self.net_ip_base,
                 host_ip=self.dns[i],
                 host=i,
@@ -89,13 +91,19 @@ class Network(object):
         dhcp_text = self.dhcp_definition() if self.dhcp else ""
         dns_text = self.dns_definition() if self.dns else ""
         nat_text = netconf["template"]["nat"] if self.nat else ""
-        return netconf["template"]["xml"].format(
+        if self.ipv == 64:
+            template = netconf["template"]["xml64"]
+        else:
+            template = netconf["template"]["xml"]
+        return template.format(
             name=self.name,
             net_ip=self.net_ip_base,
             domain=DOMAIN_NAME,
             dhcp=dhcp_text,
             dns=dns_text,
-            nat=nat_text
+            nat=nat_text,
+            prefix="64",
+            gateway="2001:dead:badd:%s::1" % rand_net(),
         )
 
     def define_interface(self):
@@ -131,24 +139,14 @@ def rand_net():
 class Network6(Network):
     def __init__(self, *args, **kwargs):
         super(Network6, self).__init__(*args, **kwargs)
-        #lab_ip = env[self.lab_id]["net_start"]
         self.ipv6 = True
         self.net_ip_base = "2001:dead:beaf:%s" % rand_net()
         self.net_ip = self.net_ip_base + "::"
         self.prefix = "64"
         self.gw = self.net_ip + "1"
-
-    def dns_definition(self):
-        dns_hosts = "\n".join(
-            [netconf["template"]["dns6_host"].format(
-                net_ip=self.net_ip_base,
-                host_ip=self.dns[i],
-                host=i,
-                domain=DOMAIN_NAME)
-             for i in self.dns])
-        return netconf["template"]["dns_def"].format(
-            dns_records=dns_hosts
-        )
+        self.dns_host_template = netconf["template"]["dns6_host"]
+        if self.dhcp:
+            raise NotImplementedError("IPv6 DHCP is not implemented yet!")
 
     def define_hosts(self):
         ip_start = env[self.lab_id]["ip_start"]
@@ -179,8 +177,7 @@ class Network6(Network):
         dhcp_text = ""
         dns_text = self.dns_definition() if self.dns else ""
         nat_text = netconf["template"]["nat"] if self.nat else ""
-        if self.dhcp:
-            self.define_hosts()
+        self.define_hosts()
 
         return netconf["template"]["xml6"].format(
             name=self.name,
