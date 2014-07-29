@@ -21,7 +21,7 @@ networks:
   - internal:
       dhcp: false
       external: false
-      nat: false
+      nat: true
       dns:
   - external:
       dhcp: false
