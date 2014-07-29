@@ -19,7 +19,7 @@ LOGS_COPY = {
     "/var/log": "all_logs",
 }
 
-SERVICES = ['neutron-', 'nova', 'glance', 'cinder', 'keystone']
+SERVICES = ['neutron-*', 'nova', 'glance', 'cinder', 'keystone']
 
 
 def apply_changes():
@@ -28,12 +28,15 @@ def apply_changes():
     apply_patches()
     warn_if_fail(run("./stack.sh"))
 
-def apply_patches():
-    warn_if_fail(run("git fetch https://review.openstack.org/openstack-dev/devstack "
-    "refs/changes/87/87987/12 && git format-patch -1  FETCH_HEAD"))
 
+def apply_patches():
+    #warn_if_fail(run("git fetch https://review.openstack.org/openstack-dev/devstack "
+    #"refs/changes/87/87987/12 && git format-patch -1  FETCH_HEAD"))
+    #warn_if_fail(run("patch -p1 < 0001-Add-IPv6-support.patch"))
     #warn_if_fail(run("git fetch https://review.openstack.org/openstack-dev/devstack "
     #"refs/changes/23/97823/1 && git format-patch -1  FETCH_HEAD"))
+    warn_if_fail(run("wget -qO- 'https://review.openstack.org/gitweb?p=openstack-dev/"
+    "devstack.git;a=patch;h=d258d2e8e8b207d332fd465aad7c02dc3ff0c941' | patch -p1 -N"))
 
 def kill_services():
     for service in SERVICES:
@@ -66,17 +69,16 @@ VOLUME_BACKING_FILE_SIZE=2052M
 API_RATE_LIMIT=False
 VERBOSE=True
 DEBUG=True
-LOGFILE=/tmp/stack.sh.log
+LOGFILE=/opt/stack/logs/stack.sh.log
 USE_SCREEN=True
 SCREEN_LOGDIR=/opt/stack/logs
-TEMPEST_REPO=https://github.com/CiscoSystems/tempest.git
-TEMPEST_BRANCH=master-in-use
-P_VERSION=4+6
-IPV6_PRIVATE_RANGE=2001:dead:beef:deed::/64
-IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
+IP_VERSION=6
+MGMT_NET=6
+IPV6_PRIVATE_RANGE=fd01:dead:beef:deed::/64
+IPV6_NETWORK_GATEWAY=fd01:dead:beef:deed::1
+IPV6_PUBLIC_RANGE=2001:dead:badd::/64
+IPV6_PUBLIC_NETWORK_GATEWAY=2001:dead:badd::1/64
 REMOVE_PUBLIC_BRIDGE=False
-#RECLONE=no
-#OFFLINE=True
 """
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
@@ -108,9 +110,9 @@ def install_devstack(settings_dict,
         quit_if_fail(run("git clone https://github.com/openstack-dev/devstack.git"))
         make_local("devstack/local.conf", sudo_flag=False)
         with cd("devstack"):
-            warn_if_fail(run("./stack.sh"))
             if patch:
-                apply_changes()
+                apply_patches()
+            warn_if_fail(run("./stack.sh"))
         if exists('~/devstack/openrc'):
             get('~/devstack/openrc', "./openrc")
         else:
