@@ -5,7 +5,7 @@ import os
 import yaml
 
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
-from fabric.contrib.files import exists, append
+from fabric.contrib.files import exists, append, comment
 from fabric.colors import green, red
 
 from utils import warn_if_fail, quit_if_fail, update_time
@@ -112,6 +112,7 @@ def install_devstack(settings_dict,
         with cd("devstack"):
             if patch:
                 apply_patches()
+            comment("lib/neutron", "sudo ip netns exec qrouter-$ROUTER_ID ip -6 route add ::/0")
             warn_if_fail(run("./stack.sh"))
         if exists('~/devstack/openrc'):
             get('~/devstack/openrc', "./openrc")
@@ -171,7 +172,11 @@ def main():
                "abort_on_prompts": True,
                "gateway": opts.gateway or None}
 
-    res = install_devstack(job, verb_mode, opts.proxy, opts.patch)
+    res = install_devstack(settings_dict=job,
+                           envs=None,
+                           verbose=verb_mode,
+                           proxy=opts.proxy,
+                           patch=opts.patch)
 
     if res:
         print "Job with host {host} finished successfully!".format(host=opts.host)

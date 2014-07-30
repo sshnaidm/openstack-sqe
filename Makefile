@@ -112,7 +112,10 @@ install-fullha-cobbler:
 install-devstack:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
 	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu
-	#time $(PYTHON) ./tools/deployers/install_coi.py -c config_file  -u localadmin -p ubuntu -s devstack
+
+install-devstack6:
+	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
+	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu -m
 
 prepare-devstack-tempest:
 	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
@@ -173,6 +176,8 @@ run-tempest: prepare-tempest run-tests
 run-tempest-parallel: prepare-tempest run-tests-parallel
 
 devstack: init prepare-devstack give-a-time install-devstack
+
+devstack6: init prepare-devstack give-a-time install-devstack6
 
 devstack-snapshot: init snapshot-revert devstack-snap-prepare
 
