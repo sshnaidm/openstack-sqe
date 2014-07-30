@@ -121,8 +121,7 @@ install-devstack:
 
 install-aio-rh:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_aio_rh.py -c config_file -u localadmin -p ubuntu -s aio_rh
-
+	time $(PYTHON) ./tools/deployers/install_aio_rh.py -c config_file -u localadmin -p ubuntu
 
 prepare-devstack-tempest:
 	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
