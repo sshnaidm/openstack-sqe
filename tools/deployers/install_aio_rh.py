@@ -22,8 +22,7 @@ LOGS_COPY = {
 def install_devstack(settings_dict,
                      envs=None,
                      verbose=None,
-                     proxy=None,
-                     patch=False):
+                     proxy=None):
     envs = envs or {}
     verbose = verbose or []
     if settings_dict['user'] != 'root':
@@ -104,7 +103,7 @@ def main():
                "abort_on_prompts": True,
                "gateway": opts.gateway or None}
 
-    res = install_devstack(job, verb_mode, opts.proxy, opts.patch)
+    res = install_devstack(settings_dict=job, envs=None, verbose=verb_mode, proxy=opts.proxy)
 
     if res:
         print "Job with host {host} finished successfully!".format(host=opts.host)
