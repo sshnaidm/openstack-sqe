@@ -74,11 +74,11 @@ USE_SCREEN=True
 SCREEN_LOGDIR=/opt/stack/logs
 IP_VERSION=6
 MGMT_NET=6
-IPV6_PRIVATE_RANGE=fd01:dead:beef:deed::/64
-IPV6_NETWORK_GATEWAY=fd01:dead:beef:deed::1
-IPV6_PUBLIC_RANGE=2001:dead:badd::/64
-IPV6_PUBLIC_NETWORK_GATEWAY=2001:dead:badd::1/64
+IPV6_PRIVATE_RANGE=feee:1975::/64
+IPV6_NETWORK_GATEWAY=feee:1975::1
 REMOVE_PUBLIC_BRIDGE=False
+IPV6_PUBLIC_RANGE=2005:1975::/64
+IPV6_PUBLIC_NETWORK_GATEWAY=2005:1975::1
 """
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
