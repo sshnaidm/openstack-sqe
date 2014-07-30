@@ -9,7 +9,6 @@ servers:
       cpu: 1
       networks:
         - admin
-        - internal
         - external
 networks:
   - admin:

@@ -80,9 +80,9 @@ prepare-fullha-cobbler:
 	time $(PYTHON) ./tools/cloud/create.py -b net -l ${LAB} -s /opt/imgs -z ./trusty-server-cloudimg-amd64-disk1.img -t fullha > config_file
 
 prepare-aio-rh:
-	@echo "$(CYAN)>>>> Preparing full HA boxes for cobbler...$(RESET)"
+	@echo "$(CYAN)>>>> Preparing AIO for CentOS...$(RESET)"
 	test -e centos-6.5.x86_64.qcow2 || wget -nv $(CENTOS65_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./centos-6.5.x86_64.qcow2 -r redhat -t aio > config_file
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./centos-6.5.x86_64.qcow2 -r redhat -c ./tools/cloud/cloud-configs/aio_rh_topology.yaml > config_file
 
 give-a-time:
 	sleep 180
@@ -120,7 +120,7 @@ install-devstack:
 	#time $(PYTHON) ./tools/deployers/install_coi.py -c config_file -u localadmin -p ubuntu -s devstack
 
 install-aio-rh:
-	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
+	@echo "$(CYAN)>>>> Installing AIO with CentOS ...$(RESET)"
 	time $(PYTHON) ./tools/deployers/install_aio_rh.py -c config_file -u localadmin -p ubuntu
 
 prepare-devstack-tempest:
