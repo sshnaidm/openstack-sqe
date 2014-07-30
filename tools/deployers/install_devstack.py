@@ -101,7 +101,7 @@ def install_devstack(settings_dict,
             warn_if_fail(put(StringIO('Acquire::http::Pipeline-Depth "0";'),
                              "/etc/apt/apt.conf.d/00no_pipelining",
                              use_sudo=True))
-        update_time(run)
+        update_time(sudo)
         warn_if_fail(sudo("apt-get update"))
         warn_if_fail(sudo("apt-get install -y git python-pip"))
         warn_if_fail(run("git config --global user.email 'test.node@example.com';"
@@ -112,7 +112,7 @@ def install_devstack(settings_dict,
         with cd("devstack"):
             if patch:
                 apply_patches()
-                comment("lib/neutron", "sudo ip netns exec qrouter-$ROUTER_ID ip -6 route add ::/0")
+                comment("lib/neutron", "sudo ip netns exec qrouter-\$ROUTER_ID ip -6 route add ::")
             warn_if_fail(run("./stack.sh"))
         if exists('~/devstack/openrc'):
             get('~/devstack/openrc', "./openrc")
