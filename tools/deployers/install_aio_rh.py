@@ -71,8 +71,6 @@ def main():
                         help='SSH key file, default is from repo')
     parser.add_argument('-j', action='store_true', dest='proxy', default=False,
                         help='Use cisco proxy if installing from Cisco local network')
-    parser.add_argument('-m', action='store_true', default=False, dest='patch',
-                        help='If apply patches to Devstack')
     parser.add_argument('-c', action='store', dest='config_file', default=None,
                         help='Configuration file, default is None')
     parser.add_argument('--version', action='version', version='%(prog)s 2.0')
