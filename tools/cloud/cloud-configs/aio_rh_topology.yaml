@@ -18,11 +18,6 @@ networks:
       nat: true
       dns:
         all-in-one: 2
-  - internal:
-      dhcp: false
-      external: false
-      nat: false
-      dns:
   - external:
       dhcp: false
       external: true
