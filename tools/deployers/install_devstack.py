@@ -112,7 +112,7 @@ def install_devstack(settings_dict,
         with cd("devstack"):
             if patch:
                 apply_patches()
-            comment("lib/neutron", "sudo ip netns exec qrouter-$ROUTER_ID ip -6 route add ::/0")
+                comment("lib/neutron", "sudo ip netns exec qrouter-$ROUTER_ID ip -6 route add ::/0")
             warn_if_fail(run("./stack.sh"))
         if exists('~/devstack/openrc'):
             get('~/devstack/openrc', "./openrc")
