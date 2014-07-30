@@ -44,12 +44,12 @@ def install_devstack(settings_dict,
         warn_if_fail(run_func("packstack --allinone"))
         if exists('/root/keystonerc_admin'):
             get('/root/keystonerc_admin', "./openrc")
+        else:
+            print (red("No openrc file, something went wrong! :("))
         if exists('/root/keystonerc_admin'):
             get('/root/keystonerc_demo', "./openrc_demo")
         if exists('/root/packstack-answers-*'):
             get('/root/packstack-answers-*', ".")
-        else:
-            print (red("No openrc file, something went wrong! :("))
         print (green("Finished!"))
         return True
 
