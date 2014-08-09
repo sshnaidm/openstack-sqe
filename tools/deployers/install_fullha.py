@@ -42,7 +42,7 @@ def prepare_files(config, paths, use_sudo_flag):
         conf["openstack-ha::load-balancer::swift_proxy_names"] = [c["hostname"]
                                                                        for c in config['servers']['swift-proxy']]
         vipsw = net_ip + ".252"
-        conf["openstack::swift::proxy::swift_proxy_net_ip"] = "%{ipaddress_eth1}"
+        conf["openstack::swift::proxy::swift_proxy_net_ip"] = "%{ipaddress_eth0}"
         conf["openstack::swift::proxy::swift_memcache_servers"] = [i["ip"] + ":11211"
                                                                    for i in config['servers']['swift-proxy']]
         conf["nova::memcached_servers"] = [i["ip"] + ":11211" for i in config['servers']['control-server']]
@@ -89,8 +89,10 @@ def prepare_files(config, paths, use_sudo_flag):
         conf["swift_proxy_net_ip"] = "%{ipaddress_eth0}"
         conf['mysql::server::override_options']['mysqld']['bind-address'] = "0.0.0.0"
         #    config['servers']['control-server'][0]['ip']
-        conf['swift_storage_interface'] = "eth0"
-        conf['swift_local_net_ip'] = "%{ipaddress_eth0}"
+        conf['swift_storage_interface'] = "eth1"
+        conf['swift_local_net_ip'] = "%{ipaddress_eth1}"
+        conf['glance::backend::swift::swift_store_key'] = 'secret_key'
+        conf['glance::backend::swift::swift_store_auth_address'] = '127.0.0.1'
         conf['internal_ip'] = "%{ipaddress_eth0}"
         conf['public_interface'] = "eth0"
         conf['private_interface'] = "eth0"
@@ -102,6 +104,7 @@ def prepare_files(config, paths, use_sudo_flag):
         conf['ceph_cluster_network'] = net_ip + ".0/24"
         conf['ceph_public_interface'] = "eth0"
         conf['ceph_public_network'] = net_ip + ".0/24"
+        conf['coe::base::supplemental_repo'] = False
         return dump(conf)
 
     def prepare_cobbler(config, cob_file):
@@ -181,6 +184,13 @@ def prepare_new_files(config, path, use_sudo_flag):
         warn_if_fail(put(fd, os.path.join(path, filename), use_sudo=sudo))
         warn_if_fail(put(fd, os.path.join(path, filename.replace("-", "_")), use_sudo=sudo))
 
+    for num, control in enumerate(config['servers']['control-server']):
+        file_name = control["hostname"] + ".yaml"
+        if num == 0:
+            cnt_text = "galera::server::master_ip: false"
+        else:
+            cnt_text = "galera::server::master_ip: %s" % config['servers']['control-server'][num - 1]["ip"]
+        write(cnt_text, path, file_name, use_sudo_flag)
     for compute in config["servers"]["compute-server"]:
         file_name = compute["hostname"] + ".yaml"
         ceph = {}
@@ -293,8 +303,8 @@ def run_db_sync_control(host,
         use_sudo_flag = False
     print >> sys.stderr, "FABRIC connecting to", settings_dict["host_string"], host["hostname"]
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
-        run_func("service mysql restart;"
-                 "sleep 180;"
+        run_func("service mysql start;"
+                 "sleep 60;"
                  "service keystone stop;"
                  "keystone-manage token_flush;"
                  "keystone-manage db_sync;"
