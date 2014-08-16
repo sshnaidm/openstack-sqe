@@ -20,7 +20,7 @@ LOGS_COPY = {
     "/var/log": "all_logs",
 }
 
-def prepare_answers(path, use_sudo_flag):
+def prepare_answers(path):
     fd = StringIO()
     warn_if_fail(get(path, fd))
     parser = SafeConfigParser()
@@ -31,8 +31,7 @@ def prepare_answers(path, use_sudo_flag):
     parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
     fd1 = StringIO()
     parser.write(fd1)
-    warn_if_fail(put(fd1, "/root/installed_answers",
-                     use_sudo=use_sudo_flag))
+    warn_if_fail(put(fd1, "~/installed_answers"))
 
 def install_devstack(settings_dict,
                      envs=None,
@@ -57,16 +56,16 @@ def install_devstack(settings_dict,
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
         warn_if_fail(run_func("packstack --gen-answer-file=answers.txt"))
-        prepare_answers("/root/answers.txt", use_sudo_flag)
-        warn_if_fail(run_func("packstack --answer-file=/root/installed_answers"))
-        if exists('/root/keystonerc_admin'):
-            get('/root/keystonerc_admin', "./openrc")
+        prepare_answers("~/answers.txt")
+        warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
+        if exists('~/keystonerc_admin'):
+            get('~/keystonerc_admin', "./openrc")
         else:
             print (red("No openrc file, something went wrong! :("))
-        if exists('/root/keystonerc_demo'):
-            get('/root/keystonerc_demo', "./openrc_demo")
-        if exists('/root/packstack-answers-*'):
-            get('/root/packstack-answers-*', ".")
+        if exists('~/keystonerc_demo'):
+            get('~/keystonerc_demo', "./openrc_demo")
+        if exists('~/packstack-answers-*'):
+            get('~/packstack-answers-*', ".")
         print (green("Finished!"))
         return True
 
