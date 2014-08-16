@@ -4,6 +4,7 @@ import argparse
 import os
 import yaml
 
+from ConfigParser import SafeConfigParser
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 from fabric.contrib.files import exists, append
 from fabric.colors import green, red
@@ -18,6 +19,20 @@ LOGS_COPY = {
     "/etc": "etc_configs",
     "/var/log": "all_logs",
 }
+
+def prepare_answers(path, use_sudo_flag):
+    fd = StringIO()
+    warn_if_fail(get(path, fd))
+    parser = SafeConfigParser()
+    parser.optionxform = str
+    parser.readfp(fd)
+    parser.set("general", "CONFIG_PROVISION_DEMO", "y")
+    parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
+    parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
+    fd1 = StringIO()
+    parser.write(fd1)
+    warn_if_fail(put(fd1, "/root/installed_answers",
+                     use_sudo=use_sudo_flag))
 
 def install_devstack(settings_dict,
                      envs=None,
@@ -41,12 +56,14 @@ def install_devstack(settings_dict,
                          "git config --global user.name 'Test Node'"))
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
-        warn_if_fail(run_func("packstack --allinone"))
+        warn_if_fail(run_func("packstack --gen-answer-file=answers.txt"))
+        prepare_answers("/root/answers.txt", use_sudo_flag)
+        warn_if_fail(run_func("packstack --answer-file=/root/installed_answers"))
         if exists('/root/keystonerc_admin'):
             get('/root/keystonerc_admin', "./openrc")
         else:
             print (red("No openrc file, something went wrong! :("))
-        if exists('/root/keystonerc_admin'):
+        if exists('/root/keystonerc_demo'):
             get('/root/keystonerc_demo', "./openrc_demo")
         if exists('/root/packstack-answers-*'):
             get('/root/packstack-answers-*', ".")
