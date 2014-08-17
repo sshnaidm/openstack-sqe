@@ -26,6 +26,9 @@ def prepare_answers(path):
     parser = SafeConfigParser()
     parser.optionxform = str
     parser.readfp(fd)
+    print parser
+    print "Sections", parser.sections()
+    print fd.getvalue()
     parser.set("general", "CONFIG_PROVISION_DEMO", "y")
     parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
     parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
