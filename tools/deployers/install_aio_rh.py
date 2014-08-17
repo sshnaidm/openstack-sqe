@@ -27,9 +27,13 @@ def prepare_answers(path):
         parser = SafeConfigParser()
         parser.optionxform = str
         parser.read(temp.name)
-    parser.set("general", "CONFIG_PROVISION_DEMO", "y")
-    parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
-    parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
+    #parser.set("general", "CONFIG_PROVISION_DEMO", "y")
+    #parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
+    #parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
+    parser.set("general", "CONFIG_KEYSTONE_ADMIN_PW", "Cisco123")
+    #parser.set("general", "CONFIG_KEYSTONE_DEMO_PW", "secret")
+    parser.set("general", "CONFIG_DEBUG_MODE", "y")
+
     with open("installed_answers", "w") as f:
         parser.write(f)
     warn_if_fail(put("installed_answers", "~/installed_answers"))
