@@ -23,12 +23,19 @@ LOGS_COPY = {
 def prepare_answers(path):
     fd = StringIO()
     warn_if_fail(get(path, fd))
+    warn_if_fail(get(path, "/tmp/lalala"))
     parser = SafeConfigParser()
     parser.optionxform = str
     parser.readfp(fd)
-    print parser
+    parser2 = SafeConfigParser()
+    parser2.optionxform = str
+    parser2.read("/tmp/lalala")
+    print "parser 2:"
+    print parser2.sections()
+    print "Original:"
+    print parser.__dict__
     print "Sections", parser.sections()
-    print fd.getvalue()
+    #print fd.getvalue()
     parser.set("general", "CONFIG_PROVISION_DEMO", "y")
     parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
     parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
