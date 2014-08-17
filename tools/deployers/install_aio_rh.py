@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from StringIO import StringIO
+from tempfile import NamedTemporaryFile
 import argparse
 import os
 import yaml
@@ -21,27 +21,18 @@ LOGS_COPY = {
 }
 
 def prepare_answers(path):
-    fd = StringIO()
-    warn_if_fail(get(path, fd))
-    warn_if_fail(get(path, "/tmp/lalala"))
-    parser = SafeConfigParser()
-    parser.optionxform = str
-    parser.readfp(fd)
-    parser2 = SafeConfigParser()
-    parser2.optionxform = str
-    parser2.read("/tmp/lalala")
-    print "parser 2:"
-    print parser2.sections()
-    print "Original:"
-    print parser.__dict__
-    print "Sections", parser.sections()
-    #print fd.getvalue()
+    with NamedTemporaryFile() as temp:
+        warn_if_fail(get(path, temp.name))
+        temp.flush()
+        parser = SafeConfigParser()
+        parser.optionxform = str
+        parser.read(temp.name)
     parser.set("general", "CONFIG_PROVISION_DEMO", "y")
     parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
     parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
-    fd1 = StringIO()
-    parser.write(fd1)
-    warn_if_fail(put(fd1, "~/installed_answers"))
+    with open("installed_answers", "w") as f:
+        parser.write(f)
+    warn_if_fail(put("installed_answers", "~/installed_answers"))
 
 def install_devstack(settings_dict,
                      envs=None,
@@ -59,7 +50,7 @@ def install_devstack(settings_dict,
         if exists("/etc/gai.conf"):
             append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
         warn_if_fail(run_func("yum -y update"))
-        warn_if_fail(run_func("yum -y install -y git python-pip vimi ntpdate"))
+        warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
         update_time(run_func)
         warn_if_fail(run_func("git config --global user.email 'test.node@example.com';"
                          "git config --global user.name 'Test Node'"))
