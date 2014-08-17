@@ -55,7 +55,7 @@ def install_devstack(settings_dict,
                          "git config --global user.name 'Test Node'"))
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
-        warn_if_fail(run_func("packstack --gen-answer-file=answers.txt"))
+        warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt")
         warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
         if exists('~/keystonerc_admin'):
