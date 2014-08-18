@@ -139,26 +139,13 @@ def check_regression(data):
         try:
             result = json.loads(requests.get(prev_link).content)
             data[topo]["regress"] = {}
-            print >> sys.stderr, "Regression prints"
             data[topo]["regress"]["failures_regression"] = data[topo]["failures_number"] - int(result['failCount'])
-            print >> sys.stderr, (data[topo]["regress"]["failures_regression"],
-                                  data[topo]["failures_number"], int(result['failCount']))
             data[topo]["regress"]["passed_regression"] = data[topo]["passes_number"] - int(result['passCount'])
-            print >> sys.stderr, (data[topo]["regress"]["passed_regression"],
-                                  data[topo]["passes_number"], int(result['passCount']))
             data[topo]["regress"]["skipped_regression"] = data[topo]["skipped_number"] - int(result['skipCount'])
-            print >> sys.stderr, (data[topo]["regress"]["skipped_regression"], data[topo]["skipped_number"],
-                                  int(result['skipCount']))
             data[topo]["regress"]["time_regression"] = data[topo]["time"] - float(result['duration'])
-            print >> sys.stderr, (data[topo]["regress"]["time_regression"],
-                                  data[topo]["time"], float(result['duration']))
             data[topo]["regress"]["total_regression"] = data[topo]["tests_number"] - sum(
                 [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])
                 ])
-            print >> sys.stderr, (data[topo]["regress"]["total_regression"], data[topo]["tests_number"],
-                                  sum(
-                                      [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])
-                                      ]))
             for reg in data[topo]["regress"]:
                 number = data[topo]["regress"][reg]
                 if number > 0:
@@ -182,22 +169,15 @@ def process_current(xmls):
             raise Exception("Can not recognize topology of file %s at path %s" % (file_name, xml))
         tree = Et.parse(xml)
         test_suite = tree.getroot()
-        print >> sys.stderr, "Prints from xml parsing for %s" % topo
         data[topo].update({"failures_number": int(test_suite.attrib['failures'])})
-        print >> sys.stderr, data[topo]["failures_number"]
         data[topo].update({"tests_number": int(test_suite.attrib['tests'])})
-        print >> sys.stderr, data[topo]["tests_number"]
         data[topo].update({"errors_number": int(test_suite.attrib['errors'])})
-        print >> sys.stderr, data[topo]["errors_number"]
         data[topo].update({"time": float(test_suite.attrib['time'])})
-        print >> sys.stderr, data[topo]["time"]
         skipped = tree.findall(".//skipped")
         data[topo].update({"skipped_number": len(skipped)})
-        print >> sys.stderr, data[topo]["skipped_number"]
         data[topo].update({"passes_number": int(test_suite.attrib['tests']) - (
             int(test_suite.attrib['errors']) + int(test_suite.attrib['failures']) + len(skipped)
         )})
-        print >> sys.stderr, data[topo]["passes_number"]
     return data
 
 
@@ -217,19 +197,13 @@ def process_current2(xmls):
         try:
             result = json.loads(requests.get(current_link).content)
             data[topo] = {}
-            print >> sys.stderr, "Prints from JSON parsing for %s" % topo
             data[topo].update({"failures_number": int(result['failCount'])})
-            print >> sys.stderr, data[topo]["failures_number"]
             data[topo].update({"passes_number": int(result['passCount'])})
-            print >> sys.stderr, data[topo]["passes_number"]
             data[topo].update({"time": float(result['duration'])})
-            print >> sys.stderr, data[topo]["time"]
             data[topo].update({"skipped_number": int(result['skipCount'])})
-            print >> sys.stderr, data[topo]["skipped_number"]
             data[topo].update({"tests_number": sum(
                 [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])]
             )})
-            print >> sys.stderr, data[topo]["tests_number"]
         except Exception as e:
             print >> sys.stderr, "No current results from Jenkins API for %s : %s!" % (
                 TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
