@@ -76,6 +76,11 @@ def update_time(func):
     """
         Update time on remote machine
 
+
+
+
+
+###############################
     :param func: function to execute the ntpdate with
     """
     ntp = False
