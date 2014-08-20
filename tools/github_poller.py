@@ -71,6 +71,7 @@ def check_n_trigger(config, start):
             repo, branch, start[repo], latest))
         if start[repo].sha != latest.sha:
             trigger_jenkins(config, repo, branch, start[repo], latest)
+            start[repo] = latest
         #time.sleep(config['commit_poll'])
 
 def trigger_jenkins(conf, repo, branch, start, end):
@@ -107,16 +108,16 @@ def calculate_diff(config, repo, branch, start, end):
     begin = finish = None
     diff = []
     for k, i in enumerate(chain(*[chain(z) for z in commits])):
-        if i.sha == start.sha:
+        if i.sha == end.sha:
             begin = k
         if begin is not None:
             diff.append(i)
-        if i.sha == end.sha:
+        if i.sha == start.sha:
             finish = k
             break
     log.debug("%s:%s Diff: begin=%s finish=%s, len(diff)=%s" % (
         repo, branch, begin, finish, len(diff)))
-    if begin and finish:
+    if begin is not None and finish is not None:
         return gh.repos.commits.compare(
             diff[-1].sha,
             diff[0].sha,
@@ -127,14 +128,14 @@ def pretty_print_diff(delta):
     if delta is None:
         return "Changes couldn't be calculated"
     text = "<h4>Changeset</h4>\n"
-    text += """<p>Statistics: Total commits: %{total}
+    text += """<p>Statistics: Total commits: {total}
  <a href="{diff_url}">Files changed</a>: {len_files}</p>
 <ul>
             """.format(
         total=delta.total_commits,
         diff_url=delta.html_url,
         len_files=len(delta.files))
-    for commit in delta.commits[:-1]:
+    for commit in delta.commits:
         text += """<li>
 {date} <a href="{author_url}">{author}</a> (<a href="mailto:{mail}">{mail}</a>)
 <br><a href="{url}">{message}</a>
