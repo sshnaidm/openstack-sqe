@@ -8,6 +8,9 @@ from fabric.contrib.files import sed, append
 __author__ = 'sshnaidm'
 
 
+
+"""kdjflksdfjklsdfjlksdjfklsdjfklsdjklfjsdlkfjlsd"""
+
 def apply_multi(config, user, password, gateway, force, verb_mode, ssh_key_file):
 
     def run_on_control(box, setts, verbose, run_func, use_sudo_flag):
