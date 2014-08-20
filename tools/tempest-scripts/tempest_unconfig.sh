@@ -37,3 +37,5 @@ for i in $(neutron subnet-list | grep start | awk {'print $2'}); do neutron subn
 echo "deleting cirros from tmp ...."
 cd /tmp
 rm -rf cirros-0.3.1-x86_64-uec*
+
+"DSfsdfsdf"
