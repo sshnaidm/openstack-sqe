@@ -107,11 +107,11 @@ def calculate_diff(config, repo, branch, start, end):
     begin = finish = None
     diff = []
     for k, i in enumerate(chain(*[chain(z) for z in commits])):
-        if i.sha == start:
+        if i.sha == start.sha:
             begin = k
         if begin is not None:
             diff.append(i)
-        if i.sha == end:
+        if i.sha == end.sha:
             finish = k
             break
     log.debug("%s:%s Diff: begin=%s finish=%s, len(diff)=%s" % (
