@@ -216,7 +216,7 @@ full-fullha: fullha run-tempest
 
 snap-aio-create: snapshot-destroy aio workaround-after snapshot-create
 snap-tempest: snapshot-revert snap-tempest-prepare
-
+snap-aio-create-test: snapshot-destroy snapshot-create
 
 
 test-me:
