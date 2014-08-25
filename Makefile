@@ -151,15 +151,36 @@ shutdown:
 	@echo "$(CYAN)>>>> Shutdown everything ...$(RESET)"
 	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -y
 
+workaround-after:
+	@echo "$(CYAN)>>>> Running workarounds...$(RESET)"
+	time $(PYTHON) ./tools/tempest-scripts/tempest_align.py -c config_file -u localadmin -p ubuntu
+
 snapshot-revert:
 	@echo "$(CYAN)>>>> Resurrecting ${LAB} snapshots ...$(RESET)"
 	time /bin/bash ./tools/libvirt-scripts/lab-snapshot-restore.sh ${LAB}
-	sleep 20
-
+	sleep 30
 
 devstack-snap-prepare:
 	@echo "$(CYAN)>>>> Preparing devstack for tests run ...$(RESET)"
 	time /bin/bash ./tools/libvirt-scripts/devstack_prepare.sh ${LAB}
+
+snapshot-destroy:
+	@echo "$(CYAN)>>>> Preparing for snapshotting ...$(RESET)"
+	/bin/bash ./tools/libvirt-scripts/lab-snapshot-destroy.sh ${LAB}
+
+snapshot-create:
+	@echo "$(CYAN)>>>> Create snapshotted lab ...$(RESET)"
+	/bin/bash ./tools/libvirt-scripts/lab-snapshot-create.sh ${LAB}
+
+snap-tempest-prepare:
+	@echo "$(CYAN)>>>> Prepare tempest for snapshotted lab ...$(RESET)"
+	time /bin/bash ./tools/libvirt-scripts/snaplab_prepare.sh ${LAB}
+	time python ${WORKSPACE}/tempest/tools/install_venv.py
+	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
+	. ${WORKSPACE}/tempest/.venv/bin/activate
+	time $(TPATH)/python ./tools/tempest-scripts/tempest_configurator.py -o ./openrc
+	test -e 2role && sed -i "s/.*[sS]wift.*\=.*[Tt]rue.*/swift=false/g" ./tempest.conf.jenkins || :
+	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
 
 init: venv requirements
 
@@ -192,6 +213,10 @@ full-2role: 2role run-tempest
 full-2role-quick: 2role run-tempest-parallel
 
 full-fullha: fullha run-tempest
+
+snap-aio-create: snapshot-destroy aio workaround-after snapshot-create
+snap-tempest: snapshot-revert snap-tempest-prepare
+
 
 
 test-me:
