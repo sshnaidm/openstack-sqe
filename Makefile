@@ -215,9 +215,9 @@ full-2role-quick: 2role run-tempest-parallel
 full-fullha: fullha run-tempest
 
 snap-aio-create: snapshot-destroy aio workaround-after snapshot-create
+snap-2role-create: snapshot-destroy 2role workaround-after snapshot-create
+snap-fullha-create: snapshot-destroy fullha workaround-after snapshot-create
 snap-tempest: snapshot-revert snap-tempest-prepare
-snap-aio-create-test: init snapshot-destroy prepare-aio snapshot-create
-
 
 test-me:
 	@echo "$(CYAN)>>>> test your commands :) ...$(RESET)"
