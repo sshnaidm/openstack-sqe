@@ -21,4 +21,4 @@ scp localadmin@$DEV_IP:/opt/stack/tempest/etc/tempest.conf $WORKSPACE/openstack-
 if [ -d "$WORKSPACE/tempest/etc" ]; then
 cp $WORKSPACE/openstack-sqe/tempest.conf $WORKSPACE/tempest/etc/
 fi
-scp localadmin@$DEV_IP:~/devstack/openrc $WORKSPACE/openrc && cp $WORKSPACE/openrc $WORKSPACE/openstack-sqe/openrc
+#scp localadmin@$DEV_IP:~/devstack/openrc $WORKSPACE/openrc && cp $WORKSPACE/openrc $WORKSPACE/openstack-sqe/openrc

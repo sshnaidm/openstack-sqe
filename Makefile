@@ -126,7 +126,6 @@ prepare-devstack-tempest:
 	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
 	. ${WORKSPACE}/tempest/.venv/bin/activate
 	mv ./tempest.conf ${WORKSPACE}/tempest/etc/tempest.conf
-	cat ${WORKSPACE}/tempest/etc/*txt > ${WORKSPACE}/openstack-sqe/tools/tempest-scripts/tests_set || :
 
 prepare-tempest:
 	@echo "$(CYAN)>>>> Preparing tempest...$(RESET)"
@@ -141,6 +140,10 @@ prepare-tempest:
 run-tests:
 	@echo "$(CYAN)>>>> Run tempest tests ...$(RESET)"
 	time timeout --preserve-status -s 2 -k ${QA_KILLTIME} ${QA_WAITTIME} /bin/bash ./tools/tempest-scripts/run_tempest_tests.sh || :
+
+run-snap-tests:
+	@echo "$(CYAN)>>>> Run tempest tests ...$(RESET)"
+	time timeout --preserve-status -s 2 -k ${QA_KILLTIME} ${QA_WAITTIME} /bin/bash ./tools/tempest-scripts/run_snap_tests.sh || :
 
 run-tests-parallel:
 	@echo "$(CYAN)>>>> Run tempest tests in parallel ...$(RESET)"
@@ -217,6 +220,8 @@ full-fullha: fullha run-tempest
 snap-aio-create: snapshot-destroy aio workaround-after snapshot-create
 snap-2role-create: snapshot-destroy 2role workaround-after snapshot-create
 snap-fullha-create: snapshot-destroy fullha workaround-after snapshot-create
+snap-devstack-create: snapshot-destroy devstack snapshot-create
+snap-devstack-tempest: snapshot-revert devstack-snap-prepare prepare-devstack-tempest
 snap-tempest: snapshot-revert snap-tempest-prepare
 
 test-me:
