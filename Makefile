@@ -150,9 +150,13 @@ run-tests-parallel:
 	sed -i 's/testr run/testr run --parallel /g' ./tools/tempest-scripts/run_tempest_tests.sh
 	time /bin/bash ./tools/tempest-scripts/run_tempest_tests.sh
 
-shutdown:
+shutdownall:
 	@echo "$(CYAN)>>>> Shutdown everything ...$(RESET)"
 	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -y
+
+shutdown:
+	@echo "$(CYAN)>>>> Shutdown boxes ...$(RESET)"
+	time /bin/bash ./tools/libvirt-scripts/lab-snapshot-shutdown.sh ${LAB}
 
 workaround-after:
 	@echo "$(CYAN)>>>> Running workarounds...$(RESET)"
