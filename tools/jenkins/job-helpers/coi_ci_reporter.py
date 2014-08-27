@@ -119,7 +119,8 @@ def make_links(data):
         if not topo:
             raise Exception("Running jobs are inconsistent with configuration")
         if topo in data:
-            data[topo]["results_link"] = link
+            if data[topo]:
+                data[topo]["results_link"] = link
             data[topo]["data_link"] = data_link
     return data
 
@@ -133,6 +134,8 @@ def check_regression(data):
         "total_regression": "n/a",
     }
     for topo in data:
+        if 'results_link' not in data[topo]:
+            continue
         prev_link = (os.environ["JENKINS_URL"] + "job/" + TOPOS[topo]["job"] + "/" +
                      str(int(os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]) - 1) +
                      "/testReport/api/json?pretty=true")
@@ -208,6 +211,7 @@ def process_current2(xmls):
             print >> sys.stderr, "No current results from Jenkins API for %s : %s!" % (
                 TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
             )
+            data[topo] = {}
 
     return data
 
@@ -221,7 +225,7 @@ def pretty_report(data):
 <td class="fail">FAILED TO TEST</td>
 <td>N/A</td>
 <td>N/A</td>
-<td>N/A</td>
+<td><a href="{data_link}">[TEST DATA FILES]</a></td>
 <td>N/A</td>
 </tr>
 """
@@ -237,12 +241,14 @@ def pretty_report(data):
 </tr>
 """
     for topo in data:
-        topos_template += table_row_template.format(
-            name=TOPOS[topo]["name"],
-            **data[topo])
-    for topo in TOPOS:
-        if topo not in data:
-            topos_template += failed_topo_template.format(name=TOPOS[topo]["name"])
+        if 'results_link' in data[topo]:
+            topos_template += table_row_template.format(
+                name=TOPOS[topo]["name"],
+                **data[topo])
+        else:
+            topos_template += failed_topo_template.format(
+                name=TOPOS[topo]["name"],
+                **data[topo])
     main_template = """
 <h2>COI CI report</h3>
 <h3>build #{build_number} of {date}</h4>
