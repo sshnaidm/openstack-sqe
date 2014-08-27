@@ -85,6 +85,10 @@ IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
 REMOVE_PUBLIC_BRIDGE=False
 RECLONE=no
 #OFFLINE=True
+[[extra|$TEMPEST_CONFIG]]
+[network]
+tenant_network_v6_cidr=2003::/48
+tenant_network_v6_mask_bits=64
 """.format(ipversion=ipversion, mgmt=mgmt, tempest=tempest)
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
