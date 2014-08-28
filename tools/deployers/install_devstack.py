@@ -131,6 +131,10 @@ def install_devstack(settings_dict,
             get('~/devstack/openrc', "./openrc")
         else:
             print (red("No openrc file, something went wrong! :("))
+        if exists('/opt/stack/tempest/etc/tempest.conf'):
+            get('/opt/stack/tempest/etc/tempest.conf', "./tempest.conf")
+        else:
+            print (red("No openrc file, something went wrong! :("))
         print (green("Finished!"))
         return True
 
