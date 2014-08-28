@@ -209,7 +209,7 @@ devstack: init prepare-devstack give-a-time install-devstack
 
 devstack-snapshot: init snapshot-revert devstack-snap-prepare
 
-devstack-tempest: prepare-devstack-tempest run-tests
+devstack-tempest: devstack-snap-prepare prepare-devstack-tempest run-tests
 
 full-aio: aio run-tempest
 
