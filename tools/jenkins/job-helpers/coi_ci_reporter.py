@@ -4,6 +4,7 @@ import sys
 import requests
 import json
 import xml.etree.ElementTree as Et
+import time
 
 __author__ = 'sshnaidm'
 
@@ -104,6 +105,9 @@ TOPOS = {
 }
 
 
+def str_time(t):
+    return time.strftime("%H h %M min", time.gmtime(t))
+
 def make_links(data):
     if "TRIGGERED_JOB_NAMES" in os.environ:
         jobs = os.environ["TRIGGERED_JOB_NAMES"].split(",")
@@ -176,6 +180,7 @@ def process_current(xmls):
         data[topo].update({"tests_number": int(test_suite.attrib['tests'])})
         data[topo].update({"errors_number": int(test_suite.attrib['errors'])})
         data[topo].update({"time": float(test_suite.attrib['time'])})
+        data[topo].update({"time_str": str_time(float(test_suite.attrib['time']))})
         skipped = tree.findall(".//skipped")
         data[topo].update({"skipped_number": len(skipped)})
         data[topo].update({"passes_number": int(test_suite.attrib['tests']) - (
@@ -197,12 +202,19 @@ def process_current2(xmls):
         current_link = (os.environ["JENKINS_URL"] + "job/" + TOPOS[topo]["job"] + "/" +
                      os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]] +
                      "/testReport/api/json?pretty=true")
+        current_build_link = (os.environ["JENKINS_URL"] + "job/" + TOPOS[topo]["job"] + "/" +
+                              os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]] +
+                              "/api/json?pretty=true")
         try:
             result = json.loads(requests.get(current_link).content)
+            build_result = json.loads(requests.get(current_build_link).content)
             data[topo] = {}
             data[topo].update({"failures_number": int(result['failCount'])})
             data[topo].update({"passes_number": int(result['passCount'])})
             data[topo].update({"time": float(result['duration'])})
+            data[topo].update({"time_str": str_time(float(result['duration']))})
+            data[topo].update({"total_time": float(build_result['duration'])})
+            data[topo].update({"total_time_str": str_time(float(build_result['duration']))})
             data[topo].update({"skipped_number": int(result['skipCount'])})
             data[topo].update({"tests_number": sum(
                 [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])]
@@ -225,8 +237,8 @@ def pretty_report(data):
 <td class="fail">FAILED TO TEST</td>
 <td>N/A</td>
 <td>N/A</td>
-<td><a href="{data_link}">[TEST DATA FILES]</a></td>
-<td>N/A</td>
+<td><a href="{data_link}">[BUILD DATA FILES]</a></td>
+<td>Total: {total_time_str}</td>
 </tr>
 """
     table_row_template = """
@@ -236,8 +248,8 @@ def pretty_report(data):
 <td class="skip">{skipped_number} ({regress[skipped_regression]})</td>
 <td>{tests_number} ({regress[total_regression]})</td>
 <td><a href="{results_link}">[DETAILED REPORT]</a></td>
-<td><a href="{data_link}">[TEST DATA FILES]</a></td>
-<td>{time} sec</td>
+<td><a href="{data_link}">[BUILD DATA FILES]</a></td>
+<td>Tests: {time_str}<br>Total: {total_time_str}</td>
 </tr>
 """
     for topo in data:
