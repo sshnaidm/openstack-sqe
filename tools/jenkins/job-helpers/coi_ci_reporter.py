@@ -212,9 +212,9 @@ def process_current2(xmls):
             data[topo].update({"failures_number": int(result['failCount'])})
             data[topo].update({"passes_number": int(result['passCount'])})
             data[topo].update({"time": float(result['duration'])})
-            data[topo].update({"time_str": str_time(float(result['duration']))})
+            data[topo].update({"time_str": str_time(int(result['duration']))})
             data[topo].update({"total_time": float(build_result['duration'])})
-            data[topo].update({"total_time_str": str_time(float(build_result['duration']))})
+            data[topo].update({"total_time_str": str_time(int(build_result['duration']))})
             data[topo].update({"skipped_number": int(result['skipCount'])})
             data[topo].update({"tests_number": sum(
                 [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])]
