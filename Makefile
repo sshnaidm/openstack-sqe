@@ -147,7 +147,7 @@ run-snap-tests:
 
 run-snap-tests-remote:
 	@echo "$(CYAN)>>>> Run tempest tests ...$(RESET)"
-	time timeout --preserve-status -s 2 -k ${QA_KILLTIME} ${QA_WAITTIME} $(PYTHON) ./tools/tempest-scripts/run_tempest.py || :
+	time timeout --preserve-status -s 2 -k ${QA_KILLTIME} ${QA_WAITTIME} /bin/bash ./tools/libvirt-scripts/run_tempest_remote.sh || :
 
 run-tests-parallel:
 	@echo "$(CYAN)>>>> Run tempest tests in parallel ...$(RESET)"
