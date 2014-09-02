@@ -108,6 +108,7 @@ TOPOS = {
 def str_time(t):
     return time.strftime("%H h %M min", time.gmtime(int(t)))
 
+
 def make_links(data):
     if "TRIGGERED_JOB_NAMES" in os.environ:
         jobs = os.environ["TRIGGERED_JOB_NAMES"].split(",")
@@ -130,7 +131,7 @@ def make_links(data):
 
 
 def check_regression(data):
-    EMPTY_REGRESSION = {
+    empty_regression = {
         "failures_regression": "n/a",
         "passed_regression": "n/a",
         "skipped_regression": "n/a",
@@ -151,8 +152,7 @@ def check_regression(data):
             data[topo]["regress"]["skipped_regression"] = data[topo]["skipped_number"] - int(result['skipCount'])
             data[topo]["regress"]["time_regression"] = data[topo]["time"] - float(result['duration'])
             data[topo]["regress"]["total_regression"] = data[topo]["tests_number"] - sum(
-                [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])
-                ])
+                [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])])
             for reg in data[topo]["regress"]:
                 number = data[topo]["regress"][reg]
                 if number > 0:
@@ -160,7 +160,7 @@ def check_regression(data):
                 else:
                     data[topo]["regress"][reg] = str(number)
         except Exception:
-            data[topo]["regress"] = EMPTY_REGRESSION
+            data[topo]["regress"] = empty_regression
     return data
 
 
@@ -200,12 +200,18 @@ def process_current2(xmls):
         if not topo:
             raise Exception("Running jobs are inconsistent with configuration")
         current_link = (os.environ["JENKINS_URL"] + "job/" + TOPOS[topo]["job"] + "/" +
-                     os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]] +
-                     "/testReport/api/json?pretty=true")
+                        os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]] +
+                        "/testReport/api/json?pretty=true")
         current_build_link = (os.environ["JENKINS_URL"] + "job/" + TOPOS[topo]["job"] + "/" +
                               os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]] +
                               "/api/json?pretty=true")
-        build_result = json.loads(requests.get(current_build_link).content)
+        try:
+            build_result = json.loads(requests.get(current_build_link).content)
+        except Exception as e:
+            print >> sys.stderr, "No current build from Jenkins API for %s : %s!" % (
+                TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
+            )
+            continue
         try:
             result = json.loads(requests.get(current_link).content)
             data[topo] = {'ok': True}
@@ -213,8 +219,8 @@ def process_current2(xmls):
             data[topo].update({"passes_number": int(result['passCount'])})
             data[topo].update({"time": float(result['duration'])})
             data[topo].update({"time_str": str_time(int(result['duration']))})
-            data[topo].update({"total_time": int(build_result['duration'])/1000})
-            data[topo].update({"total_time_str": str_time(int(build_result['duration'])/1000)})
+            data[topo].update({"total_time": int(build_result['duration']) / 1000})
+            data[topo].update({"total_time_str": str_time(int(build_result['duration']) / 1000)})
             data[topo].update({"skipped_number": int(result['skipCount'])})
             data[topo].update({"tests_number": sum(
                 [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])]
@@ -224,10 +230,8 @@ def process_current2(xmls):
                 TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
             )
             data[topo] = {'ok': False}
-            data[topo].update({"total_time": int(build_result['duration'])/1000})
-            data[topo].update({"total_time_str": str_time(int(build_result['duration'])/1000)})
-
-
+            data[topo].update({"total_time": int(build_result['duration']) / 1000})
+            data[topo].update({"total_time_str": str_time(int(build_result['duration']) / 1000)})
     return data
 
 
