@@ -256,7 +256,7 @@ def pretty_report(data):
 <td>{tests_number} ({regress[total_regression]})</td>
 <td><a href="{results_link}">[DETAILED REPORT]</a></td>
 <td><a href="{data_link}">[BUILD DATA FILES]</a></td>
-<td>Tests: {time_str}<br>Total: {total_time_str}</td>
+<td align=justify><strong>Tests:</strong> {time_str}<br><strong>Total</strong>: {total_time_str}</td>
 </tr>
 """
     for topo in data:
