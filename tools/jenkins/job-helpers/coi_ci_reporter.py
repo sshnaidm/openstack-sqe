@@ -245,7 +245,7 @@ def pretty_report(data):
 <td>N/A</td>
 <td>N/A</td>
 <td><a href="{data_link}">[BUILD DATA FILES]</a></td>
-<td>Total: {total_time_str}</td>
+<td align=justify><strong>Total</strong>: {total_time_str}</td>
 </tr>
 """
     table_row_template = """
