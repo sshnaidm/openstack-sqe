@@ -228,7 +228,7 @@ def process_current2(xmls):
             print topo
             data[topo].update({"total_time": float(build_result['duration'])})
             data[topo].update({"total_time_str": str_time(int(build_result['duration']))})
-            print data[topo]
+        print topo, data[topo]
 
 
     return data
