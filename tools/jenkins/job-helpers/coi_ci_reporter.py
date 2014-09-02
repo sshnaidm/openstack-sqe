@@ -106,7 +106,7 @@ TOPOS = {
 
 
 def str_time(t):
-    return time.strftime("%H h %M min", time.gmtime(t))
+    return time.strftime("%H h %M min", time.gmtime(int(t)))
 
 def make_links(data):
     if "TRIGGERED_JOB_NAMES" in os.environ:
@@ -213,8 +213,8 @@ def process_current2(xmls):
             data[topo].update({"passes_number": int(result['passCount'])})
             data[topo].update({"time": float(result['duration'])})
             data[topo].update({"time_str": str_time(int(result['duration']))})
-            data[topo].update({"total_time": float(build_result['duration'])})
-            data[topo].update({"total_time_str": str_time(int(build_result['duration']))})
+            data[topo].update({"total_time": int(build_result['duration'])/1000})
+            data[topo].update({"total_time_str": str_time(int(build_result['duration'])/1000)})
             data[topo].update({"skipped_number": int(result['skipCount'])})
             data[topo].update({"tests_number": sum(
                 [int(i) for i in (result['passCount'], result['failCount'], result['skipCount'])]
