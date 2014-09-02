@@ -224,8 +224,11 @@ def process_current2(xmls):
                 TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
             )
             data[topo] = {}
+            print data
+            print topo
             data[topo].update({"total_time": float(build_result['duration'])})
             data[topo].update({"total_time_str": str_time(int(build_result['duration']))})
+            print data[topo]
 
 
     return data
