@@ -230,7 +230,7 @@ snap-2role-create: snapshot-destroy 2role workaround-after snapshot-create
 snap-fullha-create: snapshot-destroy fullha workaround-after snapshot-create
 snap-devstack-create: snapshot-destroy devstack snapshot-create
 snap-devstack-tempest: snapshot-revert devstack-snap-prepare prepare-devstack-tempest
-snap-devstack-tempest-remote: snapshot-revert devstack-snap-prepare
+snap-devstack-tempest-remote: init snapshot-revert devstack-snap-prepare
 snap-tempest: snapshot-revert snap-tempest-prepare
 
 test-me:
