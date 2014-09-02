@@ -123,7 +123,7 @@ def make_links(data):
         if not topo:
             raise Exception("Running jobs are inconsistent with configuration")
         if topo in data:
-            if data[topo]:
+            if data[topo]['ok']:
                 data[topo]["results_link"] = link
             data[topo]["data_link"] = data_link
     return data
@@ -208,7 +208,7 @@ def process_current2(xmls):
         build_result = json.loads(requests.get(current_build_link).content)
         try:
             result = json.loads(requests.get(current_link).content)
-            data[topo] = {}
+            data[topo] = {'ok': True}
             data[topo].update({"failures_number": int(result['failCount'])})
             data[topo].update({"passes_number": int(result['passCount'])})
             data[topo].update({"time": float(result['duration'])})
@@ -223,12 +223,9 @@ def process_current2(xmls):
             print >> sys.stderr, "No current results from Jenkins API for %s : %s!" % (
                 TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
             )
-            data[topo] = {}
-            print >> sys.stderr, data
-            print >> sys.stderr, topo
+            data[topo] = {'ok': False}
             data[topo].update({"total_time": float(build_result['duration'])})
             data[topo].update({"total_time_str": str_time(int(build_result['duration']))})
-        print >> sys.stderr, topo, data[topo]
 
 
     return data
