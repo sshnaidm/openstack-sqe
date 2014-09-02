@@ -147,7 +147,7 @@ run-snap-tests:
 
 run-snap-tests-remote:
 	@echo "$(CYAN)>>>> Run tempest tests ...$(RESET)"
-	time timeout --preserve-status -s 2 -k ${QA_KILLTIME} ${QA_WAITTIME} /bin/bash ./tools/libvirt-scripts/run_tempest_remote.sh || :
+	time timeout --preserve-status -s 2 -k ${QA_KILLTIME} ${QA_WAITTIME} /bin/bash ./tools/tempest-scripts/run_tempest_remote.sh || :
 
 run-tests-parallel:
 	@echo "$(CYAN)>>>> Run tempest tests in parallel ...$(RESET)"
@@ -230,6 +230,7 @@ snap-2role-create: snapshot-destroy 2role workaround-after snapshot-create
 snap-fullha-create: snapshot-destroy fullha workaround-after snapshot-create
 snap-devstack-create: snapshot-destroy devstack snapshot-create
 snap-devstack-tempest: snapshot-revert devstack-snap-prepare prepare-devstack-tempest
+snap-devstack-tempest-remote: snapshot-revert devstack-snap-prepare
 snap-tempest: snapshot-revert snap-tempest-prepare
 
 test-me:
