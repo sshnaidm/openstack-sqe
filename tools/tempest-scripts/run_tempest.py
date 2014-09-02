@@ -2,7 +2,7 @@
 
 import argparse
 from fabric import api
-import os
+
 
 TEMPEST_FILE_XML = 'tempest_results.xml'
 TEMPEST_FILE_SUBUNIT = 'tempest_results.subunit'
@@ -23,6 +23,7 @@ def main(host, user, password, tempest_filter, tempest_dir, tempest_list_file):
                 cmd = TEMPEST_RUN_CMD.format('--load-list=list.txt')
             else:
                 cmd = TEMPEST_RUN_CMD.format(tempest_filter)
+            api.run(command="testr init")
             api.run(command=cmd)
             api.run(command=TEMPEST_SUBUNIT_CMD)
             api.run(command=TEMPEST_XML_CMD)
