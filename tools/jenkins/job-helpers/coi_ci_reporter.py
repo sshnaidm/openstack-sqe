@@ -205,9 +205,9 @@ def process_current2(xmls):
         current_build_link = (os.environ["JENKINS_URL"] + "job/" + TOPOS[topo]["job"] + "/" +
                               os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]] +
                               "/api/json?pretty=true")
+        build_result = json.loads(requests.get(current_build_link).content)
         try:
             result = json.loads(requests.get(current_link).content)
-            build_result = json.loads(requests.get(current_build_link).content)
             data[topo] = {}
             data[topo].update({"failures_number": int(result['failCount'])})
             data[topo].update({"passes_number": int(result['passCount'])})
@@ -224,6 +224,9 @@ def process_current2(xmls):
                 TOPOS[topo]["job"], os.environ["TRIGGERED_BUILD_NUMBER_" + TOPOS[topo]["job"]]
             )
             data[topo] = {}
+            data[topo].update({"total_time": float(build_result['duration'])})
+            data[topo].update({"total_time_str": str_time(int(build_result['duration']))})
+
 
     return data
 
