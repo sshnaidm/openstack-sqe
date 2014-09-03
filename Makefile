@@ -117,7 +117,7 @@ install-fullha-cobbler:
 
 install-devstack:
 	@echo "$(CYAN)>>>> Installing Devstack...$(RESET)"
-	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu -r $TEMPEST_REPO -b $TEMPEST_BRANCH
+	time $(PYTHON) ./tools/deployers/install_devstack.py -c config_file  -u localadmin -p ubuntu -r ${TEMPEST_REPO} -b ${TEMPEST_BRANCH}
 	#time $(PYTHON) ./tools/deployers/install_coi.py -c config_file  -u localadmin -p ubuntu -s devstack
 
 prepare-devstack-tempest:
