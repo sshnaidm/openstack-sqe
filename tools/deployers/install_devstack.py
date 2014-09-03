@@ -83,7 +83,7 @@ MGMT_NET={mgmt}
 IPV6_PRIVATE_RANGE=2001:dead:beef:deed::/64
 IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
 REMOVE_PUBLIC_BRIDGE=False
-RECLONE=no
+RECLONE=True
 #OFFLINE=True
 """.format(ipversion=ipversion, mgmt=mgmt, tempest=tempest)
     fd = StringIO(conf)
@@ -125,6 +125,10 @@ def install_devstack(settings_dict,
                 apply_changes()
         if exists('~/devstack/openrc'):
             get('~/devstack/openrc', "./openrc")
+        else:
+            print (red("No openrc file, something went wrong! :("))
+        if exists('/opt/stack/tempest/etc/tempest.conf'):
+            get('/opt/stack/tempest/etc/tempest.conf', "./tempest.conf")
         else:
             print (red("No openrc file, something went wrong! :("))
         print (green("Finished!"))
