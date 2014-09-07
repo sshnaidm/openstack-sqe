@@ -29,7 +29,20 @@ def apply_multi(config, user, password, gateway, force, verb_mode, ssh_key_file)
             sed("/etc/nova/nova-compute.conf", "virt_type=kvm", "virt_type=qemu", use_sudo=use_sudo_flag)
             run_func("service nova-compute restart")
 
+dsfdsf
+sd
+format(sdf
+@property
+def <a href="{diff_url}">(self):
+    return 
 
+@<a href="{diff_url}">.setter
+def <a href="{diff_url}">(self, value):
+    pass
+
+@<a href="{diff_url}">.deleter
+def <a href="{diff_url}">(self):
+    pass)
     job_settings = {"host_string": "",
                     "user": user,
                     "password": password,
