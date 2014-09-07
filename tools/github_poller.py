@@ -126,8 +126,8 @@ def pretty_print_diff(delta):
 
     if delta is None:
         return "Changes couldn't be calculated"
-    text = "<h4>Changeset</h4>\n"
-    text += """<p>Statistics: Total commits: {total}
+    text = "<h3>Changeset</h3>\n"
+    text += """<p>Total commits: {total}<br>
  <a href="{diff_url}">Files changed</a>: {len_files}</p>
 <ul>
             """.format(
@@ -171,7 +171,6 @@ def main():
                         filemode='w')
     global log
     log = logging.getLogger('log')
-
     conf = parse_config(opts.config_file)
     start_values = get_start_values(conf)
     while True:
