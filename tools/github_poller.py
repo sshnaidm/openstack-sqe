@@ -53,18 +53,18 @@ def get_start_values(config):
     return start
 
 
-def check_n_trigger(config, start, conf_file):
+def check_n_trigger(config, start, changes_file):
     for repo, branch in config['repos'].items():
         latest = get_last_commit(config, repo, branch)
         log.debug("%s:%s Check-n-trigger: start_commit=%s and last_commit=%s" % (
             repo, branch, start[repo], latest))
         if start[repo].sha != latest.sha:
-            trigger_jenkins(config, repo, branch, start[repo], latest, conf_file)
+            trigger_jenkins(config, repo, branch, start[repo], latest, changes_file)
             start[repo] = latest
         #time.sleep(config['commit_poll'])
 
 
-def trigger_jenkins(conf, repo, branch, start, end, conf_file):
+def trigger_jenkins(conf, repo, branch, start, end, changes_file):
     log.info("%s:%s Triggering Jenkins job!" % (repo, branch))
     diff = pretty_print_diff(calculate_diff(conf, repo, branch, start, end))
     log.info("%s:%s Difference is:\n%s" % (repo, branch, diff))
@@ -73,12 +73,12 @@ def trigger_jenkins(conf, repo, branch, start, end, conf_file):
     log.info("%s:%s Jenkins URL=%s" % (repo, branch, jenkins_url))
     params = {"parameter": [
         {"name": "tag", "value": "network"},
-        {"name": conf_file, "file": "file0"}],
+        {"name": changes_file, "file": "file0"}],
         "statusCode": "303",
         "redirectTo": "."}
     log.info("%s:%s Parameters for Jenkins URL: %s" % (repo, branch, str(params)))
     data, content_type = urllib3.encode_multipart_formdata([
-        ("file0", ("changes_file", diff)),
+        ("file0", (changes_file, diff)),
         ("json", json.dumps(params)),
         ("Submit", "Build"),
     ])
@@ -147,10 +147,12 @@ def pretty_print_diff(delta):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', action='store', dest='config_file', default="changes_file",
+    parser.add_argument('-c', action='store', dest='config_file', default="./github_poller.cfg",
                         help='Configuration file path')
     parser.add_argument('-l', action='store', dest='log_file', default="./github_poller.log",
                         help='Log file path')
+    parser.add_argument('-n', action='store', dest='changes_file', default="changes_file",
+                        help='Name of changes file')
     parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 
     opts = parser.parse_args()
@@ -167,7 +169,7 @@ def main():
     while True:
         log.debug("Sleeping %s seconds" % conf['repo_poll'])
         time.sleep(conf['repo_poll'])
-        check_n_trigger(conf, start_values, opts.config_file)
+        check_n_trigger(conf, start_values, opts.changes_file)
 
 if __name__ == "__main__":
     main()
