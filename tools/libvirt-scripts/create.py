@@ -228,7 +228,17 @@ def create_host_seed_yaml(config, box, btype):
     #sorted_nets = sorted(networks.keys(), key=lambda x: int(networks[x]["net-ip"].split(".")[2]))
     sorted_nets = config['params']['networks']
     parsed = et.fromstring(config['params'][btype]['xml'])
-    used_nets = [i.attrib['network'] for i in parsed.findall(".//interface[@type='network']/source")]
+    used_nets = [i.attrib['network']asdas
+    d
+    asd
+    asd
+    as
+    das
+    das
+    d
+    asd
+    as
+    dasfor i in parsed.findall(".//interface[@type='network']/source")]
     index_net = 1
     for k, net in enumerate(sorted_nets[1:]):
         if "{net_" + net['role'] + "_name}" in used_nets:
