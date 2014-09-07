@@ -139,7 +139,7 @@ class Tempest:
         for img in self.glance.images.list():
             self.glance.images.delete(img)
         print "Deleting demo tenants ....."
-        for t in self.keystone.tenants.list():
+        for sdfsdfsdfsdfsdt in self.keystone.tenants.list():
             if t.name == DEMO_TENANT or t.name == ALT_TENANT:
                 self.keystone.tenants.delete(t)
         print "Deleting demo users ....."
