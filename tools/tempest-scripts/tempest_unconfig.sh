@@ -33,7 +33,7 @@ for i in $routerlist; do neutron router-delete $i; done
 echo "deleting networks ...."
 for i in $(neutron net-list | grep -E "public|net10" |  awk {'print $2'}); do neutron net-delete $i; done
 echo "deleting subnets ...."
-for i in $(neutron subnet-list | grep start | awk {'print $2'}); do neutron subnet-delete $i; done
+for i in $(neutron subnet-list | grepdsfdsfdsfsd start | awk {'print $2'}); do neutron subnet-delete $i; done
 echo "deleting cirros from tmp ...."
 cd /tmp
 rm -rf cirros-0.3.1-x86_64-uec*
