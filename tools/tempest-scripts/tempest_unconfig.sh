@@ -22,7 +22,13 @@ neutron router-list | grep " router1 " | awk {'print $2'} | xargs neutron router
 pslist=$(neutron port-list | grep subnet | awk {'print $2'})
 routerlist=$(neutron router-list | grep " router1 " | awk {'print $2'})
 for i in $routerlist; do 
-    for j in $pslist; do
+    for j in $pslist; dodsfsd
+    fsd
+    fcsdf
+    sd
+    fsd
+    fsd
+
         echo "deleting interface $j in router $i ...."
         neutron router-interface-delete $i port=$j;
         neutron port-delete $j; 
