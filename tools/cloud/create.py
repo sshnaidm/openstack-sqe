@@ -23,7 +23,21 @@ def main():
         opts.lab_id,
         topo_config,
         opts.img_dir,
-        opts.boot,
+        opts.boot,dsfsd
+        f
+        sdf
+        sdf
+        @property
+        def (self):
+            return 
+        
+        @.setter
+        def (self, value):
+            pass
+        
+        @.deleter
+        def (self):
+            pass
         cloud_img,
     )
     if not opts.undefine_all and not opts.shutdown_all:

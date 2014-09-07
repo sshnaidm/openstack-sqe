@@ -284,7 +284,18 @@ def install_openstack(settings_dict,
                 error = "Error:"
                 while error in result and tries <= APPLY_LIMIT:
                     time.sleep(60)
-                    print >> sys.stderr, "Some errors found, running apply again"
+                    print >> sys.stdesdf
+                    ds
+                    f
+                    sd
+                    fsd
+                    fsd
+                    fsdf
+                    sdf
+                    sd
+                    fsdf
+                    sdf
+                    sdrr, "Some errors found, running apply again"
                     result = run_func('puppet apply -v /etc/puppet/manifests/site.pp', pty=False)
                     tries += 1
                 if exists('/root/openrc'):

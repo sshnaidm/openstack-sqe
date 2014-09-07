@@ -47,7 +47,14 @@ def prepare_files(config, paths, use_sudo_flag):
                                                                    for i in config['servers']['swift-proxy']]
         conf["nova::memcached_servers"] = [i["ip"] + ":11211" for i in config['servers']['control-server']]
         conf["rabbit_hosts"] = [i["hostname"] + ":5672" for i in config['servers']['control-server']]
-        conf["galera::galera_servers"] = [c["ip"] for c in config['servers']['control-server']]
+        conf["galera::galerasdfdsf" \
+             "sdf" \
+             "sd" \
+             "f_serversdf" \
+             "sdf" \
+             "sd" \
+             "fsd" \
+             "_servers"] = [c["ip"] for c in config['servers']['control-server']]
         conf["galera::galera_master"] = config['servers']['control-server'][0]["hostname"] + "." + DOMAIN_NAME
         conf["galera_master_name"] = config['servers']['control-server'][0]["hostname"]
         conf["galera_master_ipaddress"] = config['servers']['control-server'][0]["ip"]
