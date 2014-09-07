@@ -118,6 +118,12 @@ def calculate_diff(config, repo, branch, start, end):
 
 
 def pretty_print_diff(delta):
+
+    def html_message(t):
+        head = t.splitlines()[0]
+        foot = "\n<br>".join(t.splitlines()[1:])
+        return head, foot
+
     if delta is None:
         return "Changes couldn't be calculated"
     text = "<h4>Changeset</h4>\n"
@@ -129,13 +135,15 @@ def pretty_print_diff(delta):
         diff_url=delta.html_url,
         len_files=len(delta.files))
     for commit in delta.commits:
+        head, foot = html_message(commit.commit['message'])
         text += """<li>
 {date} <a href="{author_url}">{author}</a> (<a href="mailto:{mail}">{mail}</a>)
-<br><a href="{url}">{message}</a>
+<br><a href="{url}">{head}</a><br>{foot}
 </li>
         """.format(
             url=commit.html_url,
-            message=commit.commit['message'],
+            head=head,
+            foot=foot,
             author_url=commit.committer.html_url,
             author=commit.commit['author']['name'],
             mail=commit.commit['author']['email'],
