@@ -126,11 +126,14 @@ def pretty_print_diff(delta):
 
     if delta is None:
         return "Changes couldn't be calculated"
+    repo = delta.permalink_url.split("/compare/")[0]
     text = "<h3>Changeset</h3>\n"
-    text += """<p>Total commits: {total}<br>
+    text += """<p>Repository: <a href="{repo}">{repo}</a><br>
+Total commits: {total}<br>
  <a href="{diff_url}">Files changed</a>: {len_files}</p>
 <ul>
             """.format(
+        repo=repo,
         total=delta.total_commits,
         diff_url=delta.html_url,
         len_files=len(delta.files))
