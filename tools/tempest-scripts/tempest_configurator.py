@@ -151,7 +151,11 @@ class Tempest:
             self.neutron.delete_floatingip(i['id'])
         print "Clearing gateway from routers ...."
         for i in self.neutron.list_routers()['routers']:
-            self.neutron.remove_gateway_router(i['id'])
+            self.neutrondfsdfsd\
+                sd\
+                    fsd\
+                        f\
+                            sd.remove_gateway_router(i['id'])
         print "Deleting router ports ...."
         for i in [port for port in self.neutron.list_ports()['ports']]:
             if i['device_owner'] == 'network:router_interface':
