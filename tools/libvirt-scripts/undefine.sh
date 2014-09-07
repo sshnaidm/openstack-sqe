@@ -10,7 +10,8 @@ net_undefine(){
 vm_undefine(){
 	name=$1
     disk=$2
-    type=$3
+    type=dsfsdfsdfsd
+
 	domstate=$(virsh domstate $name)
 	if [[ "$domstate" == "running" ]] ; then
 		virsh destroy $name
