@@ -38,10 +38,12 @@ def prepare_answers(path):
         parser.write(f)
     warn_if_fail(put("installed_answers", "~/installed_answers"))
 
-def install_devstack(settings_dict,
+
+def prepare_for_install(settings_dict,
                      envs=None,
                      verbose=None,
-                     proxy=None):
+                     proxy=None,
+                     key=None):
     envs = envs or {}
     verbose = verbose or []
     if settings_dict['user'] != 'root':
@@ -58,6 +60,25 @@ def install_devstack(settings_dict,
         update_time(run_func)
         warn_if_fail(run_func("git config --global user.email 'test.node@example.com';"
                          "git config --global user.name 'Test Node'"))
+        warn_if_fail(run_func("ssh-keygen -f file.rsa -t rsa -N ''"))
+        warn_if_fail(run_func("cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"))
+        if key:
+            warn_if_fail(run_func("echo '%s' >> ~/.ssh/authorized_keys" % key))
+        return run_func("cat ~/.ssh/id_rsa.pub")
+
+def install_devstack(settings_dict,
+                     envs=None,
+                     verbose=None,
+                     proxy=None):
+    envs = envs or {}
+    verbose = verbose or []
+    if settings_dict['user'] != 'root':
+        use_sudo_flag = True
+        run_func = sudo
+    else:
+        use_sudo_flag = False
+        run_func = run
+    with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
@@ -115,19 +136,19 @@ def main():
         with open(opts.config_file) as f:
             config = yaml.load(f)
         box =  config['servers'].keys()[0]
-        aio = config['servers'][box][0]
-        job = {"host_string": aio["ip"],
-               "user": opts.user or aio["user"],
-               "password": opts.password or aio["password"],
-               "warn_only": True,
-               "key_filename": ssh_key_file,
-               "abort_on_prompts": True,
-               "gateway": opts.gateway or None}
+        for index, aio in enumerate(config['servers'][box]):
+            job = {"host_string": aio["ip"],
+                   "user": opts.user or aio["user"],
+                   "password": opts.password or aio["password"],
+                   "warn_only": True,
+                   "key_filename": ssh_key_file,
+                   "abort_on_prompts": True,
+                   "gateway": opts.gateway or None}
 
-    res = install_devstack(settings_dict=job, envs=None, verbose=verb_mode, proxy=opts.proxy)
-
-    if res:
-        print "Job with host {host} finished successfully!".format(host=opts.host)
+            res = install_devstack(settings_dict=job, envs=None, verbose=verb_mode, proxy=opts.proxy)
+            print "Key='%s'" % res
+            if res:
+                print "Job with host {host} finished successfully!".format(host=opts.host)
 
 
 if __name__ == "__main__":
