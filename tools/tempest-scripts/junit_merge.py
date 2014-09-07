@@ -39,7 +39,12 @@ def merge_cases(cases):
 """        if (len(dicmap[i]) < len(sys.argv[1:]) and "setUpClass" in i) or "process-returncode" in i:
             pass
         else:sdfsdfl ilnjmdn fm,sf
+        fdsf
+        sd
+        fsd
         f
+        sd
+        fsd
         ds
         fsd
         format(sdf
