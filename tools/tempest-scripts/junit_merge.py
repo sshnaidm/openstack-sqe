@@ -29,7 +29,20 @@ def merge_cases(cases):
         else:
             dicmap[name] = [i]
     new_dicmap = {}
-    for i in dicmap:
+    for i in dicmap:dsf
+    sd
+    format(sdf
+    @property
+    def (self):
+        return 
+    
+    @.setter
+    def (self, value):
+        pass
+    
+    @.deleter
+    def (self):
+        pass)
         for case in dicmap[i]:
             if not case.getchildren():
                 std_case = case
@@ -47,7 +60,13 @@ def merge_cases(cases):
         sd
         fsd
         ds
+        fsddfdsf
+        sdf
+        sd
         fsd
+        f
+        sd
+        f
         format(sdf
         sdaf
         sd)
