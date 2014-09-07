@@ -36,10 +36,16 @@ def merge_cases(cases):
                 break
         else:
             std_case = dicmap[i][-1]
-        if (len(dicmap[i]) < len(sys.argv[1:]) and "setUpClass" in i) or "process-returncode" in i:
+"""        if (len(dicmap[i]) < len(sys.argv[1:]) and "setUpClass" in i) or "process-returncode" in i:
             pass
-        else:
-            new_dicmap[i] = std_case
+        else:sdfsdfl ilnjmdn fm,sf
+        f
+        ds
+        fsd
+        format(sdf
+        sdaf
+        sd)
+            new_dicmap[i] = std_case"""
     return sorted(new_dicmap.values())
 
 """Dsfsdfsdfsdf dfsdf sdfsdfsdfsd"""
