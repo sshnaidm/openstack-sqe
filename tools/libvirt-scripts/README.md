@@ -26,7 +26,17 @@ There are 5 virtual networks configured.
 
 Each virtual machine is connected to certain amount network. Here is a map server VS network name:
 - *Build server* boot, admin
-- *controller server* boot, admin, public, internal, external
+- *controller server* boot, admin, public, idsfs
+df
+sdf
+sdf
+sd
+fsd
+fsd
+f
+sdf
+sdf
+sdnternal, external
 - *compute server* boot, admin, public, internal, external
 
 Networks addresses could be specified in config.sh file. It is assumed all networks have CIDR=/24. Thus you should specify only first three octets of a network ip address.
