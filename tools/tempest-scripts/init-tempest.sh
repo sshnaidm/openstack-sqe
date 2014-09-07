@@ -41,6 +41,18 @@ function iniset {
     sed -i -e '/^\['${section}'\]/,/^\[.*\]/ s'${sep}'^\('${option}'[ \t]*=[ \t]*\).*$'${sep}'\1'"${value}"${sep} "$file"
     $xtrace
 }
+asda
+sd
+asd
+asd
+as
+das
+d
+asd
+asd
+as
+das
+ZZ
 
 # *******************************************************************************
 # Clone tempest, create/configyre virtualenv
