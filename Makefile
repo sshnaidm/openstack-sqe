@@ -131,6 +131,16 @@ prepare-devstack-tempest:
 	mv ./tempest.conf ${WORKSPACE}/tempest/etc/tempest.conf
 	cat ${WORKSPACE}/tempest/etc/*txt > ${WORKSPACE}/openstack-sqe/tools/tempest-scripts/tests_set || :
 
+prepare-devstack-tempest-custom:
+	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
+	time python ${WORKSPACE}/tempest/tools/install_venv.py
+	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
+	. ${WORKSPACE}/tempest/.venv/bin/activate
+	time $(TPATH)/python ./tools/tempest-scripts/tempest_configurator.py -o ./openrc
+	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
+	cat ${WORKSPACE}/tempest/etc/*txt > ${WORKSPACE}/openstack-sqe/tools/tempest-scripts/tests_set || :
+
+
 prepare-tempest:
 	@echo "$(CYAN)>>>> Preparing tempest...$(RESET)"
 	time $(PYTHON) ./tools/tempest-scripts/tempest_align.py -c config_file -u localadmin -p ubuntu
@@ -197,6 +207,8 @@ full-2role-quick: 2role run-tempest-parallel
 full-fullha: fullha run-tempest
 
 rh-aio: init prepare-aio-rh give-a-time install-aio-rh
+rh-test: rh-aio prepare-devstack-tempest-custom run-tests
+
 
 test-me:
 	@echo "$(CYAN)>>>> test your commands :) ...$(RESET)"

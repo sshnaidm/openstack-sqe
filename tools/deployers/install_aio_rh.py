@@ -6,7 +6,7 @@ import yaml
 
 from ConfigParser import SafeConfigParser
 from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
-from fabric.contrib.files import exists, append
+from fabric.contrib.files import exists, append, contains
 from fabric.colors import green, red
 
 from utils import warn_if_fail, quit_if_fail, update_time
@@ -27,12 +27,13 @@ def prepare_answers(path):
         parser = SafeConfigParser()
         parser.optionxform = str
         parser.read(temp.name)
-    #parser.set("general", "CONFIG_PROVISION_DEMO", "y")
-    #parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
-    #parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
+    parser.set("general", "CONFIG_PROVISION_DEMO", "y")
+    parser.set("general", "CONFIG_PROVISION_TEMPEST", "y")
+    parser.set("general", "CONFIG_PROVISION_TEMPEST_REPO_REVISION", "master")
     parser.set("general", "CONFIG_KEYSTONE_ADMIN_PW", "Cisco123")
-    #parser.set("general", "CONFIG_KEYSTONE_DEMO_PW", "secret")
+    parser.set("general", "CONFIG_KEYSTONE_DEMO_PW", "secret")
     parser.set("general", "CONFIG_DEBUG_MODE", "y")
+
 
     with open("installed_answers", "w") as f:
         parser.write(f)
@@ -81,6 +82,10 @@ def install_devstack(settings_dict,
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
+        # Workaround for Centos 7
+        if contains("/etc/redhat-release", "CentOS"):
+            run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
+            run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt")
         warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
@@ -136,6 +141,7 @@ def main():
         with open(opts.config_file) as f:
             config = yaml.load(f)
         box =  config['servers'].keys()[0]
+        root_key = None
         for index, aio in enumerate(config['servers'][box]):
             job = {"host_string": aio["ip"],
                    "user": opts.user or aio["user"],
@@ -145,10 +151,17 @@ def main():
                    "abort_on_prompts": True,
                    "gateway": opts.gateway or None}
 
-            res = install_devstack(settings_dict=job, envs=None, verbose=verb_mode, proxy=opts.proxy)
-            print "Key='%s'" % res
-            if res:
-                print "Job with host {host} finished successfully!".format(host=opts.host)
+            res = prepare_for_install(settings_dict=job,
+                                      envs=None,
+                                      verbose=verb_mode,
+                                      proxy=opts.proxy,
+                                      key=root_key)
+            if index == 0:
+                root_key = res
+                root_job = job
+            print "Job with host {host} finished successfully!".format(host=job["host_string"])
+        install_devstack(settings_dict=root_job, envs=None, verbose=verb_mode, proxy=opts.proxy)
+        print "Job with host {host} finished successfully!".format(host=root_job["host_string"])
 
 
 if __name__ == "__main__":
