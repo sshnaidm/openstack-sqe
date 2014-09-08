@@ -132,8 +132,6 @@ def main():
     parser.add_argument('-t', action='store', dest='topology', default=None,
                         choices=["aio", "2role", "3role"],
                         help='Choose topology')
-    parser.add_argument('-c', action='store', dest='config_file', default=None,
-                        help='Configuration file, default is None')
     parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 
     opts = parser.parse_args()
