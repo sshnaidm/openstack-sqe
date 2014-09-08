@@ -74,6 +74,9 @@ def prepare_for_install(settings_dict,
         append("/etc/ssh/ssh_config",
                "\nStrictHostKeyChecking no\nUserKnownHostsFile=/dev/null",
                use_sudo=use_sudo_flag)
+        warn_if_fail(run_func("/bin/systemctl stop  NetworkManager.service"))
+        warn_if_fail(run_func("/bin/systemctl disable NetworkManager.service"))
+
         if key:
             warn_if_fail(run_func("echo '%s' >> ~/.ssh/authorized_keys" % key))
         return run_func("cat ~/.ssh/id_rsa.pub")
