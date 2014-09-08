@@ -20,7 +20,7 @@ LOGS_COPY = {
     "/var/log": "all_logs",
 }
 
-def prepare_answers(path):
+def prepare_answers(path, topo):
     with NamedTemporaryFile() as temp:
         warn_if_fail(get(path, temp.name))
         temp.flush()
@@ -33,7 +33,14 @@ def prepare_answers(path):
     parser.set("general", "CONFIG_KEYSTONE_ADMIN_PW", "Cisco123")
     parser.set("general", "CONFIG_KEYSTONE_DEMO_PW", "secret")
     parser.set("general", "CONFIG_DEBUG_MODE", "y")
-
+    parser.set("general", "CONFIG_NTP_SERVERS", "ntp.esl.cisco.com")
+    if topo == "2role":
+        parser.set("general", "CONFIG_CONTROLLER_HOST", "192.168.105.2")
+        parser.set("general", "CONFIG_COMPUTE_HOSTS", "192.168.105.3")
+    if topo == "3role":
+        parser.set("general", "CONFIG_CONTROLLER_HOST", "192.168.105.2")
+        parser.set("general", "CONFIG_NETWORK_HOSTS", "192.168.105.3")
+        parser.set("general", "CONFIG_COMPUTE_HOSTS", "192.168.105.4")
 
     with open("installed_answers", "w") as f:
         parser.write(f)
@@ -130,7 +137,7 @@ def main():
     ssh_key_file = opts.ssh_key_file if opts.ssh_key_file else path2ssh
 
     if not opts.config_file:
-        job = {"host_string": opts.host,
+        root_job = {"host_string": opts.host,
                "user": opts.user,
                "password": opts.password,
                "warn_only": True,
@@ -160,8 +167,8 @@ def main():
                 root_key = res
                 root_job = job
             print "Job with host {host} finished successfully!".format(host=job["host_string"])
-        install_devstack(settings_dict=root_job, envs=None, verbose=verb_mode, proxy=opts.proxy)
-        print "Job with host {host} finished successfully!".format(host=root_job["host_string"])
+    install_devstack(settings_dict=root_job, envs=None, verbose=verb_mode, proxy=opts.proxy)
+    print "Job with host {host} finished successfully!".format(host=root_job["host_string"])
 
 
 if __name__ == "__main__":
