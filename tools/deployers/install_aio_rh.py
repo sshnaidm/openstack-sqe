@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from tempfile import NamedTemporaryFile
 import argparse
+import itertools
 import os
 import yaml
 
@@ -20,7 +21,7 @@ LOGS_COPY = {
     "/var/log": "all_logs",
 }
 
-def prepare_answers(path, topo):
+def prepare_answers(path, topo, config):
     with NamedTemporaryFile() as temp:
         warn_if_fail(get(path, temp.name))
         temp.flush()
@@ -35,12 +36,12 @@ def prepare_answers(path, topo):
     parser.set("general", "CONFIG_DEBUG_MODE", "y")
     parser.set("general", "CONFIG_NTP_SERVERS", "ntp.esl.cisco.com")
     if topo == "2role":
-        parser.set("general", "CONFIG_CONTROLLER_HOST", "192.168.105.2")
-        parser.set("general", "CONFIG_COMPUTE_HOSTS", "192.168.105.3")
+        parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['control-server'][0]['ip'])
+        parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
     if topo == "3role":
-        parser.set("general", "CONFIG_CONTROLLER_HOST", "192.168.105.2")
-        parser.set("general", "CONFIG_NETWORK_HOSTS", "192.168.105.3")
-        parser.set("general", "CONFIG_COMPUTE_HOSTS", "192.168.105.4")
+        parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['control-server'][0]['ip'])
+        parser.set("general", "CONFIG_NETWORK_HOSTS", config['servers']['aio-server'][0]['ip'])
+        parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
 
     with open("installed_answers", "w") as f:
         parser.write(f)
@@ -77,7 +78,9 @@ def prepare_for_install(settings_dict,
 def install_devstack(settings_dict,
                      envs=None,
                      verbose=None,
-                     proxy=None):
+                     proxy=None,
+                     topo=None,
+                     config=None):
     envs = envs or {}
     verbose = verbose or []
     if settings_dict['user'] != 'root':
@@ -94,7 +97,7 @@ def install_devstack(settings_dict,
             run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
             run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
-        prepare_answers("~/answers.txt")
+        prepare_answers("~/answers.txt", topo=topo, config=config)
         warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
         if exists('~/keystonerc_admin'):
             get('~/keystonerc_admin', "./openrc")
@@ -126,6 +129,11 @@ def main():
                         help='Use cisco proxy if installing from Cisco local network')
     parser.add_argument('-c', action='store', dest='config_file', default=None,
                         help='Configuration file, default is None')
+    parser.add_argument('-t', action='store', dest='topology', default=None,
+                        choices=["aio", "2role", "3role"],
+                        help='Choose topology')
+    parser.add_argument('-c', action='store', dest='config_file', default=None,
+                        help='Configuration file, default is None')
     parser.add_argument('--version', action='version', version='%(prog)s 2.0')
 
     opts = parser.parse_args()
@@ -147,12 +155,14 @@ def main():
     else:
         with open(opts.config_file) as f:
             config = yaml.load(f)
-        box =  config['servers'].keys()[0]
+
         root_key = None
-        for index, aio in enumerate(config['servers'][box]):
-            job = {"host_string": aio["ip"],
-                   "user": opts.user or aio["user"],
-                   "password": opts.password or aio["password"],
+        for index, box in enumerate(sorted(
+                itertools.chain(*config['servers'].itervalues()),
+                key=lambda x: x['ip'])):
+            job = {"host_string": box["ip"],
+                   "user": opts.user or box["user"],
+                   "password": opts.password or box["password"],
                    "warn_only": True,
                    "key_filename": ssh_key_file,
                    "abort_on_prompts": True,
@@ -166,9 +176,16 @@ def main():
             if index == 0:
                 root_key = res
                 root_job = job
-            print "Job with host {host} finished successfully!".format(host=job["host_string"])
-    install_devstack(settings_dict=root_job, envs=None, verbose=verb_mode, proxy=opts.proxy)
-    print "Job with host {host} finished successfully!".format(host=root_job["host_string"])
+            print "Prepare host {host} finished successfully!".format(
+                host=job["host_string"])
+        install_devstack(settings_dict=root_job,
+                         envs=None,
+                         verbose=verb_mode,
+                         proxy=opts.proxy,
+                         topo=opts.topology,
+                         config=config)
+        print "Job with host {host} finished successfully!".format(
+            host=root_job["host_string"])
 
 
 if __name__ == "__main__":

@@ -2,7 +2,7 @@ servers:
   control-server:
     params:
       hostname: control
-      count: 2
+      count: 1
       storage: 60
       add_disks:
       ram: 8
