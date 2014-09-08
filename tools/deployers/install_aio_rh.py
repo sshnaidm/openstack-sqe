@@ -69,7 +69,7 @@ def prepare_for_install(settings_dict,
         update_time(run_func)
         warn_if_fail(run_func("git config --global user.email 'test.node@example.com';"
                          "git config --global user.name 'Test Node'"))
-        warn_if_fail(run_func("ssh-keygen -f file.rsa -t rsa -N ''"))
+        warn_if_fail(run_func("ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"))
         warn_if_fail(run_func("cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"))
         if key:
             warn_if_fail(run_func("echo '%s' >> ~/.ssh/authorized_keys" % key))
