@@ -71,6 +71,9 @@ def prepare_for_install(settings_dict,
                          "git config --global user.name 'Test Node'"))
         warn_if_fail(run_func("ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"))
         warn_if_fail(run_func("cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"))
+        append("/etc/ssh/ssh_config",
+               "\nStrictHostKeyChecking no\nUserKnownHostsFile=/dev/null",
+               use_sudo=use_sudo_flag)
         if key:
             warn_if_fail(run_func("echo '%s' >> ~/.ssh/authorized_keys" % key))
         return run_func("cat ~/.ssh/id_rsa.pub")
