@@ -62,8 +62,8 @@ def prepare_for_install(settings_dict,
         use_sudo_flag = False
         run_func = run
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
-        if exists("/etc/gai.conf"):
-            append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
+        #if exists("/etc/gai.conf"):
+        #    append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
         #warn_if_fail(run_func("yum -y update"))
         #warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
         update_time(run_func)
