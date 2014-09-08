@@ -97,9 +97,9 @@ def install_devstack(settings_dict,
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
         # Workaround for Centos 7
-        if contains("/etc/redhat-release", "CentOS"):
-            run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
-            run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
+        #if contains("/etc/redhat-release", "CentOS"):
+        #    run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
+        #    run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt", topo=topo, config=config)
         warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
