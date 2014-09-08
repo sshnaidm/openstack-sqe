@@ -7,6 +7,8 @@ RESET=$(shell echo `tput sgr0`)
 #WORKSPACE=$(shell echo ${WORKSPACE})
 UBUNTU_DISK=http://172.29.173.233/trusty-server-cloudimg-amd64-disk1.img
 CENTOS65_DISK=http://172.29.173.233/centos-6.5.x86_64.qcow2
+CENTOS7_DISK=http://172.29.173.233/centos-7.x86_64.qcow2
+FEDORA20_DISK=http://172.29.173.233/fedora-20.x86_64.qcow2
 #UBUNTU_DISK=http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
 ifndef LAB
 	LAB="lab1"
@@ -81,8 +83,19 @@ prepare-fullha-cobbler:
 
 prepare-aio-rh:
 	@echo "$(CYAN)>>>> Preparing AIO for CentOS...$(RESET)"
-	test -e centos-6.5.x86_64.qcow2 || wget -nv $(CENTOS65_DISK)
-	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./centos-6.5.x86_64.qcow2 -r redhat -c ./tools/cloud/cloud-configs/aio_rh_topology.yaml > config_file
+	test -e centos-7.x86_64.qcow2 || wget -nv $(CENTOS7_DISK)
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./centos-7.x86_64.qcow2 -r redhat -c ./tools/cloud/cloud-configs/aio_rh_topology.yaml > config_file
+
+prepare-2role-rh:
+	@echo "$(CYAN)>>>> Preparing AIO for CentOS...$(RESET)"
+	test -e centos-7.x86_64.qcow2 || wget -nv $(CENTOS7_DISK)
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./centos-7.x86_64.qcow2 -r redhat -c ./tools/cloud/cloud-configs/rh_2role_topology.yaml > config_file
+
+prepare-3role-rh:
+	@echo "$(CYAN)>>>> Preparing AIO for CentOS...$(RESET)"
+	test -e centos-7.x86_64.qcow2 || wget -nv $(CENTOS7_DISK)
+	time $(PYTHON) ./tools/cloud/create.py -l ${LAB} -s /opt/imgs -z ./centos-7.x86_64.qcow2 -r redhat -c ./tools/cloud/cloud-configs/rh_3role_topology.yaml > config_file
+
 
 give-a-time:
 	sleep 180
@@ -122,6 +135,22 @@ install-devstack:
 install-aio-rh:
 	@echo "$(CYAN)>>>> Installing AIO with CentOS ...$(RESET)"
 	time $(PYTHON) ./tools/deployers/install_aio_rh.py -c config_file -u root -p ubuntu
+
+install-rh-2role:
+	@echo "$(CYAN)>>>> Installing AIO with CentOS ...$(RESET)"
+	time $(PYTHON) ./tools/deployers/install_aio_rh.py -c config_file -u root -p ubuntu -t 2role
+
+install-rh-3role:
+	@echo "$(CYAN)>>>> Installing AIO with CentOS ...$(RESET)"
+	time $(PYTHON) ./tools/deployers/install_aio_rh.py -c config_file -u root -p ubuntu -t 3role
+
+prepare-tempest-rh:
+	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
+	time python ${WORKSPACE}/tempest/tools/install_venv.py
+	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
+	. ${WORKSPACE}/tempest/.venv/bin/activate
+	time $(TPATH)/python ./tools/tempest-scripts/tempest_configurator.py -i $$(cat ${WORKSPACE}/openstack-sqe/config_file  | grep -Eo  "ip: ([0-9\.]+)" | head -1 | sed "s/ip: //g")
+	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
 
 prepare-devstack-tempest:
 	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
@@ -207,7 +236,9 @@ full-2role-quick: 2role run-tempest-parallel
 full-fullha: fullha run-tempest
 
 rh-aio: init prepare-aio-rh give-a-time install-aio-rh
-rh-test: rh-aio prepare-devstack-tempest-custom run-tests
+rh-2role: init prepare-2role-rh give-a-time install-rh-2role
+rh-3role: init prepare-3role-rh give-a-time install-rh-3role
+rh-test: prepare-tempest-rh run-tests
 
 
 test-me:
