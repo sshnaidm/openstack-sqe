@@ -4,7 +4,7 @@ import argparse
 import os
 import yaml
 
-from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
+from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get, local
 from fabric.contrib.files import exists, append
 from fabric.colors import green, red
 
@@ -138,7 +138,8 @@ def install_devstack(settings_dict,
         quit_if_fail(run("git clone https://github.com/openstack-dev/devstack.git"))
         make_local("devstack/local.conf", sudo_flag=False, opts=opts, ip=settings_dict["host_string"])
         with cd("devstack"):
-            warn_if_fail(run("./stack.sh"))
+            #warn_if_fail(run("./stack.sh"))
+            local("ssh localadmin@%s '~/devstack/stack.sh'" % settings_dict["host_string"])
             if patch:
                 apply_changes()
         if exists('~/devstack/openrc'):
