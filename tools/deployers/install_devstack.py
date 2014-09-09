@@ -81,10 +81,10 @@ ENABLE_TENANT_TUNNELS=True
 #Q_ML2_PLUGIN_TYPE_DRIVERS=vlan
 #ENABLE_TENANT_TUNNELS=False
 #Q_ML2_TENANT_NETWORK_TYPE=local
-#ML2_VLAN_RANGES=physnet1:{vlan_start}:{vlan_end}
+#ML2_VLAN_RANGES=physnet1:{{vlan_start}}:{{vlan_end}}
 #PHYSICAL_NETWORK=physnet1
 #OVS_PHYSICAL_BRIDGE=br-eth1
-#TENANT_VLAN_RANGE={vlan_start}:{vlan_end}
+#TENANT_VLAN_RANGE={{vlan_start}}:{{vlan_end}}
 FLOATING_RANGE={local_net}
 Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
 PUBLIC_NETWORK_GATEWAY={gateway}
