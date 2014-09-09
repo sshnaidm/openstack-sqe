@@ -64,8 +64,8 @@ def prepare_for_install(settings_dict,
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         #if exists("/etc/gai.conf"):
         #    append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
-        #warn_if_fail(run_func("yum -y update"))
-        #warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
+        warn_if_fail(run_func("yum -y update"))
+        warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
         update_time(run_func)
         warn_if_fail(run_func("ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"))
         warn_if_fail(run_func("cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"))
@@ -99,12 +99,15 @@ def install_devstack(settings_dict,
 
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt", topo=topo, config=config)
-        warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
+        res = run_func("packstack --answer-file=~/installed_answers")
+        error = "ERROR :"
         # Workaround for Centos 7
-        if contains("/etc/redhat-release", "CentOS"):
+        if error in res and contains("/etc/redhat-release", "CentOS"):
             run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
             run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
-        warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
+            res = run_func("packstack --answer-file=~/installed_answers")
+        if error in res:
+            res = run_func("packstack --answer-file=~/installed_answers")
         if exists('~/keystonerc_admin'):
             get('~/keystonerc_admin', "./openrc")
         else:
