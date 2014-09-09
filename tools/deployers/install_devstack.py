@@ -85,6 +85,7 @@ ENABLE_TENANT_TUNNELS=True
 #PHYSICAL_NETWORK=physnet1
 #OVS_PHYSICAL_BRIDGE=br-eth1
 #TENANT_VLAN_RANGE={{vlan_start}}:{{vlan_end}}
+HOST_IP={ip}
 FLOATING_RANGE={local_net}
 Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
 PUBLIC_NETWORK_GATEWAY={gateway}
@@ -102,7 +103,7 @@ REMOVE_PUBLIC_BRIDGE=False
 RECLONE=True
 #OFFLINE=True
 """.format(ipversion=ipversion, mgmt=mgmt, tempest=tempest, gateway=gateway,
-           pool_end=pool_end, pool_start=pool_start, local_net=local_net)
+           pool_end=pool_end, pool_start=pool_start, local_net=local_net, ip=ip)
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
 
