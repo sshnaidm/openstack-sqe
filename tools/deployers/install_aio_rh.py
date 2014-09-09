@@ -196,6 +196,7 @@ def install_devstack(settings_dict,
         if error in res:
             #run_func("echo '%s' > /tmp/patch && cd / && patch -p1 < /tmp/patch" % PATCH)
             res = run_func("packstack --answer-file=~/installed_answers")
+        run_func("iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited")
         if exists('~/keystonerc_admin'):
             get('~/keystonerc_admin', "./openrc")
         else:
