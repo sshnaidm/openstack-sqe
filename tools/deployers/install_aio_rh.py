@@ -151,8 +151,8 @@ def prepare_for_install(settings_dict,
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         #if exists("/etc/gai.conf"):
         #    append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
-        warn_if_fail(run_func("yum -y update"))
-        warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
+        #warn_if_fail(run_func("yum -y update"))
+        #warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
         update_time(run_func)
         warn_if_fail(run_func("ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"))
         warn_if_fail(run_func("cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"))
