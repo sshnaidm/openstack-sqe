@@ -1,5 +1,5 @@
 servers:
-  control-server:
+  build-server:
     params:
       hostname: control
       count: 1
@@ -10,7 +10,7 @@ servers:
       networks:
         - admin
         - external
-  aio-server:
+  control-server:
     params:
       hostname: network
       count: 1
@@ -39,7 +39,8 @@ networks:
       nat: true
       dns:
         control: 2
-        compute: 3
+        network: 3
+        compute: 4
   - external:
       dhcp: false
       external: true

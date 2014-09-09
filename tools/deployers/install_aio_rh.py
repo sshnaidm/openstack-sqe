@@ -194,7 +194,7 @@ def install_devstack(settings_dict,
             run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
             res = run_func("packstack --answer-file=~/installed_answers")
         if error in res:
-            run_func("echo '%s' > /tmp/patch && cd / && patch -p1 < /tmp/patch" % PATCH)
+            #run_func("echo '%s' > /tmp/patch && cd / && patch -p1 < /tmp/patch" % PATCH)
             res = run_func("packstack --answer-file=~/installed_answers")
         if exists('~/keystonerc_admin'):
             get('~/keystonerc_admin', "./openrc")
