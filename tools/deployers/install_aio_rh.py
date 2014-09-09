@@ -126,8 +126,8 @@ def prepare_answers(path, topo, config):
         parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['control-server'][0]['ip'])
         parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
     if topo == "3role":
-        parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['control-server'][0]['ip'])
-        parser.set("general", "CONFIG_NETWORK_HOSTS", config['servers']['aio-server'][0]['ip'])
+        parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['build-server'][0]['ip'])
+        parser.set("general", "CONFIG_NETWORK_HOSTS", config['servers']['control-server'][0]['ip'])
         parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
 
     with open("installed_answers", "w") as f:
