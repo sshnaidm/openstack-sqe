@@ -34,7 +34,7 @@ def prepare_answers(path, topo, config):
     parser.set("general", "CONFIG_KEYSTONE_ADMIN_PW", "Cisco123")
     parser.set("general", "CONFIG_KEYSTONE_DEMO_PW", "secret")
     parser.set("general", "CONFIG_DEBUG_MODE", "y")
-    parser.set("general", "CONFIG_NTP_SERVERS", "ntp.esl.cisco.com")
+    parser.set("general", "CONFIG_NTP_SERVERS", "10.81.254.202,ntp.esl.cisco.com")
     if topo == "2role":
         parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['control-server'][0]['ip'])
         parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
@@ -96,12 +96,14 @@ def install_devstack(settings_dict,
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
         warn_if_fail(run_func("yum install -y http://rdo.fedorapeople.org/rdo-release.rpm"))
         warn_if_fail(run_func("yum install -y openstack-packstack"))
-        # Workaround for Centos 7
-        #if contains("/etc/redhat-release", "CentOS"):
-        #    run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
-        #    run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
+
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt", topo=topo, config=config)
+        warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
+        # Workaround for Centos 7
+        if contains("/etc/redhat-release", "CentOS"):
+            run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
+            run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
         warn_if_fail(run_func("packstack --answer-file=~/installed_answers"))
         if exists('~/keystonerc_admin'):
             get('~/keystonerc_admin', "./openrc")
