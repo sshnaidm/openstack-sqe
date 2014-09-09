@@ -139,7 +139,7 @@ def install_devstack(settings_dict,
         make_local("devstack/local.conf", sudo_flag=False, opts=opts, ip=settings_dict["host_string"])
         with cd("devstack"):
             #warn_if_fail(run("./stack.sh"))
-            local("ssh localadmin@%s '~/devstack/stack.sh'" % settings_dict["host_string"])
+            local("ssh localadmin@%s '/bin/bash ~/devstack/stack.sh'" % settings_dict["host_string"])
             if patch:
                 apply_changes()
         if exists('~/devstack/openrc'):
