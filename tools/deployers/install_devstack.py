@@ -44,7 +44,10 @@ def kill_services():
     sudo("rm -rf /var/log/libvirt/libvirtd.log")
 
 
-def make_local(filepath, sudo_flag, opts):
+def make_local(filepath, sudo_flag, opts, ip):
+    local_net = ".".join(ip.split(".")[:-1]) + ".0/24"
+    gateway = ".".join(ip.split(".")[:-1]) + ".1"
+    pool_start, pool_end = ".".join(ip.split(".")[:-1]) + ".50", ".".join(ip.split(".")[:-1]) + ".200"
     ipversion = "4+6" if opts.ipversion == 64 else str(opts.ipversion)
     mgmt = "4+6" if opts.mgmt == 64 else str(opts.mgmt)
     tempest = "" if opts.tempest_disbale else """
@@ -72,6 +75,19 @@ enable_service neutron
 {tempest}
 NOVA_USE_NEUTRON_API=v2
 VOLUME_BACKING_FILE_SIZE=2052M
+Q_PLUGIN=ml2
+ENABLE_TENANT_TUNNELS=True
+#Q_ML2_PLUGIN_MECHANISM_DRIVERS=openvswitch
+#Q_ML2_PLUGIN_TYPE_DRIVERS=vlan
+#ENABLE_TENANT_TUNNELS=False
+#Q_ML2_TENANT_NETWORK_TYPE=local
+#ML2_VLAN_RANGES=physnet1:{vlan_start}:{vlan_end}
+#PHYSICAL_NETWORK=physnet1
+#OVS_PHYSICAL_BRIDGE=br-eth1
+#TENANT_VLAN_RANGE={vlan_start}:{vlan_end}
+FLOATING_RANGE={local_net}
+Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
+PUBLIC_NETWORK_GATEWAY={gateway}
 API_RATE_LIMIT=False
 VERBOSE=True
 DEBUG=True
@@ -85,7 +101,8 @@ IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
 REMOVE_PUBLIC_BRIDGE=False
 RECLONE=True
 #OFFLINE=True
-""".format(ipversion=ipversion, mgmt=mgmt, tempest=tempest)
+""".format(ipversion=ipversion, mgmt=mgmt, tempest=tempest, gateway=gateway,
+           pool_end=pool_end, pool_start=pool_start, local_net=local_net)
     fd = StringIO(conf)
     warn_if_fail(put(fd, filepath, use_sudo=sudo_flag))
 
@@ -118,7 +135,7 @@ def install_devstack(settings_dict,
                          "git config --global user.name 'Test Node'"))
         run("rm -rf ~/devstack")
         quit_if_fail(run("git clone https://github.com/openstack-dev/devstack.git"))
-        make_local("devstack/local.conf", sudo_flag=False, opts=opts)
+        make_local("devstack/local.conf", sudo_flag=False, opts=opts, ip=settings_dict["host_string"])
         with cd("devstack"):
             warn_if_fail(run("./stack.sh"))
             if patch:
