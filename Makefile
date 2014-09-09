@@ -127,6 +127,14 @@ prepare-devstack-tempest:
 	. ${WORKSPACE}/tempest/.venv/bin/activate
 	mv ./tempest.conf ${WORKSPACE}/tempest/etc/tempest.conf
 
+prepare-devstack-tempest-custom:
+	echo "$(CYAN)>>>> Running devstack on tempest...$(RESET)"
+	time python ${WORKSPACE}/tempest/tools/install_venv.py
+	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
+	. ${WORKSPACE}/tempest/.venv/bin/activate
+	time $(TPATH)/python ./tools/tempest-scripts/tempest_configurator.py -i $$(sed -n "/${LAB}:/{n;p;n;p;}" tools/cloud/cloud-templates/lab.yaml | sed 'N;s/\n/ /' | sed "s/    ip_start: /./g" | sed "s/   net_start: //g")
+	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
+
 prepare-tempest:
 	@echo "$(CYAN)>>>> Preparing tempest...$(RESET)"
 	time $(PYTHON) ./tools/tempest-scripts/tempest_align.py -c config_file -u localadmin -p ubuntu
@@ -214,6 +222,7 @@ devstack: init prepare-devstack give-a-time install-devstack
 devstack-snapshot: init snapshot-revert devstack-snap-prepare
 
 devstack-tempest: prepare-devstack-tempest run-tests
+devstack-tempest-custom: prepare-devstack-tempest-custom run-tests
 
 full-aio: aio run-tempest
 
