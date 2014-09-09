@@ -81,7 +81,7 @@ class OSWebCreds:
             "password": self.password,
         }
         s = requests.Session()
-        add_url = "/horizon"
+        add_url = "/dashboard"
         url = "http://" + self.ip
         login_page = s.get(url + add_url)
         if login_page.status_code != requests.codes.ok:
