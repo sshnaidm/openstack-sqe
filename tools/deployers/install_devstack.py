@@ -45,8 +45,8 @@ def kill_services():
 
 
 def make_local(filepath, sudo_flag, opts, ip):
-    local_net = ".".join(ip.split(".")[:-1]) + ".128/25"
-    gateway = ".".join(ip.split(".")[:-1]) + ".1"
+    local_net = ".".join(ip.split(".")[:-1]) + ".0/24"
+    gateway = ".".join(ip.split(".")[:-1]) + ".254"
     pool_start, pool_end = ".".join(ip.split(".")[:-1]) + ".131", ".".join(ip.split(".")[:-1]) + ".180"
     ipversion = "4+6" if opts.ipversion == 64 else str(opts.ipversion)
     mgmt = "4+6" if opts.mgmt == 64 else str(opts.mgmt)
@@ -97,8 +97,8 @@ USE_SCREEN=True
 SCREEN_LOGDIR=/opt/stack/logs
 IP_VERSION={ipversion}
 MGMT_NET={mgmt}
-IPV6_PRIVATE_RANGE=2001:dead:beef:deed::/64
-IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
+#IPV6_PRIVATE_RANGE=2001:dead:beef:deed::/64
+#IPV6_NETWORK_GATEWAY=2001:dead:beef:deed::1
 REMOVE_PUBLIC_BRIDGE=False
 RECLONE=True
 #OFFLINE=True
