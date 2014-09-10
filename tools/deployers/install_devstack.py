@@ -45,7 +45,7 @@ def kill_services():
 
 
 def make_local(filepath, sudo_flag, opts, ip):
-    local_net = ".".join(ip.split(".")[:-1]) + ".0/24"
+    local_net = ".".join(ip.split(".")[:-1]) + ".224/27"
     gateway = ".".join(ip.split(".")[:-1]) + ".254"
     pool_start, pool_end = ".".join(ip.split(".")[:-1]) + ".131", ".".join(ip.split(".")[:-1]) + ".180"
     ipversion = "4+6" if opts.ipversion == 64 else str(opts.ipversion)
@@ -85,10 +85,11 @@ ENABLE_TENANT_TUNNELS=True
 #PHYSICAL_NETWORK=physnet1
 #OVS_PHYSICAL_BRIDGE=br-eth1
 #TENANT_VLAN_RANGE={{vlan_start}}:{{vlan_end}}
-HOST_IP={ip}
+#HOST_IP={ip}
 FLOATING_RANGE={local_net}
-Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
-PUBLIC_NETWORK_GATEWAY={gateway}
+FLAT_INTERFACE=eth0
+#Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
+#PUBLIC_NETWORK_GATEWAY={gateway}
 API_RATE_LIMIT=False
 VERBOSE=True
 DEBUG=True
