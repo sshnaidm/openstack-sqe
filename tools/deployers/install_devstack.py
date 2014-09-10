@@ -45,7 +45,7 @@ def kill_services():
 
 
 def make_local(filepath, sudo_flag, opts, ip):
-    local_net = ".".join(ip.split(".")[:-1]) + ".0/24"
+    local_net = ".".join(ip.split(".")[:-1]) + ".128/25"
     gateway = ".".join(ip.split(".")[:-1]) + ".1"
     pool_start, pool_end = ".".join(ip.split(".")[:-1]) + ".131", ".".join(ip.split(".")[:-1]) + ".180"
     ipversion = "4+6" if opts.ipversion == 64 else str(opts.ipversion)
@@ -138,8 +138,8 @@ def install_devstack(settings_dict,
         quit_if_fail(run("git clone https://github.com/openstack-dev/devstack.git"))
         make_local("devstack/local.conf", sudo_flag=False, opts=opts, ip=settings_dict["host_string"])
         with cd("devstack"):
-            #warn_if_fail(run("./stack.sh"))
-            local("ssh localadmin@%s '/bin/bash ~/devstack/stack.sh'" % settings_dict["host_string"])
+            warn_if_fail(run("./stack.sh"))
+            #local("ssh localadmin@%s '/bin/bash ~/devstack/stack.sh'" % settings_dict["host_string"])
             if patch:
                 apply_changes()
         if exists('~/devstack/openrc'):
