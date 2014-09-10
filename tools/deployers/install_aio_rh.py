@@ -187,7 +187,7 @@ def install_devstack(settings_dict,
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt", topo=topo, config=config)
         res = run_func("packstack --answer-file=~/installed_answers")
-        error = "ERROR :"
+        error = "ERROR : "
         # Workaround for Centos 7
         if error in res and contains("/etc/redhat-release", "CentOS"):
             run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
