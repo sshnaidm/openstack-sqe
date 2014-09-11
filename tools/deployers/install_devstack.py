@@ -47,7 +47,7 @@ def kill_services():
 def make_local(filepath, sudo_flag, opts, ip):
     local_net = ".".join(ip.split(".")[:-1]) + ".224/27"
     gateway = ".".join(ip.split(".")[:-1]) + ".254"
-    pool_start, pool_end = ".".join(ip.split(".")[:-1]) + ".131", ".".join(ip.split(".")[:-1]) + ".180"
+    pool_start, pool_end = ".".join(ip.split(".")[:-1]) + ".230", ".".join(ip.split(".")[:-1]) + ".250"
     ipversion = "4+6" if opts.ipversion == 64 else str(opts.ipversion)
     mgmt = "4+6" if opts.mgmt == 64 else str(opts.mgmt)
     tempest = "" if opts.tempest_disbale else """
