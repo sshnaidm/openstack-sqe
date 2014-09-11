@@ -36,6 +36,7 @@ def prepare_answers(path, topo, config):
     parser.set("general", "CONFIG_KEYSTONE_DEMO_PW", "secret")
     parser.set("general", "CONFIG_DEBUG_MODE", "y")
     parser.set("general", "CONFIG_NTP_SERVERS", "10.81.254.202,ntp.esl.cisco.com")
+    parser.set("general", "CONFIG_NOVA_NETWORK_DEFAULTFLOATINGPOOL", "public")
     if topo == "2role":
         parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['control-server'][0]['ip'])
         parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
@@ -66,7 +67,7 @@ def prepare_for_install(settings_dict,
         #if exists("/etc/gai.conf"):
         #    append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
         warn_if_fail(run_func("yum -y update"))
-        #warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
+        warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate"))
         update_time(run_func)
         warn_if_fail(run_func("ssh-keygen -f ~/.ssh/id_rsa -t rsa -N ''"))
         warn_if_fail(run_func("cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"))
@@ -75,7 +76,7 @@ def prepare_for_install(settings_dict,
                use_sudo=use_sudo_flag)
         #warn_if_fail(run_func("/bin/systemctl stop  NetworkManager.service"))
         #warn_if_fail(run_func("/bin/systemctl disable NetworkManager.service"))
-
+        append("~/.bashrc", "export TERM=xterm")
         if key:
             warn_if_fail(run_func("echo '%s' >> ~/.ssh/authorized_keys" % key))
         return run_func("cat ~/.ssh/id_rsa.pub")
