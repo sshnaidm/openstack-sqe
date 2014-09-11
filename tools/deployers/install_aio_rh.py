@@ -189,13 +189,10 @@ def install_devstack(settings_dict,
         res = run_func("packstack --answer-file=~/installed_answers")
         error = "ERROR : "
         # Workaround for Centos 7
-        if error in res and contains("/etc/redhat-release", "CentOS"):
+        if topo != "aio" and error in res and contains("/etc/redhat-release", "CentOS"):
             run_func("cp /etc/redhat-release /etc/redhat-release.bkp")
             run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
             res = run_func("packstack --allinone")
-            res = run_func("packstack --answer-file=~/installed_answers")
-        if error in res:
-            #run_func("echo '%s' > /tmp/patch && cd / && patch -p1 < /tmp/patch" % PATCH)
             res = run_func("packstack --answer-file=~/installed_answers")
         run_func("iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited")
         if exists('~/keystonerc_admin'):
