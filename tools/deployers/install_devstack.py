@@ -85,11 +85,11 @@ ENABLE_TENANT_TUNNELS=True
 #PHYSICAL_NETWORK=physnet1
 #OVS_PHYSICAL_BRIDGE=br-eth1
 #TENANT_VLAN_RANGE={{vlan_start}}:{{vlan_end}}
-#HOST_IP={ip}
+HOST_IP={ip}
 FLOATING_RANGE={local_net}
-FLAT_INTERFACE=eth0
-#Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
-#PUBLIC_NETWORK_GATEWAY={gateway}
+#FLAT_INTERFACE=eth0
+Q_FLOATING_ALLOCATION_POOL='start={pool_start},end={pool_end}'
+PUBLIC_NETWORK_GATEWAY={gateway}
 API_RATE_LIMIT=False
 VERBOSE=True
 DEBUG=True
