@@ -186,6 +186,8 @@ def install_devstack(settings_dict,
 
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt", topo=topo, config=config)
+        import sys
+        sys.exit()
         res = run_func("packstack --answer-file=~/installed_answers")
         error = "ERROR : "
         # Workaround for Centos 7
