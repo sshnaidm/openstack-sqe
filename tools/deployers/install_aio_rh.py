@@ -10,9 +10,8 @@ from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 from fabric.contrib.files import exists, append, contains
 from fabric.colors import green, red
 
-from utils import warn_if_fail, quit_if_fail, update_time
+from utils import warn_if_fail, update_time
 
-__author__ = 'sshnaidm'
 
 DOMAIN_NAME = "domain.name"
 # override logs dirs if you need
@@ -44,7 +43,6 @@ def prepare_answers(path, topo, config):
         parser.set("general", "CONFIG_CONTROLLER_HOST", config['servers']['build-server'][0]['ip'])
         parser.set("general", "CONFIG_NETWORK_HOSTS", config['servers']['control-server'][0]['ip'])
         parser.set("general", "CONFIG_COMPUTE_HOSTS", config['servers']['compute-server'][0]['ip'])
-
     with open("installed_answers", "w") as f:
         parser.write(f)
     warn_if_fail(put("installed_answers", "~/installed_answers"))
@@ -103,10 +101,10 @@ def install_devstack(settings_dict,
         prepare_answers("~/answers.txt", topo=topo, config=config)
         # Workaround for Centos 7
         if contains("/etc/redhat-release", "CentOS Linux release 7"):
-            patch = os.path.join(os.path.dirname(__file__), "original.patch")
-            warn_if_fail(put(patch, "~/original.patch"))
+            patch = os.path.join(os.path.dirname(__file__), "centos7.patch")
+            warn_if_fail(put(patch, "~/centos7.patch"))
             with cd("/usr/share/openstack-puppet"):
-                run_func("patch -p1 < ~/original.patch")
+                run_func("patch -p1 < ~/centos7.patch")
         res = run_func("packstack --answer-file=~/installed_answers")
         #run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
         run_func("iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited")
