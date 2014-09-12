@@ -102,7 +102,7 @@ def install_devstack(settings_dict,
         warn_if_fail(run_func("packstack --gen-answer-file=~/answers.txt"))
         prepare_answers("~/answers.txt", topo=topo, config=config)
         # Workaround for Centos 7
-        if topo != "aio" and contains("/etc/redhat-release", "CentOS Linux release 7"):
+        if contains("/etc/redhat-release", "CentOS Linux release 7"):
             patch = os.path.join(os.path.dirname(__file__), "original.patch")
             warn_if_fail(put(patch, "~/original.patch"))
             with cd("/usr/share/openstack-puppet"):
