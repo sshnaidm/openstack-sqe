@@ -149,7 +149,7 @@ prepare-tempest-rh:
 	time python ${WORKSPACE}/tempest/tools/install_venv.py
 	${WORKSPACE}/tempest/.venv/bin/pip install junitxml python-ceilometerclient nose testresources testtools
 	. ${WORKSPACE}/tempest/.venv/bin/activate
-	time $(TPATH)/python ./tools/tempest-scripts/tempest_configurator.py -i $$(cat ${WORKSPACE}/openstack-sqe/config_file  | grep -Eo  "ip: ([0-9\.]+)" | head -1 | sed "s/ip: //g")
+	time $(TPATH)/python ./tools/tempest-scripts/tempest_configurator.py -i $$(cat ${WORKSPACE}/openstack-sqe/config_file  | grep -Eo  "ip: ([0-9\.]+)" | sort | head -1 | sed "s/ip: //g")
 	mv ./tempest.conf.jenkins ${WORKSPACE}/tempest/etc/tempest.conf
 
 prepare-devstack-tempest:
