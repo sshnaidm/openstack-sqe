@@ -10,7 +10,7 @@ from fabric.api import sudo, settings, run, hide, put, shell_env, cd, get
 from fabric.contrib.files import exists, append, contains
 from fabric.colors import green, red
 
-from utils import warn_if_fail, update_time
+from utils import warn_if_fail, update_time, collect_logs
 
 
 DOMAIN_NAME = "domain.name"
@@ -62,8 +62,8 @@ def prepare_for_install(settings_dict,
         use_sudo_flag = False
         run_func = run
     with settings(**settings_dict), hide(*verbose), shell_env(**envs):
-        #if exists("/etc/gai.conf"):
-        #    append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
+        if exists("/etc/gai.conf"):
+            append("/etc/gai.conf", "precedence ::ffff:0:0/96  100", use_sudo=use_sudo_flag)
         warn_if_fail(run_func("yum -y update"))
         warn_if_fail(run_func("yum -y install -y git python-pip vim ntpdate patch"))
         update_time(run_func)
@@ -105,8 +105,7 @@ def install_devstack(settings_dict,
             warn_if_fail(put(patch, "~/centos7.patch"))
             with cd("/usr/share/openstack-puppet"):
                 run_func("patch -p1 < ~/centos7.patch")
-        res = run_func("packstack --answer-file=~/installed_answers")
-        #run_func("echo 'Fedora release 20 (Heisenbug)' > /etc/redhat-release")
+        run_func("packstack --answer-file=~/installed_answers")
         run_func("iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited")
         if exists('~/keystonerc_admin'):
             get('~/keystonerc_admin', "./openrc")
@@ -116,6 +115,7 @@ def install_devstack(settings_dict,
             get('~/keystonerc_demo', "./openrc_demo")
         if exists('~/packstack-answers-*'):
             get('~/packstack-answers-*', ".")
+        collect_logs(run_func=run_func, hostname='build_box', clean=True)
         print (green("Finished!"))
         return True
 
@@ -185,14 +185,14 @@ def main():
                 root_job = job
             print "Prepare host {host} finished successfully!".format(
                 host=job["host_string"])
-        install_devstack(settings_dict=root_job,
-                         envs=None,
-                         verbose=verb_mode,
-                         proxy=opts.proxy,
-                         topo=opts.topology,
-                         config=config)
-        print "Job with host {host} finished successfully!".format(
-            host=root_job["host_string"])
+    install_devstack(settings_dict=root_job,
+                     envs=None,
+                     verbose=verb_mode,
+                     proxy=opts.proxy,
+                     topo=opts.topology,
+                     config=config)
+    print "Job with host {host} finished successfully!".format(
+        host=root_job["host_string"])
 
 
 if __name__ == "__main__":
