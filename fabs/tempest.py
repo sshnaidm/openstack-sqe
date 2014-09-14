@@ -121,7 +121,7 @@ def run_tests(force=False):
                 log.info("Tests haven't run yet, run them with regex: '%s'" % regex)
                 cmd = "testr run '%s' --subunit | subunit-2to1 | tools/colorizer.py" % regex
         local(time_prefix + cmd)
-        result = os.path.join(WORKSPACE, "openstack-sqe", time.strftime("%H%M%S"))
+        result = os.path.join(WORKSPACE, "openstack-sqe", "nosetests_" + time.strftime("%H%M%S") + ".xml")
         subunit = os.path.join(WORKSPACE, "openstack-sqe", "testr_results.subunit")
         fails_extract = os.path.join(WORKSPACE, "openstack-sqe", "tools",
                                      "tempest-scripts", "extract_failures.py")
