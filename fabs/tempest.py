@@ -101,7 +101,7 @@ def run_tests():
         wait=QA_WAITTIME, kill=QA_KILLTIME)
     tests_file= os.path.join(WORKSPACE, "openstack-sqe", "tools", "tempest-scripts", "tests_set")
     with lcd(TEMPEST_DIR):
-        if os.path.exists(".testrepository"):
+        if os.path.exists(os.path.join(TEMPEST_DIR, ".testrepository")):
             log.info("Tests already ran, now run the failed only")
             cmd = "testr run --failing --subunit | subunit-2to1 | tools/colorizer.py"
         else:
