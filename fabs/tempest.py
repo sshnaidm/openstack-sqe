@@ -97,16 +97,19 @@ def prepare_devstack(ip=None, private=True):
 @task(alias="run")
 @timed
 @intempest
-def run_tests():
+def run_tests(force=False):
     ''' Run Tempest tests '''
     log.info("Run Tempest tests")
     time_prefix = "timeout --preserve-status -s 2 -k {kill} {wait} ".format(
         wait=QA_WAITTIME, kill=QA_KILLTIME)
     with lcd(TEMPEST_DIR):
-        if os.path.exists(os.path.join(TEMPEST_DIR, ".testrepository")):
+        repo_exists = os.path.exists(os.path.join(TEMPEST_DIR, ".testrepository"))
+        if repo_exists and not force:
             log.info("Tests already ran, now run the failed only")
             cmd = "testr run --failing --subunit | subunit-2to1 | tools/colorizer.py"
         else:
+            if repo_exists:
+                local("rm -rf .testrepository")
             local("testr init")
             if os.path.getsize(TESTS_FILE) > 0:
                 log.info("Tests haven't run yet, run them from file %s" % TESTS_FILE)
