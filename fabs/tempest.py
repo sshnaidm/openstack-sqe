@@ -22,7 +22,7 @@ def test():
 
 @task
 @timed
-def venv(private=False):
+def venv(private=True):
     log.info("Installing virtualenv for tempest")
     install = os.path.join(TEMPEST_DIR, "tools", "install_venv.py")
     wraps = ''
@@ -63,10 +63,10 @@ def prepare(openrc=None, ip=None, ipv=None, add=None):
 
 @task
 @timed
-def prepare_coi(topology=None):
+def prepare_coi(topology=None, private=True):
     ''' Prepare tempest especially for COI '''
     log.info("Preparing tempest for COI")
-    init()
+    init(private=private)
     prepare(openrc="./openrc")
     if topology == "2role":
         local("sed -i 's/.*[sS]wift.*\=.*[Tt]rue.*/swift=false/g' ./tempest.conf.jenkins")
@@ -76,9 +76,9 @@ def prepare_coi(topology=None):
 
 @task(alias='dev')
 @timed
-def prepare_devstack(ip=None):
+def prepare_devstack(ip=None, private=True):
     ''' Prepare tempest for devstack '''
-    init()
+    init(private=private)
     conf_dir = os.path.join(TEMPEST_DIR, "etc")
     if not ip:
         log.info("Preparing tempest for devstack with ready file")
@@ -88,8 +88,6 @@ def prepare_devstack(ip=None):
         log.info("Preparing tempest for devstack with IP: %s" % ip)
         prepare(ip=ip)
         local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
-
-
 
 @task
 @timed
