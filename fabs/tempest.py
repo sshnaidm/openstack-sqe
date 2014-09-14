@@ -1,7 +1,7 @@
 import os
 import time
 from fabric.api import task, local, env, lcd
-from common import timed, TEMPEST_VENV, TLVENV, TCVENV, intempest
+from common import timed, TEMPEST_VENV, TLVENV, TCVENV, intempest, get_dev_ip
 from common import logger as log
 from . import TEMPEST_DIR, QA_WAITTIME, QA_KILLTIME, WORKSPACE
 
@@ -73,10 +73,28 @@ def prepare_coi(topology):
     conf_dir = os.path.join(TEMPEST_DIR, "etc")
     local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
 
+
+@task(alias='dev')
+@timed
+def prepare_devstack(ip=None):
+    ''' Prepare tempest for devstack '''
+    init()
+    conf_dir = os.path.join(TEMPEST_DIR, "etc")
+    if not ip:
+        log.info("Preparing tempest for devstack with ready file")
+        local("mv ./tempest.conf %s/tempest.conf" % conf_dir)
+    else:
+        ip = get_dev_ip()
+        log.info("Preparing tempest for devstack with IP: %s" % ip)
+        prepare(ip=ip)
+        local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
+
+
+
 @task
 @timed
 @intempest
-def run_tests(topology):
+def run_tests():
     ''' Run Tempest tests '''
     log.info("Run Tempest tests")
     time_prefix = "timeout --preserve-status -s 2 -k {kill} {wait} ".format(

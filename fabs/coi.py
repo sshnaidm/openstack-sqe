@@ -27,9 +27,9 @@ def prepare_vms(topo, args='', cloud=False):
     else:
         disk = os.environ["UBUNTU_DISK"]
     if cloud:
-        url = UBUNTU_URL_CLOUD + UBUNTU_DISK
+        url = UBUNTU_URL_CLOUD + disk
     else:
-        url = WEB + UBUNTU_DISK
+        url = WEB + disk
     local("test -e %s || wget -nv %s" %(disk, url))
     local("python ./tools/cloud/create.py  -l {lab} -s /opt/imgs "
           "-z ./{disk} -t {topo} {args} > config_file".format(lab=LAB,

@@ -5,7 +5,9 @@ from contextlib import contextmanager
 import logging
 import functools
 import time
-from . import TEMPEST_DIR
+import yaml
+import sys
+from . import TEMPEST_DIR, LAB, WORKSPACE
 import subprocess
 
 env.host_string = "localhost"
@@ -19,9 +21,9 @@ CVENV = os.path.join(os.path.expanduser("~"), VENV)
 
 TVENV = ".venv"
 # Local virtualenv, that is removed every build
-TLVENV = os.path.normpath(os.path.join(TEMPEST_DIR, VENV))
+TLVENV = os.path.normpath(os.path.join(TEMPEST_DIR, TVENV))
 # Common virtualenv for tempest in HOME
-TCVENV = os.path.join(os.path.expanduser("~"), VENV)
+TCVENV = os.path.join(os.path.expanduser("~"), TVENV)
 
 
 logger = logging.getLogger('ROBOT')
@@ -94,3 +96,17 @@ def run_cmd(cmd):
                             close_fds=True)
     ret = proc.wait()
     return ret, proc.stdout.read(), proc.stderr.read()
+
+def get_dev_ip():
+    path = os.path.join(WORKSPACE, "openstack-sqe",
+                        "tools", "cloud", "cloud-templates", "lab.yaml")
+    try:
+        with open(path) as f:
+            labs = yaml.load(f)
+    except Exception as e:
+        logger.error("Exception when loading lab.yaml\n%s" % str(e))
+        sys.exit(1)
+    lab_cfg = labs[LAB]
+    ip = lab_cfg['net_start'] + "." + str(lab_cfg['ip_start'])
+    return ip
+
