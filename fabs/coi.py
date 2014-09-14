@@ -42,6 +42,7 @@ def prepare_vms(topo, args='', cloud=False):
 
 @task
 def prepare(topology, cobbler=False, cloud=False):
+    ''' Prepare VMs of specific topology for Openstack '''
     log.info("Preparing boxes for %s Openstack" % topology + (
         " with cobbler" if cobbler else ''))
     args = '-b net' if cobbler else ''
@@ -82,8 +83,8 @@ def install(topology=None, cobbler=False):
 @task
 @timed
 def aio(cloud=False):
-    ''' Prepare and install All in One Openstack '''
-    log.info("Full install of All in One Openstack")
+    ''' Prepare and install All-in-One Openstack '''
+    log.info("Full install of All-in-One Openstack")
     prepare("aio", cloud=cloud)
     time.sleep(GLOBAL_TIMEOUT)
     install("aio")
