@@ -5,7 +5,7 @@ from contextlib import contextmanager
 import logging
 import functools
 import time
-import yaml
+import re
 import sys
 from . import TEMPEST_DIR, LAB, WORKSPACE
 import subprocess
@@ -102,11 +102,11 @@ def get_dev_ip():
                         "tools", "cloud", "cloud-templates", "lab.yaml")
     try:
         with open(path) as f:
-            labs = yaml.load(f)
+            labs = f.read()
     except Exception as e:
         logger.error("Exception when loading lab.yaml\n%s" % str(e))
         sys.exit(1)
-    lab_cfg = labs[LAB]
-    ip = lab_cfg['net_start'] + "." + str(lab_cfg['ip_start'])
-    return ip
+    net, ip = re.search(LAB + ":\s*net_start: ([\.\d]+)\s*ip_start: (\d+)",
+                        labs, re.MULTILINE).groups(1)
+    return net + "." + ip
 
