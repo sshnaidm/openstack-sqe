@@ -5,7 +5,7 @@ from common import timed, TEMPEST_VENV, TLVENV, TCVENV, intempest, get_dev_ip
 from common import logger as log
 from . import TEMPEST_DIR, QA_WAITTIME, QA_KILLTIME, WORKSPACE
 
-__all__ = ['test', 'init', 'prepare_coi', 'prepare', 'run_tests']
+__all__ = ['test', 'init', 'prepare_coi', 'prepare', 'prepare_devstack', 'run_tests']
 
 env.host_string = "localhost"
 env.abort_on_prompts = True
