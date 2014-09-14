@@ -36,9 +36,6 @@ def prepare_vms(topo, args='', cloud=False):
                                                                disk=disk,
                                                                topo=topo,
                                                                args=args))
-    local("python ./tools/cloud/create.py -l {lab} -s /opt/imgs "
-          "-z ./{disk} -t aio > config_file".format(lab=LAB, disk=disk))
-
 
 @task
 def prepare(topology, cobbler=False, cloud=False):
@@ -90,6 +87,7 @@ def aio(cloud=False):
     install("aio")
 
 @task(alias='2role')
+@timed
 def role2(cloud=False, cobbler=False):
     ''' Prepare and install 2role Openstack '''
     log.info("Full install of 2role Openstack" + (
@@ -99,6 +97,7 @@ def role2(cloud=False, cobbler=False):
     install("2role", cobbler=cobbler)
 
 @task
+@timed
 def fullha(cloud=False, cobbler=False):
     ''' Prepare and install Full HA Openstack '''
     log.info("Full install of Full HA Openstack" + (
