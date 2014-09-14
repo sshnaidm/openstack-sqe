@@ -29,13 +29,7 @@ def venv(private=False):
 @virtual
 def requirements():
     log.info("Installing python modules from requirements")
-    tmp = local("TMPF=$(mktemp) && pip freeze > $TMPF && echo $TMPF", capture=True)
-    if tmp.stdout:
-        local("diff ./requirements11 {tmp} >/dev/null || "
-              "pip install -Ur requirements11; rm -f {tmp}".format(
-            tmp=tmp.stdout))
-    else:
-        local("pip install -Ur requirements")
+    local("pip install -Ur requirements")
 
 @task
 @virtual
