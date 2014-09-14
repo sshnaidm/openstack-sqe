@@ -63,7 +63,7 @@ def prepare(openrc=None, ip=None, ipv=None, add=None):
 
 @task
 @timed
-def prepare_coi(topology):
+def prepare_coi(topology=None):
     ''' Prepare tempest especially for COI '''
     log.info("Preparing tempest for COI")
     init()
