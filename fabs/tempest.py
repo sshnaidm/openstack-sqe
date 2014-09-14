@@ -106,11 +106,11 @@ def run_tests():
             local("testr init")
             if os.path.getsize(tests_file) > 0:
                 log.info("Tests haven't run yet, run them from file %s" % tests_file)
-                cmd = 'testr run --load-list "$tests" --subunit  | subunit-2to1 | tools/colorizer.py'
+                cmd = 'testr run --load-list %s --subunit  | subunit-2to1 | tools/colorizer.py' % tests_file
             else:
                 regex = os.environ.get('REG', "")
                 log.info("Tests haven't run yet, run them with regex: '%s'" % regex)
-                cmd = 'testr run %s --subunit | subunit-2to1 | tools/colorizer.py' % regex
+                cmd = "testr run '%s' --subunit | subunit-2to1 | tools/colorizer.py" % regex
         local(time_prefix + cmd)
         result = os.path.join(WORKSPACE, "openstack-sqe", time.strftime("%H%M%S"))
         subunit = os.path.join(WORKSPACE, "openstack-sqe", "testr_results.subunit")
