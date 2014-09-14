@@ -60,8 +60,3 @@ def devstack(topology='devstack'):
     prepare(topology=topology)
     time.sleep(GLOBAL_TIMEOUT)
     install()
-
-
-
-
-

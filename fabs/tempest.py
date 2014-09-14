@@ -59,6 +59,8 @@ def prepare(openrc=None, ip=None, ipv=None, add=None):
         args = " -i " + ip
     elif openrc:
         args = " -o " + openrc
+    else:
+        raise NameError("Provide either IP or openrc file!")
     if ipv:
         args += " -a " + ipv
     if add:
