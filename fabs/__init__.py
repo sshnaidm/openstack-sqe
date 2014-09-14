@@ -42,14 +42,14 @@ def _get_tempest_dir():
         _get_workspace(),
         "tempest")
 
-def _get_tempest_venv_path():
-    return os.path.join(
-        _get_tempest_dir(), ".venv")
+#def _get_tempest_venv_path():
+#    return os.path.join(
+#        _get_tempest_dir(), ".venv")
 
 
 LAB =_get_lab()
 QA_WAITTIME =_get_waittime()
 QA_KILLTIME =_get_killtime()
-WORKSPACE =_get_workspace
+WORKSPACE =_get_workspace()
 TEMPEST_DIR = _get_tempest_dir()
-TEMPEST_VENV =_get_tempest_venv_path()
+#TEMPEST_VENV =_get_tempest_venv_path()

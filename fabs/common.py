@@ -5,17 +5,23 @@ from contextlib import contextmanager
 import logging
 import functools
 import time
-from . import TEMPEST_VENV
+from . import TEMPEST_DIR
 import subprocess
 
 env.host_string = "localhost"
 
-VENV=".env1"
+VENV=".env"
 CUR_DIR = os.path.dirname(__file__)
 # Local virtualenv, that is removed every build
 LVENV = os.path.normpath(os.path.join(CUR_DIR, "..", VENV))
 # Common virtualenv in HOME, that is persistent
 CVENV = os.path.join(os.path.expanduser("~"), VENV)
+
+TVENV = ".venv"
+# Local virtualenv, that is removed every build
+TLVENV = os.path.normpath(os.path.join(TEMPEST_DIR, VENV))
+# Common virtualenv for tempest in HOME
+TCVENV = os.path.join(os.path.expanduser("~"), VENV)
 
 
 logger = logging.getLogger('ROBOT')
@@ -51,6 +57,12 @@ def _get_virtenv():
 
 CUR_VENV = _get_virtenv()
 
+def _get_tempest_virtenv():
+    if os.path.exists(TLVENV):
+        return TLVENV
+    return TCVENV
+
+TEMPEST_VENV = _get_tempest_virtenv()
 
 @contextmanager
 def virtualenv(path):
@@ -64,7 +76,7 @@ def virtual(func, envpath=None):
     @functools.wraps(func)
     def newfunc(*args, **kwargs):
         if envpath == "tempest":
-            venv = TEMPEST_VENV
+            venv = _get_tempest_virtenv()
         else:
             venv = _get_virtenv()
         with virtualenv(venv):

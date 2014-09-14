@@ -1,11 +1,11 @@
 import os
 import time
-from fabric.api import task, local, env
-from common import timed, virtual, CUR_VENV, intempest
+from fabric.api import task, local, env, lcd
+from common import timed, TEMPEST_VENV, TLVENV, TCVENV, intempest
 from common import logger as log
-from . import TEMPEST_VENV, TEMPEST_DIR, QA_WAITTIME, QA_KILLTIME
+from . import TEMPEST_DIR, QA_WAITTIME, QA_KILLTIME, WORKSPACE
 
-__all__ = ['test', 'init', 'prepare_coi']
+__all__ = ['test', 'init', 'prepare_coi', 'prepare', 'run_tests']
 
 env.host_string = "localhost"
 env.abort_on_prompts = True
@@ -17,15 +17,18 @@ env.warn_only = True
 def test():
     ''' For testing purposes only '''
     log.info("Tempest test!")
-    print "doing somehting now in %s" % TEMPEST_VENV
+    print "Doing something now in %s" % TEMPEST_VENV
     local("which python")
 
 @task
 @timed
-def venv():
+def venv(private=False):
     log.info("Installing virtualenv for tempest")
     install = os.path.join(TEMPEST_DIR, "tools", "install_venv.py")
-    local("echo 'python " + install + "'")
+    wraps = ''
+    if not private:
+        wraps = "export venv=%s; " % TCVENV
+    local("%spython " % wraps + install)
 
 
 @task
@@ -34,12 +37,12 @@ def venv():
 def additions():
     log.info("Installing additional modules for tempest")
     local("which python")
-    local("echo 'pip install junitxml nose'")
+    local("pip install junitxml nose")
 
 @task
 @timed
-def init():
-    venv()
+def init(private=False):
+    venv(private=private)
     additions()
 
 @task
@@ -49,14 +52,14 @@ def prepare(openrc=None, ip=None, ipv=None, add=None):
     ''' Prepare tempest '''
     args = ""
     if ip:
-        args = "-i " + ip
+        args = " -i " + ip
     elif openrc:
-        args = "-o " + openrc
+        args = " -o " + openrc
     if ipv:
         args += " -a " + ipv
     if add:
-        args += add
-    local("echo 'python ./tools/tempest-scripts/tempest_configurator.py %s'" % args)
+        args += " " + add
+    local("python ./tools/tempest-scripts/tempest_configurator.py %s" % args)
 
 @task
 @timed
@@ -68,14 +71,38 @@ def prepare_coi(topology):
     if topology == "2role":
         local("sed -i 's/.*[sS]wift.*\=.*[Tt]rue.*/swift=false/g' ./tempest.conf.jenkins")
     conf_dir = os.path.join(TEMPEST_DIR, "etc")
-    local("echo 'mv ./tempest.conf.jenkins %s/tempest.conf'" % conf_dir)
+    local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
 
 @task
 @timed
+@intempest
 def run_tests(topology):
     ''' Run Tempest tests '''
     log.info("Run Tempest tests")
     time_prefix = "timeout --preserve-status -s 2 -k {kill} {wait} ".format(
         wait=QA_WAITTIME, kill=QA_KILLTIME)
-    local(time_prefix + )
+    tests_file= os.path.join(WORKSPACE, "openstack-sqe", "tools", "tempest-scripts", "tests_set")
+    with lcd(TEMPEST_DIR):
+        if os.path.exists(".testrepository"):
+            log.info("Tests already ran, now run the failed only")
+            cmd = "testr run --failing --subunit | subunit-2to1 | tools/colorizer.py"
+        else:
+            if os.path.getsize(tests_file) > 0:
+                log.info("Tests haven't run yet, run them from file %s" % tests_file)
+                cmd = 'testr run --load-list "$tests" --subunit  | subunit-2to1 | tools/colorizer.py'
+            else:
+                regex = os.environ.get('REG', "")
+                log.info("Tests haven't run yet, run them with regex: '%s'" % regex)
+                cmd = 'testr run %s --subunit | subunit-2to1 | tools/colorizer.py' % regex
+        local(time_prefix + cmd)
+        result = os.path.join(WORKSPACE, "openstack-sqe", time.strftime("%H%M%S"))
+        subunit = os.path.join(WORKSPACE, "openstack-sqe", "testr_results.subunit")
+        fails_extract = os.path.join(WORKSPACE, "openstack-sqe", "tools",
+                                     "tempest-scripts", "extract_failures.py")
+        local("testr last --subunit | subunit-1to2 | subunit2junitxml --output-to=%s" % result)
+        local("testr last --subunit > %s" % subunit)
+        local("python {script} {result} > {tests_file}".format(
+            script=fails_extract, result=result, tests_file=tests_file))
+
+
 

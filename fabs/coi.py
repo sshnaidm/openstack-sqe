@@ -3,18 +3,17 @@ import time
 from fabric.api import task, local
 from common import timed, virtual, CUR_VENV
 from common import logger as log
-from tempest import prepare_coi
+from tempest import prepare_coi, run_tests
 from . import LAB, WEB, UBUNTU_DISK, UBUNTU_URL_CLOUD, GLOBAL_TIMEOUT
 __all__ = ['test', 'prepare', 'install', 'role2', 'aio', 'fullha', 'full']
 
 
-GLOBAL_TIMEOUT=1
 @task
 @timed
 @virtual
 def test():
     ''' For testing purposes only  '''
-    print "doing somehting now in %s" % CUR_VENV
+    print "Doing something now in %s" % CUR_VENV
     local("which python")
 
 
@@ -31,16 +30,14 @@ def prepare_vms(topo, args='', cloud=False):
         url = UBUNTU_URL_CLOUD + UBUNTU_DISK
     else:
         url = WEB + UBUNTU_DISK
-    #local("test -e %s || wget -nv %s" %(disk, url))
-    local("which python")
-    local("echo './tools/cloud/create.py  -l {lab} -s /opt/imgs "
-          "-z ./{disk} -t {topo} {args} > config_file'".format(lab=LAB,
+    local("test -e %s || wget -nv %s" %(disk, url))
+    local("python ./tools/cloud/create.py  -l {lab} -s /opt/imgs "
+          "-z ./{disk} -t {topo} {args} > config_file".format(lab=LAB,
                                                                disk=disk,
                                                                topo=topo,
                                                                args=args))
-    #local("./tools/cloud/create.py -l {lab} -s /opt/imgs "
-    #      "-z ./{disk} -t aio > config_file".format(lab=LAB, disk=disk)
-    pass
+    local("python ./tools/cloud/create.py -l {lab} -s /opt/imgs "
+          "-z ./{disk} -t aio > config_file".format(lab=LAB, disk=disk))
 
 
 @task
@@ -56,9 +53,9 @@ def prepare(topology, cobbler=False, cloud=False):
 @virtual
 def install_os(script, args='', waittime=10000):
     killtime = waittime + 60
-    local("echo 'timeout --preserve-status -s 15 "
+    local("timeout --preserve-status -s 15 "
           "-k {killtime} {waittime} ./tools/deployers/{script} "
-          "{args} -c config_file -u root'".format(
+          "{args} -c config_file -u root".format(
         script=script,
         args=args,
         waittime=waittime,
@@ -113,7 +110,9 @@ def fullha(cloud=False, cobbler=False):
 @timed
 @virtual
 def workarounds():
-    local("python ./tools/tempest-scripts/tempest_align.py -c config_file -u localadmin -p ubuntu")
+    ''' Make workarounds for tempest after COI install '''
+    local("python ./tools/tempest-scripts/tempest_align.py "
+          "-c config_file -u localadmin -p ubuntu")
 
 
 @task
@@ -129,3 +128,4 @@ def full(topology, cobbler=False, cloud=False):
     install(topology, cobbler=cobbler)
     workarounds()
     prepare_coi(topology)
+    run_tests()
