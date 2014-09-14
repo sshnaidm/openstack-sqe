@@ -105,6 +105,7 @@ def run_tests():
             log.info("Tests already ran, now run the failed only")
             cmd = "testr run --failing --subunit | subunit-2to1 | tools/colorizer.py"
         else:
+            local("testr init")
             if os.path.getsize(tests_file) > 0:
                 log.info("Tests haven't run yet, run them from file %s" % tests_file)
                 cmd = 'testr run --load-list "$tests" --subunit  | subunit-2to1 | tools/colorizer.py'
