@@ -11,6 +11,10 @@ env.host_string = "localhost"
 env.abort_on_prompts = True
 env.warn_only = True
 
+TESTS_FILE = os.path.join(WORKSPACE, "openstack-sqe", "tools",
+                         "tempest-scripts", "tests_set")
+
+
 @task
 @timed
 @intempest
@@ -89,7 +93,8 @@ def prepare_devstack(ip=None, private=True):
         prepare(ip=ip)
         local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
 
-@task
+
+@task(alias="run")
 @timed
 @intempest
 def run_tests():
@@ -97,16 +102,15 @@ def run_tests():
     log.info("Run Tempest tests")
     time_prefix = "timeout --preserve-status -s 2 -k {kill} {wait} ".format(
         wait=QA_WAITTIME, kill=QA_KILLTIME)
-    tests_file= os.path.join(WORKSPACE, "openstack-sqe", "tools", "tempest-scripts", "tests_set")
     with lcd(TEMPEST_DIR):
         if os.path.exists(os.path.join(TEMPEST_DIR, ".testrepository")):
             log.info("Tests already ran, now run the failed only")
             cmd = "testr run --failing --subunit | subunit-2to1 | tools/colorizer.py"
         else:
             local("testr init")
-            if os.path.getsize(tests_file) > 0:
-                log.info("Tests haven't run yet, run them from file %s" % tests_file)
-                cmd = 'testr run --load-list %s --subunit  | subunit-2to1 | tools/colorizer.py' % tests_file
+            if os.path.getsize(TESTS_FILE) > 0:
+                log.info("Tests haven't run yet, run them from file %s" % TESTS_FILE)
+                cmd = 'testr run --load-list %s --subunit  | subunit-2to1 | tools/colorizer.py' % TESTS_FILE
             else:
                 regex = os.environ.get('REG', "")
                 log.info("Tests haven't run yet, run them with regex: '%s'" % regex)
@@ -119,7 +123,29 @@ def run_tests():
         local("testr last --subunit | subunit-1to2 | subunit2junitxml --output-to=%s" % result)
         local("testr last --subunit > %s" % subunit)
         local("python {script} {result} > {tests_file}".format(
-            script=fails_extract, result=result, tests_file=tests_file))
+            script=fails_extract, result=result, tests_file=TESTS_FILE))
 
-
-
+@task(alias="remote")
+@timed
+@intempest
+def run_remote_tests():
+    ''' Run Tempest tests remotely'''
+    log.info("Run Tempest tests remotely")
+    tempest_repo = os.environ.get("TEMPEST_REPO", "")
+    tempest_br = os.environ.get("TEMPEST_BRANCH", "")
+    ip = get_dev_ip()
+    test_regex = os.environ.get('REG', "")
+    args = ""
+    if os.path.getsize(TESTS_FILE) > 0:
+        log.info("Run tests from file %s" % TESTS_FILE)
+        args = " -l %s " % TESTS_FILE
+    elif test_regex:
+        log.info("Run tests with regex: '%s'" % test_regex)
+        args = " -f '%s' " % test_regex
+    else:
+        log.info("Run all tests for devstack")
+    local('{wrk}/openstack-sqe/sqe.py run_tempest -r {ip} '
+          '{args} --repo {repo} --branch {br}'.format(
+        wrk=WORKSPACE, ip=ip, args=args,
+        repo=tempest_repo, br=tempest_br
+    ))
