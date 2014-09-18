@@ -102,6 +102,7 @@ class OSWebCreds:
                 break
         else:
             raise NameError("Can not download login page!")
+        print "Getting credentials from Horizon: %s" % real_url
         token = token_re.search(login_page.content).group(1)
         region = region_re.search(login_page.content).group(1)
         local_params.update({"csrfmiddlewaretoken": token})
