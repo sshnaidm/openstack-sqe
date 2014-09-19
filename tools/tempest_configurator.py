@@ -494,7 +494,7 @@ class Tempest:
 
 def parse_config(o):
     config = {}
-    if 'OS_AUTH_URL' in os.environ:
+    if 'OS_AUTH_URL' in os.environ and not (o.ip or o.openrc):
         config["OS_AUTH_URL"] = os.environ['OS_AUTH_URL']
         config["OS_TENANT_NAME"] = os.environ['OS_TENANT_NAME']
         config["OS_USERNAME"] = os.environ['OS_USERNAME']
@@ -529,6 +529,7 @@ def parse_config(o):
             config["external_net"] = "10.10.10"
         else:
             config["external_net"] = "2002::"
+    print "Configuring Openstack tempest with options below:\n%s" % str(config)
     return config
 
 DESCRIPTION = 'reconfigure devstack to be used for tempest'
