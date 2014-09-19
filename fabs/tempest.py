@@ -100,12 +100,18 @@ def prepare_devstack(web=True, copy=False, remote=False, private=True):
             get("/opt/stack/tempest/etc/tempest.conf", "./tempest.conf")
     if not web:
         log.info("Preparing tempest for devstack with ready file")
-        local("mv ./tempest.conf %s/tempest.conf" % conf_dir)
+        cmd = local("mv ./tempest.conf %s/tempest.conf" % conf_dir)
     else:
         ip = get_lab_vm_ip()
         log.info("Preparing tempest for devstack with IP: %s" % ip)
-        prepare(ip=ip)
-        local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
+        for _ in xrange(3):
+            prepare(ip=ip)
+            cmd = local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
+            if cmd.failed:
+                time.sleep(20)
+            else:
+                return
+
 
 
 @task(alias='ip')
