@@ -362,13 +362,13 @@ class Tempest:
 
         main_image_dict = IMAGES['image_ref']
         parser.set("compute", "image_ref", main_image_dict['id'])
-        parser.set("compute", "flavor_ref", main_image_dict['flavor'])
+        parser.set("compute", "flavor_ref", "1")
         parser.set("compute", "image_ssh_user", main_image_dict['user'])
         parser.set("compute", "image_ssh_password", main_image_dict['password'])
 
         alt_image_dict = IMAGES[IMAGES['alt_image_key']]
         parser.set("compute", "image_ref_alt", alt_image_dict['id'])
-        parser.set("compute", "flavor_ref_alt", alt_image_dict['flavor'])
+        parser.set("compute", "flavor_ref_alt", "2")
         parser.set("compute", "image_alt_ssh_user", alt_image_dict['user'])
         parser.set("compute", "image_alt_ssh_password", alt_image_dict['password'])
 
