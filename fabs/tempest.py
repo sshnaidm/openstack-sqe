@@ -108,7 +108,7 @@ def prepare_devstack(web=True, copy=False, remote=False, private=True):
             prepare(ip=ip)
             cmd = local("mv ./tempest.conf.jenkins %s/tempest.conf" % conf_dir)
             if cmd.failed:
-                time.sleep(20)
+                time.sleep(10)
             else:
                 return
 
