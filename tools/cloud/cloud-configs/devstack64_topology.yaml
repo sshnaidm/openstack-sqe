@@ -12,6 +12,7 @@ servers:
 networks:
   - admin:
       dhcp: true
+      dhcp6: true
       external: false
       nat: true
       dns:
