@@ -94,8 +94,8 @@ class Network(object):
     def dhcp6_definition(self):
         return netconf["template"]["dhcp_def6"].format(
             dhcp_records="",
-            start_ip=NET6 + "::500",
-            end_ip=NET6 + "::800"
+            start_ip=NET6 + "500",
+            end_ip=NET6 + "800"
         )
 
     def define(self):
