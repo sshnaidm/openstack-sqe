@@ -25,7 +25,9 @@ template:
           {nat}
           <domain name='{domain}'/>
           {dns}
-          <ip family="ipv6" address='{gateway}' prefix='{prefix}'/>
+          <ip family="ipv6" address='{gateway}' prefix='{prefix}'>
+          {dhcp6}
+          </ip>
           <ip address='{net_ip}.1' netmask='255.255.255.0'>
           {dhcp}
           </ip>

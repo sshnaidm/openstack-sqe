@@ -13,6 +13,9 @@ with open(os.path.join(TEMPLATE_PATH, "host_template.yaml")) as f:
     hostconf = yaml.load(f)
 
 
+def rand_net():
+    return "".join([str(random.randint(1,9)) for i in xrange(4)])
+
 def rand_mac():
     mac = [0x52, 0x54, 0x00,
            random.randint(0x00, 0xff),
@@ -20,6 +23,7 @@ def rand_mac():
            random.randint(0x00, 0xff)]
     return ':'.join(["%02x" % x for x in mac])
 
+NET6 = "2001:dead:badd:%s::" % rand_net()
 
 class Network(object):
     pool = {}
@@ -87,8 +91,16 @@ class Network(object):
             dns_records=dns_hosts
         )
 
+    def dhcp6_definition(self):
+        return netconf["template"]["dhcp_def6"].format(
+            dhcp_records="",
+            start_ip=NET6 + "::500",
+            end_ip=NET6 + "::800"
+        )
+
     def define(self):
         dhcp_text = self.dhcp_definition() if getattr(self, "dhcp", None) else ""
+        dhcp6_text = self.dhcp6_definition() if getattr(self, "dhcp6", None) else ""
         dns_text = self.dns_definition() if getattr(self, "dns", None) else ""
         nat_text = netconf["template"]["nat"] if getattr(self, "nat", None) else ""
         if self.ipv == 64:
@@ -100,10 +112,11 @@ class Network(object):
             net_ip=self.net_ip_base,
             domain=DOMAIN_NAME,
             dhcp=dhcp_text,
+            dhcp6=dhcp6_text,
             dns=dns_text,
             nat=nat_text,
             prefix="64",
-            gateway="2001:dead:badd:%s::1" % rand_net(),
+            gateway=NET6
         )
 
     def define_interface(self):
@@ -137,8 +150,7 @@ class Network(object):
         net.setAutostart(True)
         self.pool[self.name] = [net, self]
 
-def rand_net():
-    return "".join([str(random.randint(1,9)) for i in xrange(4)])
+
 
 class Network6(Network):
     def __init__(self, *args, **kwargs):
