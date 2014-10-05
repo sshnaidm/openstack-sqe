@@ -149,8 +149,8 @@ class Network6(Network):
         self.prefix = "64"
         self.gw = self.net_ip + "1"
         self.dns_host_template = netconf["template"]["dns6_host"]
-        if getattr(self, "dhcp", None):
-            raise NotImplementedError("IPv6 DHCP is not implemented yet!")
+        #if getattr(self, "dhcp", None):
+        #    raise NotImplementedError("IPv6 DHCP is not implemented yet!")
 
     def define_hosts(self):
         ip_start = env[self.lab_id]["ip_start"]
@@ -177,8 +177,15 @@ class Network6(Network):
                 ]
         self.hosts.append(hosts_def)
 
+    def dhcp_definition(self):
+        return netconf["template"]["dhcp_def6"].format(
+            dhcp_records="",
+            start_ip=self.net_ip_base + "::500",
+            end_ip=self.net_ip_base + "::800"
+        )
+
     def define(self):
-        dhcp_text = ""
+        dhcp_text = self.dhcp_definition() if getattr(self, "dhcp", None) else ""
         dns_text = self.dns_definition() if getattr(self, "dns", None) else ""
         nat_text = netconf["template"]["nat"] if getattr(self, "nat", None) else ""
         self.define_hosts()
