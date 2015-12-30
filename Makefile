@@ -1,4 +1,13 @@
 .DEFAULT_GOAL := init
+kasdjkldjklasjd 
+as
+das
+d
+asd
+asd
+as
+d
+
 VENV=.env
 PYTHON=$(VENV)/bin/python
 CYAN=$(shell echo `tput bold``tput setaf 6`)
